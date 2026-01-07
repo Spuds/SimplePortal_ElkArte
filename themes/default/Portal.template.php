@@ -4,24 +4,49 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
 use BBC\ParserWrapper;
 
+function template_articlesabove_above()
+{
+	global $context;
+
+	if (!empty($context['articles']))
+	{
+		template_portal_articles();
+	}
+}
+
+function template_articlesbelow_below()
+{
+	global $context;
+
+	if (!empty($context['articles']))
+	{
+		template_portal_articles();
+	}
+}
+
+function template_portal_index()
+{
+	global $context, $modSettings;
+
+	if (!empty($context['articles']) && $modSettings['sp_articles_index_position'] === 'inline')
+	{
+		template_portal_articles();
+	}
+}
+
 /**
  * Used to display articles on the portal
  */
-function template_portal_index()
+function template_portal_articles()
 {
 	global $context, $txt;
-
-	if (empty($context['articles']))
-	{
-		return;
-	}
 
 	echo '
 	<div id="sp_index" class="sp_article_block_container">';
@@ -29,9 +54,9 @@ function template_portal_index()
 	foreach ($context['articles'] as $article)
 	{
 		echo '
-		<h3 class="category_header">
+		<h2 class="category_header">
 			', $article['link'], '
-		</h3>
+		</h2>
 		<div class="sp_block_section">
 			<div class="sp_content_padding">
  				<div class="sp_article_detail">';
@@ -80,7 +105,8 @@ function template_portal_index()
 					</div>';
 		}
 
-		echo
+		echo '
+				<hr />',
 				$article['preview'], '
 				<div class="sp_article_extra clear">
 					<a class="linkbutton" href="', $article['href'], '">', $txt['sp_read_more'], '</a>
@@ -224,7 +250,7 @@ function template_portal_above()
 }
 
 /**
- * Display below blocks, this includes our right, bottom and footer blocks
+ * Display below blocks; this includes our right, bottom and footer blocks
  */
 function template_portal_below()
 {

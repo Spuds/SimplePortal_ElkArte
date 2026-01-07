@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 // Configuration area
@@ -16,7 +16,7 @@ $txt['sp-adminGeneralSettingsName'] = 'General Settings';
 $txt['sp-adminBlockSettingsName'] = 'Block Settings';
 $txt['sp-adminArticleSettingsName'] = 'Article Settings';
 $txt['sp-adminother'] = 'Other';
-$txt['PortalMain_Controller'] = 'Portal';
+$txt['PortalMain'] = 'Portal';
 
 // General settings
 $txt['portalactive'] = 'Enable SimplePortal';
@@ -53,6 +53,10 @@ $txt['sp_articles_per_page'] = 'Articles Per Page on Article List';
 $txt['sp_articles_comments_per_page'] = 'Articles Comments Per Page';
 $txt['sp_articles_length'] = 'Maximum Characters Before Article Cut-off';
 $txt['sp_articles_attachment_dir'] = 'Articles Attachment Directory';
+$txt['sp_articles_index_position'] = 'Position of the Articles section on the portal page';
+$txt['sp_articles_position_inline'] = 'Between the end of top and start of bottom blocks';
+$txt['sp_articles_position_above'] = 'Above all the portal blocks';
+$txt['sp_articles_position_below'] = 'Below all the portal blocks';
 
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
@@ -99,25 +103,25 @@ $txt['sp-blocksForce'] = 'Not Collapsible';
 $txt['sp-blocksMobile'] = 'Show on mobile';
 
 // Block labels
-$txt['sp_function_User_Info_label'] = 'Member Information';
-$txt['sp_function_Latest_Member_label'] = 'Latest Members';
-$txt['sp_function_Whos_Online_label'] = 'Who\'s Online';
-$txt['sp_function_Show_Poll_label'] = 'Poll';
-$txt['sp_function_Board_Stats_label'] = 'Board Statistics';
-$txt['sp_function_Quick_Search_label'] = 'Quick Search';
-$txt['sp_function_Top_Poster_label'] = 'Top Poster';
-$txt['sp_function_Top_Stats_Member_label'] = 'Top Member Stats';
-$txt['sp_function_Top_Boards_label'] = 'Top Boards';
-$txt['sp_function_Top_Topics_label'] = 'Top Topics';
+$txt['sp_function_UserInfo_label'] = 'Member Information';
+$txt['sp_function_LatestMember_label'] = 'Latest Members';
+$txt['sp_function_WhosOnline_label'] = 'Who\'s Online';
+$txt['sp_function_ShowPoll_label'] = 'Poll';
+$txt['sp_function_BoardStats_label'] = 'Board Statistics';
+$txt['sp_function_QuickSearch_label'] = 'Quick Search';
+$txt['sp_function_TopPoster_label'] = 'Top Poster';
+$txt['sp_function_TopStats_Member_label'] = 'Top Member Stats';
+$txt['sp_function_TopBoards_label'] = 'Top Boards';
+$txt['sp_function_TopTopics_label'] = 'Top Topics';
 $txt['sp_function_Recent_label'] = 'Recent Posts/Topics';
-$txt['sp_function_Board_News_label'] = 'Board News';
+$txt['sp_function_BoardNews_label'] = 'Board News';
 $txt['sp_function_News_label'] = 'Forum News';
-$txt['sp_function_Attachment_Image_label'] = 'Recent Image Attachments';
-$txt['sp_function_Attachment_Recent_label'] = 'Recent Attachments';
+$txt['sp_function_AttachmentImage_label'] = 'Recent Image Attachments';
+$txt['sp_function_AttachmentRecent_label'] = 'Recent Attachments';
 $txt['sp_function_Calendar_label'] = 'Calendar';
-$txt['sp_function_Calendar_Information_label'] = 'Calendar Information';
-$txt['sp_function_Rss_Feed_label'] = 'RSS Feed';
-$txt['sp_function_Theme_Select_label'] = 'Theme Selection';
+$txt['sp_function_CalendarInformation_label'] = 'Calendar Information';
+$txt['sp_function_RssFeed_label'] = 'RSS Feed';
+$txt['sp_function_ThemeSelect_label'] = 'Theme Selection';
 $txt['sp_function_Staff_label'] = 'Staff List';
 $txt['sp_function_Articles_label'] = 'Articles';
 $txt['sp_function_Shoutbox_label'] = 'Shoutbox';
@@ -129,28 +133,28 @@ $txt['sp_function_Menu_label'] = 'Forum Menu';
 $txt['sp_function_Bbc_label'] = 'Custom BBC';
 $txt['sp_function_Html_label'] = 'Custom HTML';
 $txt['sp_function_Php_label'] = 'Custom PHP';
-$txt['sp_function_Admin_Info_label'] = 'Admin Information Center';
+$txt['sp_function_AdminInfo_label'] = 'Admin Information Center';
 
 // Block descriptions
-$txt['sp_function_Latest_Member_desc'] = 'Displays the latest members and their registration dates.';
-$txt['sp_function_User_Info_desc'] = 'Displays member information if the viewer is logged in, and a login box if the viewer is a guest.';
-$txt['sp_function_Whos_Online_desc'] = 'Displays the who\'s online list.';
-$txt['sp_function_Show_Poll_desc'] = 'Displays a poll with voting options if the viewer can vote, or the results if the viewer is unable to vote.';
-$txt['sp_function_Board_Stats_desc'] = 'Displays some statistical information about the forum.';
-$txt['sp_function_Quick_Search_desc'] = 'Displays a simple quick search form.';
-$txt['sp_function_Top_Poster_desc'] = 'Displays the top posters with their post count and avatars.';
-$txt['sp_function_Top_Stats_Member_desc'] = 'Displays various types of member stats.';
-$txt['sp_function_Top_Boards_desc'] = 'Displays a list of boards according to their activity.';
-$txt['sp_function_Top_Topics_desc'] = 'Displays a list topics according to their activity.';
+$txt['sp_function_LatestMember_desc'] = 'Displays the latest members and their registration dates.';
+$txt['sp_function_UserInfo_desc'] = 'Displays member information if the viewer is logged in, and a login box if the viewer is a guest.';
+$txt['sp_function_WhosOnline_desc'] = 'Displays the who\'s online list.';
+$txt['sp_function_ShowPoll_desc'] = 'Displays a poll with voting options if the viewer can vote, or the results if the viewer is unable to vote.';
+$txt['sp_function_BoardStats_desc'] = 'Displays some statistical information about the forum.';
+$txt['sp_function_QuickSearch_desc'] = 'Displays a simple quick search form.';
+$txt['sp_function_TopPoster_desc'] = 'Displays the top posters with their post count and avatars.';
+$txt['sp_function_TopStats_Member_desc'] = 'Displays various types of member stats.';
+$txt['sp_function_TopBoards_desc'] = 'Displays a list of boards according to their activity.';
+$txt['sp_function_TopTopics_desc'] = 'Displays a list topics according to their activity.';
 $txt['sp_function_Recent_desc'] = 'Displays a list of the forums recent posts or topics.';
-$txt['sp_function_Board_News_desc'] = 'Displays a list of posts from a selected board.';
+$txt['sp_function_BoardNews_desc'] = 'Displays a list of posts from a selected board.';
 $txt['sp_function_News_desc'] = 'Displays a random news line.';
-$txt['sp_function_Attachment_Image_desc'] = 'Displays a list of recently attached images.';
-$txt['sp_function_Attachment_Recent_desc'] = 'Displays a list of recent attachments.';
+$txt['sp_function_AttachmentImage_desc'] = 'Displays a list of recently attached images.';
+$txt['sp_function_AttachmentRecent_desc'] = 'Displays a list of recent attachments.';
 $txt['sp_function_Calendar_desc'] = 'Displays a full month calendar with all events.';
-$txt['sp_function_Calendar_Information_desc'] = 'Displays calendar information such as birthdays, events and holidays.';
-$txt['sp_function_Rss_Feed_desc'] = 'Displays an RSS Feed.';
-$txt['sp_function_Theme_Select_desc'] = 'Displays a list of available themes and allows members to select one.';
+$txt['sp_function_CalendarInformation_desc'] = 'Displays calendar information such as birthdays, events and holidays.';
+$txt['sp_function_RssFeed_desc'] = 'Displays an RSS Feed.';
+$txt['sp_function_ThemeSelect_desc'] = 'Displays a list of available themes and allows members to select one.';
 $txt['sp_function_Staff_desc'] = 'Displays list of forum staff with their position and avatar.';
 $txt['sp_function_Articles_desc'] = 'Displays recent or random articles.';
 $txt['sp_function_Shoutbox_desc'] = 'Displays a shoutbox.';
@@ -162,58 +166,58 @@ $txt['sp_function_Menu_desc'] = 'Displays a vertical forum menu.';
 $txt['sp_function_Bbc_desc'] = 'A custom block where BBC content can be added.';
 $txt['sp_function_Html_desc'] = 'A custom block where HTML content can be added.';
 $txt['sp_function_Php_desc'] = 'A custom block where PHP content can be added.';
-$txt['sp_function_Admin_Info_desc'] = 'Quick glance for actions that require admin/moderation attention';
+$txt['sp_function_AdminInfo_desc'] = 'Quick glance for actions that require admin/moderation attention';
 
 // Block parameters
-$txt['sp_param_Latest_Member_limit'] = 'Members to Show';
-$txt['sp_param_Whos_Online_online_today'] = 'Users Online Today';
-$txt['sp_param_Whos_Online_avatars'] = 'Show user avatar';
-$txt['sp_param_Whos_Online_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
-$txt['sp_param_Board_Stats_averages'] = 'Show Averages';
-$txt['sp_param_Top_Poster_limit'] = 'Top Posters to Display';
-$txt['sp_param_Top_Poster_type'] = 'Display';
-$txt['sp_param_Top_Stats_Member_type'] = 'Type of the Top Member List';
-$txt['sp_param_Top_Stats_Member_limit'] = 'Members to display';
-$txt['sp_param_Top_Stats_Member_enable_label'] = 'Enable label for list';
-$txt['sp_param_Top_Stats_Member_list_label'] = 'List label';
-$txt['sp_param_Top_Stats_Member_sort_asc'] = 'Sort in reverse order';
-$txt['sp_param_Top_Stats_Member_last_active_limit'] = 'Remove inactive Members from the List<span class="smalltext">(Time in days)</span>';
+$txt['sp_param_LatestMember_limit'] = 'Members to Show';
+$txt['sp_param_WhosOnline_online_today'] = 'Users Online Today';
+$txt['sp_param_WhosOnline_avatars'] = 'Show user avatar';
+$txt['sp_param_WhosOnline_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
+$txt['sp_param_BoardStats_averages'] = 'Show Averages';
+$txt['sp_param_TopPoster_limit'] = 'Top Posters to Display';
+$txt['sp_param_TopPoster_type'] = 'Display';
+$txt['sp_param_TopStats_Member_type'] = 'Type of the Top Member List';
+$txt['sp_param_TopStats_Member_limit'] = 'Members to display';
+$txt['sp_param_TopStats_Member_enable_label'] = 'Enable label for list';
+$txt['sp_param_TopStats_Member_list_label'] = 'List label';
+$txt['sp_param_TopStats_Member_sort_asc'] = 'Sort in reverse order';
+$txt['sp_param_TopStats_Member_last_active_limit'] = 'Remove inactive Members from the List<span class="smalltext">(Time in days)</span>';
 $txt['sp_param_Recent_limit'] = 'Recent Posts or Topics to Display';
 $txt['sp_param_Recent_type'] = 'Display';
 $txt['sp_param_Recent_display'] = 'Display type';
 $txt['sp_param_Recent_boards'] = 'Include boards';
-$txt['sp_param_Top_Topics_type'] = 'Sorting Type';
-$txt['sp_param_Top_Topics_limit'] = 'Topics to Display';
-$txt['sp_param_Top_Boards_limit'] = 'Boards to Display';
-$txt['sp_param_Show_Poll_topic'] = 'Topic ID';
-$txt['sp_param_Show_Poll_type'] = 'Type';
-$txt['sp_param_Board_News_board'] = 'Boards';
-$txt['sp_param_Board_News_limit'] = 'Topics to Display';
-$txt['sp_param_Board_News_start'] = 'Starting Post ID';
-$txt['sp_param_Board_News_length'] = 'Maximum Characters';
-$txt['sp_param_Board_News_avatar'] = 'Display Avatars';
-$txt['sp_param_Board_News_attachment'] = 'Display first attachment';
-$txt['sp_param_Board_News_per_page'] = 'Posts Per Page';
-$txt['sp_param_Attachment_Image_limit'] = 'Images to Display';
-$txt['sp_param_Attachment_Image_direction'] = 'List Direction';
-$txt['sp_param_Attachment_Image_disablePoster'] = 'Remove Image Poster\'s Name';
-$txt['sp_param_Attachment_Image_disableDownloads'] = 'Remove image Download';
-$txt['sp_param_Attachment_Image_disableLink'] = 'Remove Image Download Link';
-$txt['sp_param_Attachment_Recent_limit'] = 'Attachments to Display';
+$txt['sp_param_TopTopics_type'] = 'Sorting Type';
+$txt['sp_param_TopTopics_limit'] = 'Topics to Display';
+$txt['sp_param_TopBoards_limit'] = 'Boards to Display';
+$txt['sp_param_ShowPoll_topic'] = 'Topic ID';
+$txt['sp_param_ShowPoll_type'] = 'Type';
+$txt['sp_param_BoardNews_board'] = 'Boards';
+$txt['sp_param_BoardNews_limit'] = 'Topics to Display';
+$txt['sp_param_BoardNews_start'] = 'Starting Post ID';
+$txt['sp_param_BoardNews_length'] = 'Maximum Characters';
+$txt['sp_param_BoardNews_avatar'] = 'Display Avatars';
+$txt['sp_param_BoardNews_attachment'] = 'Display first attachment';
+$txt['sp_param_BoardNews_per_page'] = 'Posts Per Page';
+$txt['sp_param_AttachmentImage_limit'] = 'Images to Display';
+$txt['sp_param_AttachmentImage_direction'] = 'List Direction';
+$txt['sp_param_AttachmentImage_disablePoster'] = 'Remove Image Poster\'s Name';
+$txt['sp_param_AttachmentImage_disableDownloads'] = 'Remove image Download';
+$txt['sp_param_AttachmentImage_disableLink'] = 'Remove Image Download Link';
+$txt['sp_param_AttachmentRecent_limit'] = 'Attachments to Display';
 $txt['sp_param_Calendar_events'] = 'Show Events';
 $txt['sp_param_Calendar_birthdays'] = 'Show Birthdays';
 $txt['sp_param_Calendar_holidays'] = 'Show Holidays';
-$txt['sp_param_Calendar_Information_events'] = 'Show Events';
-$txt['sp_param_Calendar_Information_future'] = 'Number of days in future to show events';
-$txt['sp_param_Calendar_Information_birthdays'] = 'Show Birthdays';
-$txt['sp_param_Calendar_Information_holidays'] = 'Show Holidays';
-$txt['sp_param_Rss_Feed_url'] = 'Feed URL';
-$txt['sp_param_Rss_Feed_show_title'] = 'Show Title';
-$txt['sp_param_Rss_Feed_show_content'] = 'Show Content';
-$txt['sp_param_Rss_Feed_show_date'] = 'Show Date';
-$txt['sp_param_Rss_Feed_strip_preserve'] = 'Tags to Preserve';
-$txt['sp_param_Rss_Feed_count'] = 'Items to Show';
-$txt['sp_param_Rss_Feed_limit'] = 'Character Limit';
+$txt['sp_param_CalendarInformation_events'] = 'Show Events';
+$txt['sp_param_CalendarInformation_future'] = 'Number of days in future to show events';
+$txt['sp_param_CalendarInformation_birthdays'] = 'Show Birthdays';
+$txt['sp_param_CalendarInformation_holidays'] = 'Show Holidays';
+$txt['sp_param_RssFeed_url'] = 'Feed URL';
+$txt['sp_param_RssFeed_show_title'] = 'Show Title';
+$txt['sp_param_RssFeed_show_content'] = 'Show Content';
+$txt['sp_param_RssFeed_show_date'] = 'Show Date';
+$txt['sp_param_RssFeed_strip_preserve'] = 'Tags to Preserve';
+$txt['sp_param_RssFeed_count'] = 'Items to Show';
+$txt['sp_param_RssFeed_limit'] = 'Character Limit';
 $txt['sp_param_Staff_lmod'] = 'Disable Local Moderators';
 $txt['sp_param_Articles_category'] = 'Category';
 $txt['sp_param_Articles_limit'] = 'Articles to Display';
@@ -239,23 +243,23 @@ $txt['sp_param_Html_content'] = 'Custom HTML';
 $txt['sp_param_Bbc_content'] = 'Custom BBC';
 $txt['sp_param_Php_content'] = 'Custom PHP';
 $txt['sp_param_Recent_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
-$txt['sp_param_Board_Stats_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
+$txt['sp_param_BoardStats_refresh_value'] = 'Refresh value in seconds, 0 or blank to disable.';
 
 // Parameter options
-$txt['sp_param_Top_Poster_type_options'] = 'All Time|Today|This Week|This Month';
-$txt['sp_param_Top_Stats_Member_type_options'] = 'Total Time Logged In|Posts|Good Karma|Bad Karma|Total Karma|Likes Given|Likes Received|Likes Total';
+$txt['sp_param_TopPoster_type_options'] = 'All Time|Today|This Week|This Month';
+$txt['sp_param_TopStats_Member_type_options'] = 'Total Time Logged In|Posts|Good Karma|Bad Karma|Total Karma|Likes Given|Likes Received|Likes Total';
 $txt['sp_param_Recent_type_options'] = 'Posts|Topics';
 $txt['sp_param_Recent_display_options'] = 'Compact|Full';
-$txt['sp_param_Top_Topics_type_options'] = 'Replies|Views';
-$txt['sp_param_Show_Poll_type_options'] = 'Normal|Recent|Random';
-$txt['sp_param_Attachment_Image_direction_options'] = 'Vertical|Horizontal';
+$txt['sp_param_TopTopics_type_options'] = 'Replies|Views';
+$txt['sp_param_ShowPoll_type_options'] = 'Normal|Recent|Random';
+$txt['sp_param_AttachmentImage_direction_options'] = 'Vertical|Horizontal';
 $txt['sp_param_Articles_type_options'] = 'Latest|Random';
 $txt['sp_param_Articles_view_options'] = 'Compact|Full';
 $txt['sp_param_Gallery_type_options'] = 'Latest Items|Random Items|Latest Images|Random Images';
 $txt['sp_param_Gallery_direction_options'] = 'Vertical|Horizontal';
 $txt['sp_param_Blog_type_options'] = 'Articles|Blogs';
 $txt['sp_param_Blog_sort_options'] = 'Latest|Random';
-$txt['sp_param_Whos_Online_online_today_options'] = '|Count|List';
+$txt['sp_param_WhosOnline_online_today_options'] = '|Count|List';
 
 // Articles Area
 $txt['sp_admin_articles_title'] = 'Articles';
@@ -314,7 +318,7 @@ $txt['sp_error_category_namespace_invalid_chars'] = 'Sorry, there are invalid ch
 $txt['sp_error_category_namespace_numeric'] = 'Sorry, category ID\'s cannot be only numbers. Category ID\'s need letters, and or an underscore';
 
 $txt['sp_admin_categories_col_name'] = 'Name';
-$txt['sp_admin_categories_col_namespace'] = 'Category ID';
+$txt['sp_admin_categories_col_namespace'] = 'Category Namespace';
 $txt['sp_admin_categories_col_description'] = 'Description';
 $txt['sp_admin_categories_col_articles'] = 'Articles';
 $txt['sp_admin_categories_col_status'] = 'Active';

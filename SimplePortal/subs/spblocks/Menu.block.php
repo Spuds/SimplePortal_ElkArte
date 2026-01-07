@@ -4,11 +4,10 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
-
 
 /**
  * Menu Block, creates a sidebar menu block based on the system main menu
@@ -19,7 +18,7 @@
  *@todo needs updating so it knows right vs left block for the flyout
  *
  */
-class Menu_Block extends SP_Abstract_Block
+class MenuBlock extends SPAbstractBlock
 {
 	/**
 	 * Initializes a block for use.
@@ -95,5 +94,5 @@ function template_sp_menu($data)
 			$('#sp_menu').superfish({delay : 300, speed: 175, hoverClass: 'sfhover'});
 	});";
 
-	addInlineJavascript($javascript, true);
+	theme()->addInlineJavascript($javascript, true);
 }

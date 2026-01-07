@@ -4,18 +4,23 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\Controller;
+
+use ElkArte\AbstractController;
+use ElkArte\Languages\Txt;
+use ElkArte\User;
 
 /**
  * Refresh controller.
  *
  * - This class handles requests for block updates
  */
-class PortalRefresh_Controller extends Action_Controller
+class PortalRefresh extends AbstractController
 {
 	protected $_request = true;
 	protected $_block_id;
@@ -26,11 +31,11 @@ class PortalRefresh_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		loadLanguage('SPortal');
-		require_once(SUBSDIR . '/Portal.subs.php');
-		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
+		Txt::load('SimplePortal');
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.class.php');
 
-		// Not running via ssi then we need to get SSI for many block functions
+		// Not running via SSI then we need to get SSI for many block functions
 		if (ELK !== 'SSI')
 		{
 			require_once(BOARDDIR . '/SSI.php');
@@ -98,10 +103,10 @@ class PortalRefresh_Controller extends Action_Controller
 	 */
 	private function _check_access()
 	{
-		global $context, $modSettings, $user_info, $settings, $maintenance;
+		global $context, $modSettings, $settings, $maintenance;
 
 		// Not for guests etc
-		if ($user_info['is_guest'] || $user_info['id'] == 0 || $user_info['possibly_robot'])
+		if (User::$info->is_guest || (int) User::$info->id === 0 || User::$info->possibly_robot)
 		{
 			$this->_request = false;
 		}
@@ -110,13 +115,13 @@ class PortalRefresh_Controller extends Action_Controller
 		if (!empty($modSettings['sp_disableMobile'])
 			|| !empty($settings['disable_sp'])
 			|| empty($modSettings['sp_portal_mode'])
-			|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
-			|| (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest']))
+			|| (empty($modSettings['allow_guestAccess']) && $context['user']['is_guest'])
+			|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')))
 		{
 			$this->_request = false;
 		}
 
-		// Refreshing what, nothing ?
+		// Refreshing what, nothing?
 		if (empty($_POST['block']))
 		{
 			$this->_request = false;

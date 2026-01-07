@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 global $helptxt;
@@ -48,6 +48,7 @@ $helptxt['sp_articles_length'] = 'This setting allows a limit to be set on the a
 $helptxt['sp_articles_per_page'] = 'This sets the maximum amount of articles shown per page on the article listing';
 $helptxt['sp_articles_comments_per_page'] = 'This sets the maximum amount articles comments per page';
 $helptxt['sp_articles_attachment_dir'] = 'The directory to save attachments uploaded with articles.  The directory must exist and be writable.  Do not use the standard attachment directory and don\'t change this unless you know what you are doing.';
+$helptxt['sp_articles_index_position'] = 'This setting allows the position of the article listing to be set.  The default is "inline" which will display the article listing between the top and bottom portal blocks.  "above" will display the article listing above the portal, while "below" will display the article listing below the portal.';
 
 // Blocks area
 $helptxt['sp_BlocksArea'] = 'Blocks are boxes which can be displayed on the portal or inside the forum. This section enables existing blocks to be modified, and new ones to be created.';
@@ -171,7 +172,7 @@ $helptxt['sp_param_sp_articles_limit'] = 'How many articles to display.';
 $helptxt['sp_param_sp_articles_type'] = 'Displays random articles, or the latest articles.';
 $helptxt['sp_param_sp_articles_view'] = 'Compact will display a simple list of article titles, linked to the article.  Full will display the article full text, or up to the limit characters';
 $helptxt['sp_param_sp_articles_length'] = 'If specified, full articles exceeding this limit will be shortened and have an ellipsis (...) link placed on the end.';
-$helptxt['sp_param_sp_articles_avatar'] = 'Enables the author avatar to be displayed along with the article.';
+$helptxt['sp_param_sp_articles_avatar'] = 'Enables the author avatar to be displayed with the article when in full view mode.';
 $helptxt['sp_param_sp_articles_attachment'] = 'Enables the first article attachment to be displayed as a leading left floated image, giving a blog look to the article block.  Inline image attachments will override this settings on a per article basis.';
 $helptxt['sp_param_sp_gallery_limit'] = 'How many items to display.';
 $helptxt['sp_param_sp_gallery_type'] = 'Displays random or the latest gallery items.';

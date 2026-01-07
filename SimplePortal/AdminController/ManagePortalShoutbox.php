@@ -4,18 +4,25 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\AdminController;
+
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
+use ElkArte\Languages\Txt;
 
 /**
  * SimplePortal Shoutbox Administration controller class.
  *
  * - This class handles the administration of the shoutbox
  */
-class ManagePortalShoutbox_Controller extends Action_Controller
+class ManagePortalShoutbox extends AbstractController
 {
 	/**
 	 * This method is executed before any action handler.
@@ -24,9 +31,9 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(SUBSDIR . '/Portal.subs.php');
-		require_once(SUBSDIR . '/PortalShoutbox.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalAdmin.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalShoutbox.subs.php');
 	}
 
 	/**
@@ -44,31 +51,31 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			isAllowedTo('sp_manage_shoutbox');
 		}
 
-		loadTemplate('PortalAdminShoutbox');
+		theme()->getTemplates()->load('PortalAdminShoutbox');
 
 		// The actions allowed in the shoutbox
-		$subActions = array(
-			'list' => array($this, 'action_list'),
-			'add' => array($this, 'action_edit'),
-			'edit' => array($this, 'action_edit'),
-			'prune' => array($this, 'action_prune'),
-			'delete' => array($this, 'action_delete'),
-			'status' => array($this, 'action_status'),
-			'blockredirect' => array($this, 'action_block_redirect'),
-		);
+		$subActions = [
+			'list' => [$this, 'action_list'],
+			'add' => [$this, 'action_edit'],
+			'edit' => [$this, 'action_edit'],
+			'prune' => [$this, 'action_prune'],
+			'delete' => [$this, 'action_delete'],
+			'status' => [$this, 'action_status'],
+			'blockredirect' => [$this, 'action_block_redirect'],
+		];
 
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_shoutbox');
 
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $txt['sp_admin_shoutbox_title'],
 			'help' => 'sp_ShoutboxArea',
 			'description' => $txt['sp_admin_shoutbox_desc'],
-			'tabs' => array(
-				'list' => array(),
-				'add' => array(),
-			),
-		);
+			'tabs' => [
+				'list' => [],
+				'add' => [],
+			],
+		];
 
 		// Default the action to list if none or no valid option is given
 		$subAction = $action->initialize($subActions, 'list');
@@ -89,121 +96,121 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $modSettings;
 
 		// Build the listoption array to display the categories
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'portal_shout',
 			'title' => $txt['sp_admin_shoutbox_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['error_sp_no_shoutbox'],
 			'base_href' => $scripturl . '?action=admin;area=portalshoutbox;sa=list;',
 			'default_sort_col' => 'name',
-			'get_items' => array(
-				'function' => array($this, 'list_spLoadShoutbox'),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_spCountShoutbox'),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			'get_items' => [
+				'function' => [$this, 'list_spLoadShoutbox'],
+			],
+			'get_count' => [
+				'function' => [$this, 'list_spCountShoutbox'],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['sp_admin_shoutbox_col_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'name',
 						'reverse' => 'name DESC',
-					),
-				),
-				'shouts' => array(
-					'header' => array(
+					],
+				],
+				'shouts' => [
+					'header' => [
 						'value' => $txt['sp_admin_shoutbox_col_shouts'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'shouts',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'shouts',
 						'reverse' => 'shouts DESC',
-					),
-				),
-				'caching' => array(
-					'header' => array(
+					],
+				],
+				'caching' => [
+					'header' => [
 						'value' => $txt['sp_admin_shoutbox_col_caching'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'caching',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'caching',
 						'reverse' => 'caching DESC',
-					),
-				),
-				'status' => array(
-					'header' => array(
+					],
+				],
+				'status' => [
+					'header' => [
 						'value' => $txt['sp_admin_shoutbox_col_status'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'status_image',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'status',
 						'reverse' => 'status DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['sp_admin_shoutbox_col_actions'],
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<a href="?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="m">' . sp_embed_image('modify') . '</a>&nbsp;
 								<a href="?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="p">' . sp_embed_image('bin') . '</a>&nbsp;
 								<a href="?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_shoutbox_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
-							'params' => array(
+							'params' => [
 								'id' => true,
-							),
-						),
+							],
+						],
 						'class' => 'centertext nowrap',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $scripturl . '?action=admin;area=portalshoutbox;sa=remove',
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'value' => '<input type="submit" name="remove_shoutbox" value="' . $txt['sp_admin_shoutbox_remove'] . '" class="right_submit" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['sp_admin_shoutbox_title'];
@@ -211,7 +218,6 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 		$context['default_list'] = 'portal_shout';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -254,14 +260,14 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				throw new Elk_Exception('sp_error_shoutbox_name_empty', false);
+				throw new Exception('sp_error_shoutbox_name_empty', false);
 			}
 
 			// No two the same
 			$has_duplicate = sp_check_duplicate_shoutbox($_POST['name'], $_POST['shoutbox_id']);
 			if (!empty($has_duplicate))
 			{
-				throw new Elk_Exception('sp_error_shoutbox_name_duplicate', false);
+				throw new Exception('sp_error_shoutbox_name_duplicate', false);
 			}
 
 			if (isset($_POST['moderator_groups']) && is_array($_POST['moderator_groups']) && count($_POST['moderator_groups']) > 0)
@@ -292,7 +298,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				$_POST['allowed_bbc'] = '';
 			}
 
-			$shoutbox_info = array(
+			$shoutbox_info = [
 				'id' => (int) $_POST['shoutbox_id'],
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
 				'permissions' => (int) $_POST['permissions'],
@@ -306,14 +312,14 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				'caching' => !empty($_POST['caching']) ? 1 : 0,
 				'refresh' => (int) $_POST['refresh'],
 				'status' => !empty($_POST['status']) ? 1 : 0,
-			);
+			];
 
 			// Update existing or add a new shoutbox
 			$shoutbox_info['id'] = sp_edit_shoutbox($shoutbox_info, $context['SPortal']['is_new']);
 
 			sportal_update_shoutbox($shoutbox_info['id']);
 
-			if ($context['SPortal']['is_new'] && (allowedTo(array('sp_admin', 'sp_manage_blocks'))))
+			if ($context['SPortal']['is_new'] && (allowedTo(['sp_admin', 'sp_manage_blocks'])))
 			{
 				redirectexit('action=admin;area=portalshoutbox;sa=blockredirect;shoutbox=' . $shoutbox_info['id']);
 			}
@@ -325,13 +331,13 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		if ($context['SPortal']['is_new'])
 		{
-			$context['SPortal']['shoutbox'] = array(
+			$context['SPortal']['shoutbox'] = [
 				'id' => 0,
 				'name' => $txt['sp_shoutbox_default_name'],
 				'permissions' => 3,
-				'moderator_groups' => array(),
+				'moderator_groups' => [],
 				'warning' => '',
-				'allowed_bbc' => array('b', 'i', 'u', 's', 'url', 'code', 'quote', 'me'),
+				'allowed_bbc' => ['b', 'i', 'u', 's', 'url', 'code', 'quote', 'me'],
 				'height' => 200,
 				'num_show' => 20,
 				'num_max' => 1000,
@@ -339,7 +345,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 				'caching' => 1,
 				'refresh' => 0,
 				'status' => 1,
-			);
+			];
 		}
 		else
 		{
@@ -347,18 +353,18 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			$context['SPortal']['shoutbox'] = sportal_get_shoutbox($_REQUEST['shoutbox_id']);
 		}
 
-		loadLanguage('Editor');
+		Txt::load('Editor');
 
 		$context['SPortal']['shoutbox']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		sp_loadMemberGroups($context['SPortal']['shoutbox']['moderator_groups'], 'moderator', 'moderator_groups');
 
 		if (empty($context['SPortal']['shoutbox']['permission_profiles']))
 		{
-			throw new Elk_Exception('error_sp_no_permission_profiles', false);
+			throw new Exception('error_sp_no_permission_profiles', false);
 		}
 
 		// We only allow some BBC in the shoutbox
-		$context['allowed_bbc'] = array(
+		$context['allowed_bbc'] = [
 			'b' => $editortxt['Bold'],
 			'i' => $editortxt['Italic'],
 			'u' => $editortxt['Underline'],
@@ -376,10 +382,10 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 			'font' => $editortxt['Font Name'],
 			'color' => $editortxt['Font Color'],
 			'me' => 'me',
-		);
+		];
 
 		// Remove the ones the admin does not allow
-		$disabled_tags = array();
+		$disabled_tags = [];
 		if (!empty($modSettings['disabledBBC']))
 		{
 			$disabled_tags = explode(',', $modSettings['disabledBBC']);
@@ -417,7 +423,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 		if (empty($context['shoutbox']))
 		{
-			throw new Elk_Exception('error_sp_shoutbox_not_exist', false);
+			throw new Exception('error_sp_shoutbox_not_exist', false);
 		}
 
 		// Time to remove some chitta-chatta
@@ -427,8 +433,8 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 
 			if (!empty($_POST['type']))
 			{
-				$where = array('id_shoutbox = {int:shoutbox_id}');
-				$parameters = array('shoutbox_id' => $shoutbox_id);
+				$where = ['id_shoutbox = {int:shoutbox_id}'];
+				$parameters = ['shoutbox_id' => $shoutbox_id];
 
 				// Prune by days
 				if ($_POST['type'] === 'days' && !empty($_POST['days']))
@@ -468,7 +474,7 @@ class ManagePortalShoutbox_Controller extends Action_Controller
 	 */
 	public function action_delete()
 	{
-		$shoutbox_ids = array();
+		$shoutbox_ids = [];
 
 		// Get the page id's to remove
 		if (!empty($_POST['remove_shoutbox']) && !empty($_POST['remove']) && is_array($_POST['remove']))

@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
 
@@ -116,6 +116,6 @@ function template_view_category()
 
 	if (!empty($context['using_relative_time']))
 	{
-		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
+		theme()->addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
 	}
 }

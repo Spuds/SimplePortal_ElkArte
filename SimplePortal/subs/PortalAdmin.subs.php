@@ -4,11 +4,14 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 2.0.0
  */
 
+use ElkArte\Helper\Util;
+use ElkArte\Languages\Txt;
+use ElkArte\User;
 
 /**
  * Fetches all the classes (blocks) in the system
@@ -26,18 +29,18 @@ function getFunctionInfo($function = null)
 {
 	global $txt;
 
-	$return = array();
+	$return = [];
 
 	// Looking for a specific block or all of them
 	if ($function !== null)
 	{
 		// Replace dots with nothing to avoid security issues
-		$function = strtr($function, array('.' => ''));
-		$pattern = SUBSDIR . '/spblocks/' . $function . '.block.php';
+		$function = strtr($function, ['.' => '']);
+		$pattern = ADDONSDIR . '/SimplePortal/subs/spblocks/' . $function . '.block.php';
 	}
 	else
 	{
-		$pattern = SUBSDIR . '/spblocks/*.block.php';
+		$pattern = ADDONSDIR . '/SimplePortal/subs/spblocks/*.block.php';
 	}
 
 	// Iterates through a file system in a similar fashion to glob().
@@ -46,8 +49,8 @@ function getFunctionInfo($function = null)
 	// Loop on the glob-ules !
 	foreach ($fs as $item)
 	{
-		// Convert file names to class names, UserInfo.block.pbp => User_Info_Block
-		$class = str_replace('.block.php', '_Block', trim(preg_replace('/((?<=)\p{Lu}(?=\p{Ll}))/u', '_$1', $item->getFilename()), '_'));
+		// Convert file names to class names, UserInfo.block.pbp => UserInfoBlock
+		$class = str_replace('.block.php', 'Block', trim(preg_replace('/((?<=)\p{Lu}(?=\p{Ll}))/u', '$1', $item->getFilename()), '_'));
 
 		// Load the block, make sure we can access it
 		require_once($item->getPathname());
@@ -63,13 +66,13 @@ function getFunctionInfo($function = null)
 		}
 
 		// Add it to our allowed lists
-		$return[] = array(
+		$return[] = [
 			'id' => $class,
-			'function' => str_replace('_Block', '', $class),
+			'function' => str_replace('Block', '', $class),
 			'custom_label' => $class::blockName(),
 			'custom_desc' => $class::blockDescription(),
-			'standard_label' => $txt['sp_function_' . str_replace('_Block', '', $class) . '_label'] ?? str_replace('_Block', '', $class)
-		);
+			'standard_label' => $txt['sp_function_' . str_replace('Block', '', $class) . '_label'] ?? str_replace('Block', '', $class)
+		];
 	}
 
 	// Show the block list in alpha order
@@ -100,7 +103,7 @@ function fixColumnRows($column_id = null)
 
 	// Get the list of all blocks in this column
 	$blockList = getBlockInfo($column_id);
-	$blockIds = array();
+	$blockIds = [];
 
 	foreach ($blockList as $block)
 	{
@@ -118,10 +121,10 @@ function fixColumnRows($column_id = null)
 			UPDATE {db_prefix}sp_blocks
 			SET `row` = {int:counter}
 			WHERE id_block = {int:block}',
-			array(
+			[
 				'counter' => $counter,
 				'block' => $block,
-			)
+			]
 		);
 	}
 }
@@ -140,48 +143,48 @@ function sp_changeState($type = null, $id = null)
 
 	if ($type === 'block')
 	{
-		$query = array(
+		$query = [
 			'column' => 'state',
 			'table' => 'sp_blocks',
 			'query_id' => 'id_block',
 			'id' => $id
-		);
+		];
 	}
 	elseif ($type === 'category')
 	{
-		$query = array(
+		$query = [
 			'column' => 'status',
 			'table' => 'sp_categories',
 			'query_id' => 'id_category',
 			'id' => $id
-		);
+		];
 	}
 	elseif ($type === 'article')
 	{
-		$query = array(
+		$query = [
 			'column' => 'status',
 			'table' => 'sp_articles',
 			'query_id' => 'id_article',
 			'id' => $id
-		);
+		];
 	}
 	elseif ($type === 'page')
 	{
-		$query = array(
+		$query = [
 			'column' => 'status',
 			'table' => 'sp_pages',
 			'query_id' => 'id_page',
 			'id' => $id
-		);
+		];
 	}
 	elseif ($type === 'shout')
 	{
-		$query = array(
+		$query = [
 			'column' => 'status',
 			'table' => 'sp_shoutboxes',
 			'query_id' => 'id_shoutbox',
 			'id' => $id
-		);
+		];
 	}
 	else
 	{
@@ -193,13 +196,13 @@ function sp_changeState($type = null, $id = null)
 		UPDATE {db_prefix}{raw:table}
 		SET {raw:column} = CASE WHEN {raw:column} = {int:is_active} THEN 0 ELSE 1 END
 		WHERE {raw:query_id} = {int:id}',
-		array(
+		[
 			'table' => $query['table'],
 			'column' => $query['column'],
 			'query_id' => $query['query_id'],
 			'id' => $query['id'],
 			'is_active' => 1,
-		)
+		]
 	);
 
 	// Get the new state
@@ -207,15 +210,15 @@ function sp_changeState($type = null, $id = null)
 		SELECT {raw:column}
 		FROM {db_prefix}{raw:table}
 		WHERE {raw:query_id} = {int:id}',
-		array(
+		[
 			'table' => $query['table'],
 			'column' => $query['column'],
 			'query_id' => $query['query_id'],
 			'id' => $id,
-		)
+		]
 	);
-	list ($state) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($state) = $request->fetch_row();
+	$request->free_result();
 
 	return $state;
 }
@@ -231,24 +234,21 @@ function sp_general_load_themes()
 
 	$db = database();
 
-	$request = $db->query('', '
+	$SPortal_themes = ['0' => &$txt['portalthemedefault']];
+	$db->query('', '
 		SELECT
 			id_theme, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}
 			AND id_member = {int:member}
 		ORDER BY id_theme',
-		array(
+		[
 			'member' => 0,
 			'name' => 'name',
-		)
-	);
-	$SPortal_themes = array('0' => &$txt['portalthemedefault']);
-	while ($row = $db->fetch_assoc($request))
-	{
+		]
+	)->fetch_callback(function ($row) use (&$SPortal_themes) {
 		$SPortal_themes[$row['id_theme']] = $row['name'];
-	}
-	$db->free_result($request);
+	});
 
 	return $SPortal_themes;
 }
@@ -266,23 +266,23 @@ function sp_general_load_themes()
  *
  * @return null
  */
-function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
+function sp_loadMemberGroups($selectedGroups = [], $show = 'normal', $contextName = 'member_groups', $subContext = 'SPortal')
 {
 	global $context, $txt;
 
 	$db = database();
 
 	// Some additional Language stings are needed
-	loadLanguage('ManageBoards');
+	Txt::load('ManageBoards');
 
 	// Make sure its empty
 	if (!empty($subContext))
 	{
-		$context[$subContext][$contextName] = array();
+		$context[$subContext][$contextName] = [];
 	}
 	else
 	{
-		$context[$contextName] = array();
+		$context[$contextName] = [];
 	}
 
 	// Presetting some things :)
@@ -297,7 +297,7 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 
 	if (!$checked && isset($selectedGroups) && $selectedGroups == '0')
 	{
-		$selectedGroups = array(0);
+		$selectedGroups = [0];
 	}
 	elseif (!$checked && !empty($selectedGroups))
 	{
@@ -316,16 +316,16 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 	}
 	else
 	{
-		$selectedGroups = array();
+		$selectedGroups = [];
 	}
 
 	// Okay let us checkup the show function
-	$show_option = array(
+	$show_option = [
 		'normal' => 'id_group != 3',
 		'moderator' => 'id_group != 1 AND id_group != 3',
 		'post' => 'min_posts != -1',
 		'master' => 'min_posts = -1 AND id_group != 3',
-	);
+	];
 
 	$show = strtolower($show);
 
@@ -339,44 +339,43 @@ function sp_loadMemberGroups($selectedGroups = array(), $show = 'normal', $conte
 	{
 		if ($show !== 'moderator')
 		{
-			$context[$contextName][-1] = array(
+			$context[$contextName][-1] = [
 				'id' => -1,
 				'name' => $txt['membergroups_guests'],
 				'checked' => $checked || in_array(-1, $selectedGroups),
 				'is_post_group' => false,
-			);
+			];
 		}
 
-		$context[$contextName][0] = array(
+		$context[$contextName][0] = [
 			'id' => 0,
 			'name' => $txt['membergroups_members'],
 			'checked' => $checked || in_array(0, $selectedGroups),
 			'is_post_group' => false,
-		);
+		];
 	}
 
 	// Load membergroups.
-	$request = $db->query('', '
+	$db->query('', '
 		SELECT
 			group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE {raw:show}
 		ORDER BY min_posts, id_group != {int:global_moderator}, group_name',
-		array(
+		[
 			'show' => $show_option[$show],
 			'global_moderator' => 2,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$context[$contextName][(int) $row['id_group']] = array(
+		]
+	)->fetch_callback( function ($row) use ($contextName, $checked, $selectedGroups) {
+		global $context;
+
+		$context[$contextName][(int) $row['id_group']] = [
 			'id' => $row['id_group'],
 			'name' => trim($row['group_name']),
 			'checked' => $checked || in_array($row['id_group'], $selectedGroups),
-			'is_post_group' => $row['min_posts'] != -1,
-		);
-	}
-	$db->free_result($request);
+			'is_post_group' => $row['min_posts'] !== -1,
+		];
+	});
 }
 
 /**
@@ -395,30 +394,27 @@ function sp_load_membergroups()
 	$db = database();
 
 	// Need to speak the right language
-	loadLanguage('ManageBoards');
+	Txt::load('ManageBoards');
 
 	// Start off with some known ones, guests and regular members
-	$groups = array(
+	$groups = [
 		-1 => $txt['parent_guests_only'],
 		0 => $txt['parent_members_only'],
-	);
+	];
 
 	// Load up all groups in the system as long as they are not moderator groups
-	$request = $db->query('', '
+	$db->query('', '
 		SELECT
 			group_name, id_group, min_posts
 		FROM {db_prefix}membergroups
 		WHERE id_group != {int:moderator_group}
 		ORDER BY min_posts, group_name',
-		array(
+		[
 			'moderator_group' => 3,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
+		]
+	)->fetch_callback( function ($row) use (&$groups) {
 		$groups[(int) $row['id_group']] = trim($row['group_name']);
-	}
-	$db->free_result($request);
+	});
 
 	return $groups;
 }
@@ -436,8 +432,8 @@ function sp_count_categories()
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_categories'
 	);
-	list ($total_categories) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_categories) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_categories;
 }
@@ -459,22 +455,20 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 
 	$db = database();
 
-	$request = $db->query('', '
+	$categories = [];
+	$db->query('', '
 		SELECT
 			id_category, name, namespace, articles, status
 		FROM {db_prefix}sp_categories' . (isset($sort) ? '
 		ORDER BY {raw:sort}' : '') . (isset($start) ? '
 		LIMIT {int:start}, {int:limit}' : ''),
-		array(
+		[
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
-	);
-	$categories = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$categories[$row['id_category']] = array(
+		]
+	)->fetch_callback( function ($row) use (&$categories, $scripturl, $txt, $context) {
+		$categories[$row['id_category']] = [
 			'id' => $row['id_category'],
 			'category_id' => $row['namespace'],
 			'name' => $row['name'],
@@ -485,9 +479,8 @@ function sp_load_categories($start = null, $items_per_page = null, $sort = null)
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalcategories;sa=status;category_id=' . $row['id_category'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
 				onclick="sp_change_status(\'' . $row['id_category'] . '\', \'category\');return false;">' .
 				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_categories_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_category']) . '</a>',
-		);
-	}
-	$db->free_result($request);
+		];
+	});
 
 	return $categories;
 }
@@ -502,21 +495,21 @@ function sp_check_duplicate_category($id, $namespace = '')
 {
 	$db = database();
 
-	$result = $db->query('', '
+	$request = $db->query('', '
 		SELECT 
 			id_category
 		FROM {db_prefix}sp_categories
 		WHERE namespace = {string:namespace}
 			AND id_category != {int:current}
 		LIMIT {int:limit}',
-		array(
+		[
 			'limit' => 1,
 			'namespace' => $namespace,
 			'current' => (int) $id,
-		)
+		]
 	);
-	list ($has_duplicate) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($has_duplicate) = $request->fetch_row();
+	$request->free_result();
 
 	return $has_duplicate;
 }
@@ -538,13 +531,13 @@ function sp_update_category($data, $is_new = false)
 	$id = $data['id'] ?? null;
 
 	// Field definitions
-	$fields = array(
+	$fields = [
 		'namespace' => 'string',
 		'name' => 'string',
 		'description' => 'string',
 		'permissions' => 'int',
 		'status' => 'int',
-	);
+	];
 
 	// New category?
 	if ($is_new)
@@ -554,14 +547,14 @@ function sp_update_category($data, $is_new = false)
 			{db_prefix}sp_categories',
 			$fields,
 			$data,
-			array('id_category')
+			['id_category']
 		);
-		$id = $db->insert_id('{db_prefix}sp_categories', 'id_category');
+		$id = (int) $db->insert_id('{db_prefix}sp_categories');
 	}
 	// Update an existing one then
 	else
 	{
-		$update_fields = array();
+		$update_fields = [];
 
 		foreach ($fields as $name => $type)
 		{
@@ -585,7 +578,7 @@ function sp_update_category($data, $is_new = false)
  *
  * @return null
  */
-function sp_delete_categories($category_ids = array())
+function sp_delete_categories($category_ids = [])
 {
 	$db = database();
 
@@ -593,18 +586,18 @@ function sp_delete_categories($category_ids = array())
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_categories
 		WHERE id_category IN ({array_int:categories})',
-		array(
+		[
 			'categories' => $category_ids,
-		)
+		]
 	);
 
 	// And remove the articles that were in those categories
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_category IN ({array_int:categories})',
-		array(
+		[
 			'categories' => $category_ids,
-		)
+		]
 	);
 }
 
@@ -623,9 +616,9 @@ function sp_category_update_total($category_id)
 		UPDATE {db_prefix}sp_categories
 		SET articles = articles - 1
 		WHERE id_category = {int:id}',
-		array(
+		[
 			'id' => $category_id,
-		)
+		]
 	);
 }
 
@@ -643,8 +636,8 @@ function sp_count_articles()
 		    COUNT(*)
 		FROM {db_prefix}sp_articles'
 	);
-	list ($total_articles) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_articles) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_articles;
 }
@@ -665,7 +658,8 @@ function sp_load_articles($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $db->query('', '
+	$articles = [];
+	$db->query('', '
 		SELECT
 			spa.id_article, spa.id_category, spa.title, spa.type, spa.date, spa.status,
 			spc.name, spc.namespace AS category_namespace,
@@ -676,16 +670,13 @@ function sp_load_articles($start, $items_per_page, $sort)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
-		array(
+		[
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
-	);
-	$articles = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$articles[$row['id_article']] = array(
+		]
+	)->fetch_callback( function ($row) use (&$articles, $scripturl, $txt, $context) {
+		$articles[$row['id_article']] = [
 			'id' => $row['id_article'],
 			'article_id' => $row['article_namespace'],
 			'title' => $row['title'],
@@ -694,20 +685,20 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'category_name' => $row['name'],
 			'category_id' => $row['category_namespace'],
 			'author_name' => $row['author_name'],
-			'category' => array(
+			'category' => [
 				'id' => $row['id_category'],
 				'name' => $row['name'],
 				'href' => $scripturl . '?category=' . $row['category_namespace'],
 				'link' => '<a class="sp_cat_link" href="' . $scripturl . '?category=' . $row['category_namespace'] . '">' . $row['name'] . '</a>',
-			),
-			'author' => array(
+			],
+			'author' => [
 				'id' => $row['id_author'],
 				'name' => $row['author_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_author'],
 				'link' => $row['id_author']
 					? ('<a href="' . $scripturl . '?action=profile;u=' . $row['id_author'] . '">' . $row['author_name'] . '</a>')
 					: $row['author_name'],
-			),
+			],
 			'type' => $row['type'],
 			'type_text' => $txt['sp_articles_type_' . $row['type']],
 			'date' => standardTime($row['date']),
@@ -715,13 +706,12 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" 
 				onclick="sp_change_status(\'' . $row['id_article'] . '\', \'articles\');return false;">' .
 				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_articles_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_article']) . '</a>',
-			'actions' => array(
+			'actions' => [
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=edit;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=delete;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_articles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-			)
-		);
-	}
-	$db->free_result($request);
+			]
+		];
+	});
 
 	return $articles;
 }
@@ -731,7 +721,7 @@ function sp_load_articles($start, $items_per_page, $sort)
  *
  * @param int[]|int $article_ids
  */
-function sp_delete_articles($article_ids = array())
+function sp_delete_articles($article_ids = [])
 {
 	global $modSettings;
 
@@ -739,24 +729,24 @@ function sp_delete_articles($article_ids = array())
 
 	if (!is_array($article_ids))
 	{
-		$article_ids = array($article_ids);
+		$article_ids = [$article_ids];
 	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
 		WHERE id_article = {array_int:id}',
-		array(
+		[
 			'id' => $article_ids,
-		)
+		]
 	);
 
 	// Remove attachments, thumbs, etc. for these articles
 	foreach ($article_ids as $aid)
 	{
-		$attachmentQuery = array(
+		$attachmentQuery = [
 			'id_article' => $aid,
 			'id_folder' => $modSettings['sp_articles_attachment_dir'],
-		);
+		];
 
 		removeArticleAttachments($attachmentQuery);
 	}
@@ -783,14 +773,14 @@ function sp_duplicate_articles($article_id, $namespace)
 		WHERE namespace = {string:namespace}
 			AND id_article != {int:current}
 		LIMIT 1',
-		array(
+		[
 			'limit' => 1,
 			'namespace' => $namespace,
 			'current' => $article_id,
-		)
+		]
 	);
-	list ($has_duplicate) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($has_duplicate) = $result->fetch_row();
+	$result->free_result();
 
 	return $has_duplicate;
 }
@@ -809,12 +799,12 @@ function sp_duplicate_articles($article_id, $namespace)
  */
 function sp_save_article($article_info, $is_new = false, $update_counts = true)
 {
-	global $context, $user_info;
+	global $context;
 
 	$db = database();
 
 	// Our base article database looks like this, so shall you comply
-	$fields = array(
+	$fields = [
 		'id_category' => 'int',
 		'namespace' => 'string',
 		'title' => 'string',
@@ -823,7 +813,7 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		'permissions' => 'int',
 		'styles' => 'int',
 		'status' => 'int',
-	);
+	];
 
 	// Brand new, insert it
 	if ($is_new)
@@ -832,29 +822,29 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		unset($article_info['id']);
 
 		// If new we set these one time fields
-		$fields = array_merge($fields, array(
+		$fields = array_merge($fields, [
 			'id_member' => 'int',
 			'member_name' => 'string',
 			'date' => 'int',
-		));
+		]);
 
 		// And populate them with data
-		$article_info = array_merge($article_info, array(
-			'id_member' => $user_info['id'],
-			'member_name' => $user_info['name'],
+		$article_info = array_merge($article_info, [
+			'id_member' => User::$info->id,
+			'member_name' => User::$info->name,
 			'date' => time(),
-		));
+		]);
 
 		// Add the new article to the system
 		$db->insert('', '
 			{db_prefix}sp_articles',
 			$fields,
 			$article_info,
-			array('id_article')
+			['id_article']
 		);
-		$article_info['id'] = $db->insert_id('{db_prefix}sp_articles', 'id_article');
+		$article_info['id'] = $db->insert_id('{db_prefix}sp_articles');
 	}
-	// Then editing so we update what was there
+	// Editing, update what was there
 	else
 	{
 		// They may have chosen to [attach] to an existing image
@@ -868,7 +858,7 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 			}
 		}
 
-		$update_fields = array();
+		$update_fields = [];
 		foreach ($fields as $name => $type)
 		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
@@ -878,23 +868,23 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 			UPDATE {db_prefix}sp_articles
 			SET ' . implode(', ', $update_fields) . '
 			WHERE id_article = {int:id}',
-			array_merge(array(
-				'id' => $article_info['id']),
+			array_merge([
+				'id' => $article_info['id']],
 				$article_info)
 		);
 	}
 
 	// Now is a good time to update the counters if needed
-	if ($update_counts && ($is_new || $article_info['id_category'] != $context['article']['category']['id']))
+	if ($update_counts && ($is_new || (int) $article_info['id_category'] !== (int) $context['article']['category']['id']))
 	{
 		// Increase the number of items in this category
 		$db->query('', '
 			UPDATE {db_prefix}sp_categories
 			SET articles = articles + 1
 			WHERE id_category = {int:id}',
-			array(
+			[
 				'id' => $article_info['id_category'],
-			)
+			]
 		);
 
 		// Not new then moved, so decrease the old category count
@@ -904,9 +894,9 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 				UPDATE {db_prefix}sp_categories
 				SET articles = articles - 1
 				WHERE id_category = {int:id}',
-				array(
+				[
 					'id' => $context['article']['category']['id'],
-				)
+				]
 			);
 		}
 	}
@@ -928,8 +918,8 @@ function sp_count_pages()
 		    COUNT(*)
 		FROM {db_prefix}sp_pages'
 	);
-	list ($total_pages) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_pages) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_pages;
 }
@@ -950,22 +940,20 @@ function sp_load_pages($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $db->query('', '
+	$pages = [];
+	$db->query('', '
 		SELECT
 			id_page, namespace, title, type, views, status
 		FROM {db_prefix}sp_pages
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
-		array(
+		[
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
-	);
-	$pages = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$pages[$row['id_page']] = array(
+		]
+	)->fetch_callback(function ($row) use (&$pages, $scripturl, $txt, $context) {
+		$pages[$row['id_page']] = [
 			'id' => $row['id_page'],
 			'page_id' => $row['namespace'],
 			'title' => $row['title'],
@@ -978,13 +966,12 @@ function sp_load_pages($start, $items_per_page, $sort)
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=status;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
 				onclick="sp_change_status(\'' . $row['id_page'] . '\', \'page\');return false;">' .
 				sp_embed_image(empty($row['status']) ? 'deactive' : 'active', $txt['sp_admin_pages_' . (!empty($row['status']) ? 'de' : '') . 'activate'], null, null, true, 'status_image_' . $row['id_page']) . '</a>',
-			'actions' => array(
+			'actions' => [
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=edit;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalpages;sa=delete;page_id=' . $row['id_page'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_pages_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-			)
-		);
-	}
-	$db->free_result($request);
+			]
+		];
+	});
 
 	return $pages;
 }
@@ -994,16 +981,16 @@ function sp_load_pages($start, $items_per_page, $sort)
  *
  * @param int[] $page_ids
  */
-function sp_delete_pages($page_ids = array())
+function sp_delete_pages($page_ids = [])
 {
 	$db = database();
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_pages
 		WHERE id_page IN ({array_int:pages})',
-		array(
+		[
 			'pages' => $page_ids,
-		)
+		]
 	);
 }
 
@@ -1022,7 +1009,7 @@ function sp_save_page($page_info, $is_new = false)
 	$db = database();
 
 	// Our base page database looks like this, so shall you
-	$fields = array(
+	$fields = [
 		'namespace' => 'string',
 		'title' => 'string',
 		'body' => 'string',
@@ -1030,7 +1017,7 @@ function sp_save_page($page_info, $is_new = false)
 		'permissions' => 'int',
 		'styles' => 'int',
 		'status' => 'int',
-	);
+	];
 
 	// Brand new, insert it
 	if ($is_new)
@@ -1041,15 +1028,15 @@ function sp_save_page($page_info, $is_new = false)
 			{db_prefix}sp_pages',
 			$fields,
 			$page_info,
-			array('id_page')
+			['id_page']
 		);
 
-		$page_info['id'] = $db->insert_id('{db_prefix}sp_pages', 'id_page');
+		$page_info['id'] = $db->insert_id('{db_prefix}sp_pages');
 	}
 	// The editing so we update what was there
 	else
 	{
-		$update_fields = array();
+		$update_fields = [];
 		foreach ($fields as $name => $type)
 		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
@@ -1082,14 +1069,14 @@ function sp_check_duplicate_pages($namespace, $page_id)
 		WHERE namespace = {string:namespace}
 			AND id_page != {int:current}
 		LIMIT {int:limit}',
-		array(
+		[
 			'limit' => 1,
 			'namespace' => Util::htmlspecialchars($namespace, ENT_QUOTES),
 			'current' => (int) $page_id,
-		)
+		]
 	);
-	list ($has_duplicate) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($has_duplicate) = $result->fetch_row();
+	$result->free_result();
 
 	return $has_duplicate;
 }
@@ -1108,8 +1095,8 @@ function sp_count_shoutbox()
 		    COUNT(*)
 		FROM {db_prefix}sp_shoutboxes'
 	);
-	list ($total_shoutbox) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_shoutbox) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_shoutbox;
 }
@@ -1130,22 +1117,20 @@ function sp_load_shoutbox($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $db->query('', '
+	$shoutboxes = [];
+	$db->query('', '
 		SELECT
 			id_shoutbox, name, caching, status, num_shouts
 		FROM {db_prefix}sp_shoutboxes
 		ORDER BY id_shoutbox, {raw:sort}
 		LIMIT {int:start}, {int:limit}',
-		array(
+		[
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
-	);
-	$shoutboxes = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$shoutboxes[$row['id_shoutbox']] = array(
+		]
+	)->fetch_callback(function ($row) use (&$shoutboxes, $scripturl, $txt, $context) {
+		$shoutboxes[$row['id_shoutbox']] = [
 			'id' => $row['id_shoutbox'],
 			'name' => $row['name'],
 			'shouts' => $row['num_shouts'],
@@ -1154,14 +1139,13 @@ function sp_load_shoutbox($start, $items_per_page, $sort)
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=status;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image(empty($row['status'])
 					? 'deactive' : 'active', $txt['sp_admin_shoutbox_' . (!empty($row['status']) ? 'de'
 					: '') . 'activate']) . '</a>',
-			'actions' => array(
+			'actions' => [
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=edit;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'prune' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=prune;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('bin') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalshoutbox;sa=delete;shoutbox_id=' . $row['id_shoutbox'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_shoutbox_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-			)
-		);
-	}
-	$db->free_result($request);
+			]
+		];
+	});
 
 	return $shoutboxes;
 }
@@ -1171,24 +1155,24 @@ function sp_load_shoutbox($start, $items_per_page, $sort)
  *
  * @param int[] $shoutbox_ids
  */
-function sp_delete_shoutbox($shoutbox_ids = array())
+function sp_delete_shoutbox($shoutbox_ids = [])
 {
 	$db = database();
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_shoutboxes
 		WHERE id_shoutbox IN ({array_int:shoutbox})',
-		array(
+		[
 			'shoutbox' => $shoutbox_ids,
-		)
+		]
 	);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_shouts
 		WHERE id_shoutbox IN ({array_int:shoutbox})',
-		array(
+		[
 			'shoutbox' => $shoutbox_ids,
-		)
+		]
 	);
 }
 
@@ -1211,14 +1195,14 @@ function sp_check_duplicate_shoutbox($name, $shoutbox_id)
 		WHERE name = {string:name}
 			AND id_shoutbox != {int:current}
 		LIMIT {int:limit}',
-		array(
+		[
 			'limit' => 1,
 			'name' => Util::htmlspecialchars($name, ENT_QUOTES),
 			'current' => (int) $shoutbox_id,
-		)
+		]
 	);
-	list ($has_duplicate) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($has_duplicate) = $result->fetch_row();
+	$result->free_result();
 
 	return $has_duplicate;
 }
@@ -1236,7 +1220,7 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
 	$db = database();
 
 	// Our base shoutbox database looks like this
-	$fields = array(
+	$fields = [
 		'name' => 'string',
 		'permissions' => 'int',
 		'moderator_groups' => 'string',
@@ -1249,7 +1233,7 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
 		'caching' => 'int',
 		'refresh' => 'int',
 		'status' => 'int',
-	);
+	];
 
 	// Brand new, insert it
 	if ($is_new)
@@ -1261,15 +1245,15 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
 			{db_prefix}sp_shoutboxes',
 			$fields,
 			$shoutbox_info,
-			array('id_shoutbox')
+			['id_shoutbox']
 		);
 
-		$shoutbox_info['id'] = $db->insert_id('{db_prefix}sp_shoutboxes', 'id_shoutbox');
+		$shoutbox_info['id'] = $db->insert_id('{db_prefix}sp_shoutboxes');
 	}
-	// Then editing so we update what was there
+	// Editing, update what was there
 	else
 	{
-		$update_fields = array();
+		$update_fields = [];
 		foreach ($fields as $name => $type)
 		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
@@ -1286,8 +1270,8 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
 }
 
 /**
- * Gets a members ID from their userid or display name, used to
- * prune a members shouts from a box
+ * Gets a members ID from their userid or display name.
+ * Used to prune a shouts from a box
  *
  * @param string $member
  *
@@ -1304,13 +1288,13 @@ function sp_shoutbox_prune_member($member)
 		WHERE member_name = {string:member}
 			OR real_name = {string:member}
 		LIMIT {int:limit}',
-		array(
-			'member' => strtr(trim(Util::htmlspecialchars($member, ENT_QUOTES)), array('\'' => '&#039;')),
+		[
+			'member' => strtr(trim(Util::htmlspecialchars($member, ENT_QUOTES)), ['\'' => '&#039;']),
 			'limit' => 1,
-		)
+		]
 	);
-	list ($member_id) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($member_id) = $request->fetch_row();
+	$request->free_result();
 
 	return (int) $member_id;
 }
@@ -1339,17 +1323,18 @@ function sp_prune_shoutbox($shoutbox_id, $where, $parameters, $all = false)
 	if (!$all)
 	{
 		$request = $db->query('', '
-			SELECT COUNT(*)
+			SELECT 
+				COUNT(*)
 			FROM {db_prefix}sp_shouts
 			WHERE id_shoutbox = {int:shoutbox_id}
 			LIMIT {int:limit}',
-			array(
+			[
 				'shoutbox_id' => $shoutbox_id,
 				'limit' => 1,
-			)
+			]
 		);
-		list ($total_shouts) = $db->fetch_row($request);
-		$db->free_result($request);
+		list ($total_shouts) = $request->fetch_row();
+		$request->free_result();
 	}
 
 	// Update the shout count
@@ -1357,10 +1342,10 @@ function sp_prune_shoutbox($shoutbox_id, $where, $parameters, $all = false)
 		UPDATE {db_prefix}sp_shoutboxes
 		SET num_shouts = {int:total_shouts}
 		WHERE id_shoutbox = {int:shoutbox_id}',
-		array(
+		[
 			'shoutbox_id' => $shoutbox_id,
 			'total_shouts' => $total_shouts,
-		)
+		]
 	);
 }
 
@@ -1374,15 +1359,16 @@ function sp_count_profiles($type = 1)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}sp_profiles
 		WHERE type = {int:type}',
-		array(
+		[
 			'type' => $type,
-		)
+		]
 	);
-	list ($total_profiles) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_profiles) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_profiles;
 }
@@ -1405,70 +1391,64 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 	$db = database();
 
 	// First load up all the permission profiles names in the system
-	$request = $db->query('', '
+	$profiles = [];
+	$db->query('', '
 		SELECT
 			id_profile, name
 		FROM {db_prefix}sp_profiles
 		WHERE type = {int:type}
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
-		array(
+		[
 			'type' => $type,
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
-	);
-	$profiles = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$profiles[$row['id_profile']] = array(
+		]
+	)->fetch_callback(function ($row) use (&$profiles, $scripturl, $txt, $context) {
+		$profiles[$row['id_profile']] = [
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
 			'label' => $txt['sp_admin_profiles' . substr($row['name'], 1)] ?? $row['name'],
-			'actions' => array(
+			'actions' => [
 				'edit' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=editpermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
 				'delete' => '<a href="' . $scripturl . '?action=admin;area=portalprofiles;sa=deletepermission;profile_id=' . $row['id_profile'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'', $txt['sp_admin_profiles_delete_confirm'], '\');">' . sp_embed_image('delete') . '</a>',
-			)
-		);
-	}
-	$db->free_result($request);
+			]
+		];
+	});
 
 	// Now for each profile, load up the specific in-use for each area of the portal
 	switch ($type)
 	{
 		case 2:
 			$select = 'styles, COUNT(*) AS used';
-			$area = array('articles', 'blocks', 'pages');
+			$area = ['articles', 'blocks', 'pages'];
 			$group = 'styles';
 			break;
 		case 3:
 			$select = 'visibility, COUNT(*) AS used';
-			$area = array('blocks');
+			$area = ['blocks'];
 			$group = 'visibility';
 			break;
 		default:
 			$select = 'permissions, COUNT(*) AS used';
-			$area = array('articles', 'blocks', 'categories', 'pages', 'shoutboxes');
+			$area = ['articles', 'blocks', 'categories', 'pages', 'shoutboxes'];
 			$group = 'permissions';
 			break;
 	}
 
 	foreach ($area as $module)
 	{
-		$request = $db->query('', '
+		$db->query('', '
 			SELECT ' . $select . '
 			FROM {db_prefix}sp_' . $module . '
 			GROUP BY ' . $group
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
+		)->fetch_callback(function ($row) use (&$profiles, $group, $module) {
 			if (isset($profiles[$row[$group]]))
 			{
 				$profiles[$row[$group]][$module] = $row['used'];
 			}
-		}
-		$db->free_result($request);
+		});
 	}
 
 	return $profiles;
@@ -1479,16 +1459,16 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
  *
  * @param int[] $remove_ids
  */
-function sp_delete_profiles($remove_ids = array())
+function sp_delete_profiles($remove_ids = [])
 {
 	$db = database();
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_profiles
 		WHERE id_profile IN ({array_int:profiles})',
-		array(
+		[
 			'profiles' => $remove_ids,
-		)
+		]
 	);
 }
 
@@ -1516,11 +1496,11 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
 			WHERE col = {int:col}
 				AND `row` > {int:start}
 				AND row <= {int:end}',
-			array(
+			[
 				'col' => (int) $col,
 				'start' => $current_row,
 				'end' => $row,
-			)
+			]
 		);
 	}
 	else
@@ -1531,22 +1511,20 @@ function sp_update_block_row($current_row, $row, $col, $decrement = true)
 			WHERE col = {int:col}
 				AND `row` >= {int:start}' . (!empty($current_row) ? '
 				AND `row` < {int:end}' : ''),
-			array(
+			[
 				'col' => (int) $col,
 				'start' => $row,
 				'end' => !empty($current_row) ? $current_row : 0,
-			)
+			]
 		);
 	}
 }
 
 /**
- * Update a portals block display
+ * Update a portal block display
  *
  * @param int $id
  * @param array $data
- *
- * @return null
  */
 function sp_update_block_visibility($id, $data)
 {
@@ -1558,11 +1536,11 @@ function sp_update_block_visibility($id, $data)
 			display = {string:display},
 			display_custom = {string:display_custom}
 		WHERE id_block = {int:id}',
-		array(
+		[
 			'id' => $id,
 			'display' => $data['display'],
 			'display_custom' => $data['display_custom'],
-		)
+		]
 	);
 }
 
@@ -1588,13 +1566,13 @@ function sp_block_nextrow($block_column, $block_id = 0)
 			AND id_block != {int:current_id}' : '') . '
 		ORDER BY `row` DESC
 		LIMIT 1',
-		array(
+		[
 			'col' => $block_column,
 			'current_id' => $block_id,
-		)
+		]
 	);
-	list ($row) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($row) = $request->fetch_row();
+	$request->free_result();
 
 	return $row + 1;
 }
@@ -1610,14 +1588,14 @@ function sp_block_insert($blockInfo)
 
 	$db->insert('', '
 		{db_prefix}sp_blocks',
-		array(
+		[
 			'label' => 'string', 'type' => 'string', 'col' => 'int', 'row' => 'int', 'permissions' => 'int', 'styles' => 'int',
-			'visibility' => 'int', 'state' => 'int', 'force_view' => 'int'),
+			'visibility' => 'int', 'state' => 'int', 'force_view' => 'int'],
 		$blockInfo,
-		array('id_block')
+		['id_block']
 	);
 
-	return $db->insert_id('{db_prefix}sp_blocks', 'id_block');
+	return $db->insert_id('{db_prefix}sp_blocks');
 }
 
 /**
@@ -1633,14 +1611,14 @@ function sp_block_update($blockInfo)
 	$db = database();
 
 	// The fields in the database
-	$block_fields = array(
+	$block_fields = [
 		"label = {string:label}",
 		"permissions = {int:permissions}",
 		"styles={int:styles}",
 		"visibility = {int:visibility}",
 		"state = {int:state}",
 		"force_view = {int:force_view}",
-	);
+	];
 
 	if (!empty($blockInfo['row']))
 	{
@@ -1662,9 +1640,9 @@ function sp_block_update($blockInfo)
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_parameters
 		WHERE id_block = {int:id}',
-		array(
+		[
 			'id' => $blockInfo['id'],
-		)
+		]
 	);
 }
 
@@ -1678,21 +1656,21 @@ function sp_block_insert_parameters($new_parameters, $id_block)
 {
 	$db = database();
 
-	$parameters = array();
+	$parameters = [];
 	foreach ($new_parameters as $variable => $value)
 	{
-		$parameters[] = array(
+		$parameters[] = [
 			'id_block' => $id_block,
 			'variable' => $variable,
 			'value' => $value,
-		);
+		];
 	}
 
 	$db->insert('', '
 		{db_prefix}sp_parameters',
-		array('id_block' => 'int', 'variable' => 'string', 'value' => 'string'),
+		['id_block' => 'int', 'variable' => 'string', 'value' => 'string'],
 		$parameters,
-		array()
+		[]
 	);
 }
 
@@ -1713,14 +1691,14 @@ function sp_block_get_position($block_id)
 		FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:block_id}
 		LIMIT 1',
-		array(
+		[
 			'block_id' => $block_id,
-		)
+		]
 	);
-	list ($current_side, $current_row) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($current_side, $current_row) = $request->fetch_row();
+	$request->free_result();
 
-	return array($current_side, $current_row);
+	return [(int) $current_side, (int) $current_row];
 }
 
 /**
@@ -1740,11 +1718,11 @@ function sp_block_move_col($block_id, $target_side)
 		UPDATE {db_prefix}sp_blocks
 		SET col = {int:target_side}, `row` = {int:temp_row}
 		WHERE id_block = {int:block_id}',
-		array(
+		[
 			'target_side' => $target_side,
 			'temp_row' => $current_row,
 			'block_id' => $block_id,
-		)
+		]
 	);
 }
 
@@ -1768,10 +1746,10 @@ function sp_blocks_move_row($block_id, $target_side, $target_row)
 		SET `row` = `row` + 1
 		WHERE col = {int:target_side}
 			AND `row` >= {int:target_row}',
-		array(
+		[
 			'target_side' => $target_side,
 			'target_row' => $target_row,
-		)
+		]
 	);
 
 	// Set the new block to the now available row position
@@ -1779,18 +1757,18 @@ function sp_blocks_move_row($block_id, $target_side, $target_row)
 		UPDATE {db_prefix}sp_blocks
 		SET `row` = {int:target_row}
 		WHERE id_block = {int:block_id}',
-		array(
+		[
 			'target_row' => $target_row,
 			'block_id' => $block_id,
-		)
+		]
 	);
 }
 
 /**
  * Remove a block from the portal
  *
- * - removes the block from the portal
- * - removes the blocks parameters
+ * - Removes the block from the portal
+ * - Removes the blocks parameters
  *
  * @param int $block_id
  */
@@ -1804,18 +1782,18 @@ function sp_block_delete($block_id)
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_blocks
 		WHERE id_block = {int:id}',
-		array(
+		[
 			'id' => $block_id,
-		)
+		]
 	);
 
 	// No parameters
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_parameters
 		WHERE id_block = {int:id}',
-		array(
+		[
 			'id' => $block_id,
-		)
+		]
 	);
 }
 
@@ -1832,11 +1810,11 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 	$db = database();
 
 	// Our database fields
-	$fields = array(
+	$fields = [
 		'type' => 'int',
 		'name' => 'string',
 		'value' => 'string',
-	);
+	];
 
 	// A new profile?
 	if ($is_new)
@@ -1848,15 +1826,15 @@ function sp_add_permission_profile($profile_info, $is_new = false)
 			'{db_prefix}sp_profiles',
 			$fields,
 			$profile_info,
-			array('id_profile')
+			['id_profile']
 		);
 
-		$profile_info['id'] = $db->insert_id('{db_prefix}sp_profiles', 'id_profile');
+		$profile_info['id'] = $db->insert_id('{db_prefix}sp_profiles');
 	}
 	// Or an edit, we do a little update
 	else
 	{
-		$update_fields = array();
+		$update_fields = [];
 		foreach ($fields as $name => $type)
 		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
@@ -1885,9 +1863,9 @@ function sp_delete_profile($profile_id)
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_profiles
 		WHERE id_profile = {int:id}',
-		array(
+		[
 			'id' => $profile_id,
-		)
+		]
 	);
 }
 
@@ -1902,67 +1880,58 @@ function sp_block_template_helpers()
 {
 	$db = database();
 
-	$helpers = array();
+	$helpers = [];
 
 	// Get a list of board names for use in the template
-	$request = $db->query('', '
+	$helpers['boards'] = [];
+	$db->query('', '
 		SELECT
 			id_board, name
 		FROM {db_prefix}boards
 		WHERE redirect = {string:empty}
 		ORDER BY name DESC',
-		array(
+		[
 			'empty' => '',
-		)
-	);
-	$helpers['boards'] = array();
-	while ($row = $db->fetch_assoc($request))
-	{
+		]
+	)->fetch_callback(function ($row) use (&$helpers) {
 		$helpers['boards']['b' . $row['id_board']] = $row['name'];
-	}
-	$db->free_result($request);
+	});
 
 	// Get all the pages loaded in the system for template use
-	$request = $db->query('', '
+	$helpers['pages'] = [];
+	$db->query('', '
 		SELECT
 			id_page, title
 		FROM {db_prefix}sp_pages
-		ORDER BY title DESC'
-	);
-	$helpers['pages'] = array();
-	while ($row = $db->fetch_assoc($request))
-	{
+		ORDER BY title DESC',
+		[]
+	)->fetch_callback(function ($row) use (&$helpers) {
 		$helpers['pages']['p' . $row['id_page']] = $row['title'];
-	}
-	$db->free_result($request);
+	});
 
 	// Same for categories
-	$request = $db->query('', '
+	$helpers['categories'] = [];
+	$db->query('', '
 		SELECT
 			id_category, name
 		FROM {db_prefix}sp_categories
-		ORDER BY name DESC'
-	);
-	$helpers['categories'] = array();
-	while ($row = $db->fetch_assoc($request))
-	{
+		ORDER BY name DESC',
+		[]
+	)->fetch_callback(function ($row) use (&$helpers) {
 		$helpers['categories']['c' . $row['id_category']] = $row['name'];
-	}
-	$db->free_result($request);
+	});
 
 	// And finish up with articles
-	$request = $db->query('', '
+	$helpers['articles'] = [];
+	$db->query('', '
 		SELECT
 			id_article, title
 		FROM {db_prefix}sp_articles
-		ORDER BY title DESC'
-	);
-	$helpers['articles'] = array();
-	while ($row = $db->fetch_assoc($request))
-	{
+		ORDER BY title DESC',
+		[]
+	)->fetch_callback(function ($row) use (&$helpers) {
 		$helpers['articles']['a' . $row['id_article']] = $row['title'];
-	}
-	$db->free_result($request);
+	});
 
 	return $helpers;
 }
@@ -1978,15 +1947,15 @@ function sp_remove_menu($remove_ids)
 
 	if (!is_array($remove_ids))
 	{
-		$remove_ids = array($remove_ids);
+		$remove_ids = [$remove_ids];
 	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_custom_menus
 		WHERE id_menu IN ({array_int:menus})',
-		array(
+		[
 			'menus' => $remove_ids,
-		)
+		]
 	);
 }
 
@@ -2001,15 +1970,15 @@ function sp_remove_menu_items($remove_ids)
 
 	if (!is_array($remove_ids))
 	{
-		$remove_ids = array($remove_ids);
+		$remove_ids = [$remove_ids];
 	}
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_menu_items
 		WHERE id_menu = {array_int:id}',
-		array(
+		[
 			'id' => $remove_ids,
-		)
+		]
 	);
 }
 
@@ -2023,11 +1992,12 @@ function sp_menu_count()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT
+		    COUNT(*)
 		FROM {db_prefix}sp_custom_menus'
 	);
-	list ($total_menus) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_menus) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_menus;
 }
@@ -2045,7 +2015,8 @@ function sp_custom_menu_items($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$menus = [];
+	$db->query('', '
 		SELECT
 			cm.id_menu, cm.name, COUNT(mi.id_item) AS items
 		FROM {db_prefix}sp_custom_menus AS cm
@@ -2053,22 +2024,18 @@ function sp_custom_menu_items($start, $items_per_page, $sort)
 		GROUP BY cm.id_menu
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
-		array(
+		[
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
-	);
-	$menus = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$menus[$row['id_menu']] = array(
+		]
+	)->fetch_callback(function ($row) use (&$menus) {
+		$menus[$row['id_menu']] = [
 			'id' => $row['id_menu'],
 			'name' => $row['name'],
 			'items' => $row['items'],
-		);
-	}
-	$db->free_result($request);
+		];
+	});
 
 	return $menus;
 }
@@ -2086,9 +2053,9 @@ function sp_add_menu($menu_info, $is_new = false)
 	$db = database();
 
 	// Our database fields
-	$fields = array(
+	$fields = [
 		'name' => 'string',
-	);
+	];
 
 	// A new profile?
 	if ($is_new)
@@ -2100,15 +2067,15 @@ function sp_add_menu($menu_info, $is_new = false)
 			'{db_prefix}sp_custom_menus',
 			$fields,
 			$menu_info,
-			array('id_menu')
+			['id_menu']
 		);
 
-		$menu_info['id'] = $db->insert_id('{db_prefix}sp_custom_menus', 'id_menu');
+		$menu_info['id'] = $db->insert_id('{db_prefix}sp_custom_menus');
 	}
 	// Or an edit, we do a little update
 	else
 	{
-		$update_fields = array();
+		$update_fields = [];
 		foreach ($fields as $name => $type)
 		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
@@ -2144,14 +2111,14 @@ function sp_menu_check_duplicate_items($id, $namespace)
 		WHERE namespace = {string:namespace}
 			AND id_item != {int:current}
 		LIMIT {int:limit}',
-		array(
+		[
 			'namespace' => $namespace,
 			'current' => $id,
 			'limit' => 1,
-		)
+		]
 	);
-	list ($has_duplicate) = $db->fetch_row($result);
-	$db->free_result($result);
+	list ($has_duplicate) = $result->fetch_row();
+	$result->free_result();
 
 	return $has_duplicate;
 }
@@ -2169,13 +2136,13 @@ function sp_add_menu_item($item_info, $is_new)
 	$db = database();
 
 	// Our database fields
-	$fields = array(
+	$fields = [
 		'id_menu' => 'int',
 		'namespace' => 'string',
 		'title' => 'string',
 		'href' => 'string',
 		'target' => 'int',
-	);
+	];
 
 	// Adding a new item
 	if ($is_new)
@@ -2187,15 +2154,15 @@ function sp_add_menu_item($item_info, $is_new)
 			'{db_prefix}sp_menu_items',
 			$fields,
 			$item_info,
-			array('id_item')
+			['id_item']
 		);
 
-		$item_info['id'] = $db->insert_id('{db_prefix}sp_menu_items', 'id_item');
+		$item_info['id'] = $db->insert_id('{db_prefix}sp_menu_items');
 	}
 	// Update what we have
 	else
 	{
-		$update_fields = array();
+		$update_fields = [];
 		foreach ($fields as $name => $type)
 		{
 			$update_fields[] = $name . ' = {' . $type . ':' . $name . '}';
@@ -2226,12 +2193,12 @@ function sp_menu_item_count($menu_id)
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_menu_items
 		WHERE id_menu = {int:menu}',
-		array(
+		[
 			'menu' => $menu_id,
-		)
+		]
 	);
-	list ($total_menus) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_menus) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_menus;
 }
@@ -2252,32 +2219,29 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 
 	$db = database();
 
-	$request = $db->query('', '
+	$items = [];
+	$db->query('', '
 		SELECT
 			id_item, title, namespace, target
 		FROM {db_prefix}sp_menu_items
 		WHERE id_menu = {int:menu}
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:limit}',
-		array(
+		[
 			'menu' => $menu_id,
 			'sort' => $sort,
 			'start' => $start,
 			'limit' => $items_per_page,
-		)
-	);
-	$items = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$items[$row['id_item']] = array(
+		]
+	)->fetch_callback(function ($row) use (&$items, $menu_id, $txt) {
+		$items[$row['id_item']] = [
 			'id' => $row['id_item'],
 			'menu' => $menu_id,
 			'title' => $row['title'],
 			'namespace' => $row['namespace'],
 			'target' => $txt['sp_admin_menus_link_target_' . $row['target']],
-		);
-	}
-	$db->free_result($request);
+		];
+	});
 
 	return $items;
 }
@@ -2285,14 +2249,14 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 /**
  * SCEditor spplugin Plugin.
  * Used to set editor initial state and the setup so type conversion can
- * happen.  Just call the plugin with initial and new states.
+ * happen. Just call the plugin with initial and new states.
  *
  * @param string $type
  */
 function addConversionJS($type)
 {
 	// Set the globals, spplugin will be called with editor init to set mode
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		let start_state = "' . $type . '",
 			editor;
 			

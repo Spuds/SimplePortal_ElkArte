@@ -4,19 +4,24 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\AdminController;
+
+use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Helper\DataValidator;
 
 /**
  * SimplePortal Category Administration controller class.
  *
  * - This class handles the adding/editing/listing of categories
  */
-class ManagePortalCategories_Controller extends Action_Controller
+class ManagePortalCategories extends AbstractController
 {
 	/** @var bool If we are adding a new category*/
 	protected $_is_new;
@@ -39,30 +44,30 @@ class ManagePortalCategories_Controller extends Action_Controller
 		}
 
 		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(SUBSDIR . '/Portal.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalAdmin.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
 
-		$subActions = array(
-			'list' => array($this, 'action_list'),
-			'add' => array($this, 'action_edit'),
-			'edit' => array($this, 'action_edit'),
-			'status' => array($this, 'action_status'),
-			'delete' => array($this, 'action_delete'),
-		);
+		$subActions = [
+			'list' => [$this, 'action_list'],
+			'add' => [$this, 'action_edit'],
+			'edit' => [$this, 'action_edit'],
+			'status' => [$this, 'action_status'],
+			'delete' => [$this, 'action_delete'],
+		];
 
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_categories');
 
 		// Set up the tabs
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $txt['sp_admin_categories_title'],
 			'help' => 'sp_CategoriesArea',
 			'description' => $txt['sp_admin_categories_desc'],
-			'tabs' => array(
-				'list' => array(),
-				'add' => array(),
-			),
-		);
+			'tabs' => [
+				'list' => [],
+				'add' => [],
+			],
+		];
 
 		// Default to list the categories
 		$subAction = $action->initialize($subActions, 'list');
@@ -80,120 +85,120 @@ class ManagePortalCategories_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $modSettings;
 
 		// Build the listoption array to display the categories
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'portal_categories',
 			'title' => $txt['sp_admin_categories_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['error_sp_no_categories'],
 			'base_href' => $scripturl . '?action=admin;area=portalcategories;sa=list;',
 			'default_sort_col' => 'name',
-			'get_items' => array(
-				'function' => array($this, 'list_spLoadCategories'),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_spCountCategories'),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			'get_items' => [
+				'function' => [$this, 'list_spLoadCategories'],
+			],
+			'get_count' => [
+				'function' => [$this, 'list_spCountCategories'],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['sp_admin_categories_col_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'name',
 						'reverse' => 'name DESC',
-					),
-				),
-				'namespace' => array(
-					'header' => array(
+					],
+				],
+				'namespace' => [
+					'header' => [
 						'value' => $txt['sp_admin_categories_col_namespace'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'category_id',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'category_id',
 						'reverse' => 'category_id DESC',
-					),
-				),
-				'articles' => array(
-					'header' => array(
+					],
+				],
+				'articles' => [
+					'header' => [
 						'value' => $txt['sp_admin_categories_col_articles'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'articles',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'articles',
 						'reverse' => 'articles DESC',
-					),
-				),
-				'status' => array(
-					'header' => array(
+					],
+				],
+				'status' => [
+					'header' => [
 						'value' => $txt['sp_admin_categories_col_status'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'status_image',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'status',
 						'reverse' => 'status DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['sp_admin_categories_col_actions'],
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<a href="?action=admin;area=portalcategories;sa=edit;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('edit') . '</a>&nbsp;
 								<a href="?action=admin;area=portalcategories;sa=delete;category_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_categories_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
-							'params' => array(
+							'params' => [
 								'id' => true,
-							),
-						),
+							],
+						],
 						'class' => 'centertext nowrap',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $scripturl . '?action=admin;area=portalcategories;sa=remove',
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '<a class="linkbutton" href="?action=admin;area=portalcategories;sa=add;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="a">' . $txt['sp_admin_categories_add'] . '</a>
 						<input type="submit" name="remove_categories" value="' . $txt['sp_admin_categories_remove'] . '" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['sp_admin_categories_title'];
@@ -201,7 +206,6 @@ class ManagePortalCategories_Controller extends Action_Controller
 		$context['default_list'] = 'portal_categories';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -236,36 +240,34 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		loadTemplate('PortalAdminCategories');
+		theme()->getTemplates()->load('PortalAdminCategories');
 		$this->category_errors = ErrorContext::context('category', 0);
-		$this->_is_new = empty($_REQUEST['category_id']);
+		$this->_is_new = empty($this->_req->getRequest('category_id'));
 
 		// Saving the category form
 		if (!empty($_POST['submit']))
 		{
 			checkSession();
 
-			// Clean and Review the post data for compliance
-			require_once(SUBSDIR . '/DataValidator.class.php');
-			$validator = new Data_Validator();
-			$validator->sanitation_rules(array(
-				'name' => 'Util::htmltrim|Util::htmlspecialchars',
-				'namespace' => 'trim|Util::htmlspecialchars',
-				'current' => 'intval',
-				'description' => 'trim|Util::htmlspecialchars',
-				'permissions' => 'intval',
+			// Clean and Review the data for compliance
+			$validator = new DataValidator();
+			$validator->sanitation_rules([
+				'category_name' => 'Util::htmltrim|Util::htmlspecialchars',
+				'category_namespace' => 'trim|Util::htmlspecialchars',
+				'category_description' => 'trim|Util::htmlspecialchars',
+				'category_permissions' => 'intval',
 				'category_id' => 'intval'
-			));
-			$validator->validation_rules(array(
-				'name' => 'required',
-				'namespace' => 'alpha_numeric|required',
-				'description' => 'required'
-			));
-			$validator->text_replacements(array(
-				'name' => $txt['sp_admin_categories_col_name'],
-				'namespace' => $txt['sp_admin_categories_col_namespace'],
-				'description' => $txt['sp_admin_categories_col_description']
-			));
+			]);
+			$validator->validation_rules([
+				'category_name' => 'required',
+				'category_namespace' => 'alpha_numeric|required',
+				'category_description' => 'required'
+			]);
+			$validator->text_replacements([
+				'category_name' => $txt['sp_admin_categories_col_name'],
+				'category_namespace' => $txt['sp_admin_categories_col_namespace'],
+				'category_description' => $txt['sp_admin_categories_col_description']
+			]);
 
 			// If you messed this up, tell them why
 			if (!$validator->validate($_POST))
@@ -276,63 +278,62 @@ class ManagePortalCategories_Controller extends Action_Controller
 				}
 			}
 
-			if (sp_check_duplicate_category($validator->current, $validator->namespace))
+			if (sp_check_duplicate_category($validator->category_id, $validator->category_namespace))
 			{
 				$this->category_errors->addError('sp_error_category_namespace_duplicate');
 			}
 
-			if ($validator->namespace !== '' && preg_replace('~[0-9]+~', '', $_POST['namespace']) === '')
+			if ($validator->category_namespace !== '' && preg_replace('~\d+~', '', $_POST['category_namespace']) === '')
 			{
 				$this->category_errors->addError('sp_error_category_namespace_numeric');
 			}
 
-			$category_info = array(
+			$category_info = [
 				'id' => $validator->category_id,
-				'category_id' => $validator->namespace,
-				'namespace' => $validator->namespace,
-				'name' => $validator->name,
-				'description' => $validator->description,
-				'permissions' => $validator->permissions,
-				'status' => !empty($_POST['status']) ? 1 : 0,
-			);
+				'namespace' => $validator->category_namespace,
+				'name' => $validator->category_name,
+				'description' => $validator->category_description,
+				'permissions' => $validator->category_permissions,
+				'status' => $this->_req->hasPost('category_status') ? 1 : 0,
+			];
 
 			// None shall pass ... with errors
 			if ($this->category_errors->hasErrors())
 			{
 				// Return what we have to the form, show them the issues
 				$context['category'] = $category_info;
-				$context['category_errors'] = array(
+				$context['category_errors'] = [
 					'errors' => $this->category_errors->prepareErrors(),
 					'type' => 'minor',
 					'title' => $txt['sp_form_errors_detected'],
-				);
+				];
 				unset($_POST['submit']);
 			}
 			else
 			{
 				// Clear to save
-				$category_info['id'] = sp_update_category($category_info, $this->_is_new);
+				sp_update_category($category_info, $this->_is_new);
 				redirectexit('action=admin;area=portalcategories');
 			}
 		}
 		// Creating a new category, lets set up some defaults for the form
 		elseif ($this->_is_new)
 		{
-			$context['category'] = array(
+			$context['category'] = [
 				'id' => 0,
-				'category_id' => 'category' . random_int(1, 5000),
+				'namespace' => 'category' . random_int(1, 5000),
 				'name' => $txt['sp_categories_default_name'],
 				'description' => '',
 				'permissions' => 3,
-				'groups_allowed' => array(),
-				'groups_denied' => array(),
+				'groups_allowed' => [],
+				'groups_denied' => [],
 				'status' => 1,
-			);
+			];
 		}
 		else
 		{
-			$_REQUEST['category_id'] = (int) $_REQUEST['category_id'];
-			$context['category'] = sportal_get_categories($_REQUEST['category_id']);
+			$category_id = $this->_req->getQuery('category_id', 'intval', 0);
+			$context['category'] = sportal_get_categories($category_id);
 		}
 
 		$context['is_new'] = $this->_is_new;
@@ -349,20 +350,20 @@ class ManagePortalCategories_Controller extends Action_Controller
 	{
 		global $context;
 
-		checkSession(isset($_REQUEST['xml']) ? '' : 'get');
+		checkSession($this->getApi() === 'xml' ? '' : 'get');
 
-		$category_id = !empty($_REQUEST['category_id']) ? (int) $_REQUEST['category_id'] : 0;
+		$category_id = $this->_req->getRequest('category_id', 'intval', 0);
 		$state = sp_changeState('category', $category_id);
 
 		// Doing this the ajax way?
-		if (isset($_REQUEST['xml']))
+		if ($this->getApi() === 'xml')
 		{
 			$context['item_id'] = $category_id;
 			$context['status'] = !empty($state) ? 'active' : 'deactive';
 
 			// Clear out any template layers, add the xml response
-			loadTemplate('PortalAdmin');
-			$template_layers = Template_Layers::instance();
+			theme()->getTemplates()->load('PortalAdmin');
+			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
 			$context['sub_template'] = 'change_status';
 
@@ -377,22 +378,24 @@ class ManagePortalCategories_Controller extends Action_Controller
 	 */
 	public function action_delete()
 	{
-		$category_ids = array();
+		$category_ids = [];
 
 		// Receive the cat ids to remove
-		if (!empty($_POST['remove_categories']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		if ($this->_req->hasPost('remove_categories')
+			&& $this->_req->hasPost('remove')
+			&& is_array($this->_req->getPost('remove')))
 		{
 			checkSession();
 
-			foreach ($_POST['remove'] as $index => $category_id)
+			foreach ($this->_req->getPost('remove') as $index => $category_id)
 			{
 				$category_ids[(int) $index] = (int) $category_id;
 			}
 		}
-		elseif (!empty($_REQUEST['category_id']))
+		elseif (!empty($this->_req->getRequest('category_id')))
 		{
 			checkSession('get');
-			$category_ids[] = (int) $_REQUEST['category_id'];
+			$category_ids[] = $this->_req->getRequest('category_id', 'intval', 0);
 		}
 
 		// If we have some to remove

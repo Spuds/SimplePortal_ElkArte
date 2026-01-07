@@ -6,7 +6,7 @@
  * @author SimplePortal Team
  * @copyright 2015-2021 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 // Configuration area
@@ -133,7 +133,7 @@ $txt['sp_function_sp_attachmentRecent_label'] = 'Aktuelle Attachments';
 $txt['sp_function_sp_calendar_label'] = 'Kalender';
 $txt['sp_function_sp_calendarInformation_label'] = 'Kalender-Informationen';
 $txt['sp_function_sp_rssFeed_label'] = 'RSS Feed';
-$txt['sp_function_sp_theme_select_label'] = 'Theme-Auswahl';
+$txt['sp_function_sp_themeselect_label'] = 'Theme-Auswahl';
 $txt['sp_function_sp_staff_label'] = 'Team-Liste';
 $txt['sp_function_sp_articles_label'] = 'Artikel';
 $txt['sp_function_sp_shoutbox_label'] = 'Shoutbox';

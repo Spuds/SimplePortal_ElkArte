@@ -4,10 +4,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 2.0.0
  */
+
+use ElkArte\Hooks;
 
 if (file_exists(__DIR__ . '/SSI.php') && !defined('ELK'))
 {
@@ -37,7 +39,7 @@ $defaults = array(
 );
 
 $updates = array(
-	'sp_version' => '1.0.3',
+	'sp_version' => '2.0.0',
 	'front_page' => 'PortalMain_Controller',
 	'admin_features' => $modSettings['admin_features'] . ',pt'
 );
@@ -52,8 +54,8 @@ foreach ($defaults as $index => $value)
 
 updateSettings($updates);
 
-// Enable the core feature by default on install
-Hooks::instance()->enableIntegration('Portal_Integrate');
+// Enable the core feature by default during installation
+Hooks::instance()->enableIntegration('\Addons\SimplePortal\PortalIntegrate');
 
 $standalone_file = BOARDDIR . '/PortalStandalone.php';
 

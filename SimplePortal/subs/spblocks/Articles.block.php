@@ -4,52 +4,51 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
 
 /**
  * Article Block, show the list of articles in the system
  *
  * @param array $parameters
- * 		'category' => list of categories to choose article from
- * 		'limit' => number of articles to show
- * 		'type' => 0 latest 1 random
- * 		'view' => 0 compact 1 full
- * 		'length' => length for the body text preview
- * 		'avatar' => whether to show the author avatar or not
- * 		'attachment' => Show the first attachment as "blog" image *if* no ILA tags found
+ *        'category' => list of categories to choose article from
+ *        'limit' => number of articles to show
+ *        'type' => 0 latest 1 random
+ *        'view' => 0 compact 1 full
+ *        'length' => length for the body text preview
+ *        'avatar' => whether to show the author avatar or not
+ *        'attachment' => Show the first attachment as "blog" image *if* no ILA tags found
  *
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Articles_Block extends SP_Abstract_Block
+class ArticlesBlock extends SPAbstractBlock
 {
-	/**
-	 * @var array
-	 */
-	protected $attachments = array();
+	/** @var array  */
+	protected $attachments = [];
 
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		require_once(SUBSDIR . '/PortalArticle.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalArticle.subs.php');
 
-		$this->block_parameters = array(
-			'category' => array(),
+		$this->block_parameters = [
+			'category' => [],
 			'limit' => 'int',
 			'type' => 'select',
 			'view' => 'select',
 			'length' => 'int',
 			'avatar' => 'check',
 			'attachment' => 'check',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -63,7 +62,7 @@ class Articles_Block extends SP_Abstract_Block
 	{
 		global $txt;
 
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalAdmin.subs.php');
 
 		// Load the sp categories for selection in the block
 		$categories = sp_load_categories();
@@ -92,7 +91,7 @@ class Articles_Block extends SP_Abstract_Block
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// Set up for the query
-		$category = empty($parameters['category']) ? 0 : (int) $parameters['category'];
+		$category = empty($parameters['category']) ? null : (int) $parameters['category'];
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
 		$type = empty($parameters['type']) ? 0 : 1;
 		$attachments = !empty($parameters['attachment']);
@@ -159,7 +158,7 @@ class Articles_Block extends SP_Abstract_Block
 			censor($article['body']);
 
 			// Parse and optionally shorten the result
-			$context['article']['id'] = $article['id'];
+			$context['article']['id'] = (int) $article['id'];
 			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $this->_modSettings['sp_articles_length'], $article['article_id']);
 
 			if ($this->_modSettings['sp_resize_images'])
@@ -170,7 +169,7 @@ class Articles_Block extends SP_Abstract_Block
 			// Check if we need the blog attachment, no if we rendered any ILA/[sp attach] tags
 			if (strpos($article['body'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article=') !== false)
 			{
-				$article['attachments'] = array();
+				$article['attachments'] = [];
 			}
 
 			// Account for embedded videos
@@ -188,7 +187,7 @@ class Articles_Block extends SP_Abstract_Block
 	{
 		global $color_profile;
 
-		$color_ids = array();
+		$color_ids = [];
 		foreach ($this->data['articles'] as $article)
 		{
 			if (!empty($article['author']['id']))
@@ -229,7 +228,7 @@ function template_sp_articles($data)
 {
 	global $scripturl, $txt, $context;
 
-	// Not showing avatars, just use a compact link view
+	// Not showing avatars, then use a compact link view
 	if (empty($data['view']))
 	{
 		echo '
@@ -247,27 +246,15 @@ function template_sp_articles($data)
 	// Or the full monty!
 	else
 	{
-		// Auto video embedding enabled?
-		if ($data['embed_videos'])
-		{
-			addInlineJavascript('
-			$(document).ready(function() {
-				$().linkifyvideo(oEmbedtext);
-			});', true);
-		}
-
-		// Relative times?
-		if (!empty($context['using_relative_time']))
-		{
-			addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
-		}
+		// Account for videos, pretty print, spoilers and more
+		theme()->addInlineJavascript('sp_prep_articles();', true);
 
 		// Show the articles.
 		foreach ($data['articles'] as $article)
 		{
 			echo '
 			<h3 class="secondary_header">',
-			$article['title'], '
+				$article['title'], '
 			</h3>
 			<div id="msg_', $article['article_id'], '" class="sp_article_content">
 				<div class="sp_content_padding">';
@@ -281,7 +268,7 @@ function template_sp_articles($data)
 					<span>
 						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
 						<br />
-						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+						', sprintf($article['view_count'] === 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] === 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>';
 			}
 			else
@@ -290,7 +277,7 @@ function template_sp_articles($data)
 					<span>
 						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
 						<br />
-						', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+						', sprintf($article['view_count'] === 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] === 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>';
 			}
 
@@ -313,6 +300,7 @@ function template_sp_articles($data)
 			}
 
 			echo '
+					<hr />
 					<div class="sp_article_block">',
 			$article['body'], '
 					</div>

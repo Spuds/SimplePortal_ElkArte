@@ -4,11 +4,15 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\AdminController;
+
+use ElkArte\AbstractController;
+use ElkArte\Action;
 
 /**
  * SimplePortal Menus Administration controller class.
@@ -16,7 +20,7 @@
  *
  * @todo not complete, do not use
  */
-class ManagePortalMenus_Controller extends Action_Controller
+class ManagePortalMenus extends AbstractController
 {
 	/**
 	 * The starting point for the controller, called before all others
@@ -32,41 +36,41 @@ class ManagePortalMenus_Controller extends Action_Controller
 		}
 
 		// Going to need these
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		loadTemplate('PortalAdminMenus');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalAdmin.subs.php');
+		theme()->getTemplates()->load('PortalAdminMenus');
 
-		$subActions = array(
-			'listmainitem' => array($this, 'action_sportal_admin_menus_main_item_list'),
-			'addmainitem' => array($this, 'action_sportal_admin_menus_main_item_edit'),
-			'editmainitem' => array($this, 'action_sportal_admin_menus_main_item_edit'),
-			'deletemainitem' => array($this, 'action_sportal_admin_menus_main_item_delete'),
+		$subActions = [
+			'listmainitem' => [$this, 'action_sportal_admin_menus_main_item_list'],
+			'addmainitem' => [$this, 'action_sportal_admin_menus_main_item_edit'],
+			'editmainitem' => [$this, 'action_sportal_admin_menus_main_item_edit'],
+			'deletemainitem' => [$this, 'action_sportal_admin_menus_main_item_delete'],
 
-			'listcustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_list'),
-			'addcustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_edit'),
-			'editcustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_edit'),
-			'deletecustommenu' => array($this, 'action_sportal_admin_menus_custom_menu_delete'),
+			'listcustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_list'],
+			'addcustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_edit'],
+			'editcustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_edit'],
+			'deletecustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_delete'],
 
-			'listcustomitem' => array($this, 'action_sportal_admin_menus_custom_item_list'),
-			'addcustomitem' => array($this, 'action_sportal_admin_menus_custom_item_edit'),
-			'editcustomitem' => array($this, 'action_sportal_admin_menus_custom_item_edit'),
-			'deletecustomitem' => array($this, 'action_sportal_admin_menus_custom_item_delete'),
-		);
+			'listcustomitem' => [$this, 'action_sportal_admin_menus_custom_item_list'],
+			'addcustomitem' => [$this, 'action_sportal_admin_menus_custom_item_edit'],
+			'editcustomitem' => [$this, 'action_sportal_admin_menus_custom_item_edit'],
+			'deletecustomitem' => [$this, 'action_sportal_admin_menus_custom_item_delete'],
+		];
 
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_menus');
 
 		// Set up the tabs
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $txt['sp_admin_menus_title'],
 			'help' => 'sp_MenusArea',
 			'description' => $txt['sp_admin_menus_desc'],
-			'tabs' => array(
+			'tabs' => [
 				//	'listmainitem' => array(),
 				//	'addmainitem' => array(),
-				'listcustommenu' => array(),
-				'addcustommenu' => array(),
-			),
-		);
+				'listcustommenu' => [],
+				'addcustommenu' => [],
+			],
+		];
 
 		// Default to list the categories
 		$subAction = $action->initialize($subActions, 'listcustommenu');
@@ -75,9 +79,9 @@ class ManagePortalMenus_Controller extends Action_Controller
 		// Extra tab in the right cases
 		if ($context['sub_action'] === 'listcustomitem' && !empty($_REQUEST['menu_id']))
 		{
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['addcustomitem'] = array(
+			$context[$context['admin_menu_name']]['tab_data']['tabs']['addcustomitem'] = [
 				'add_params' => ';menu_id=' . $_REQUEST['menu_id'],
-			);
+			];
 		}
 
 		// Call the right function for this sub-action.
@@ -96,7 +100,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		{
 			checkSession();
 
-			$remove_ids = array();
+			$remove_ids = [];
 			foreach ($_POST['remove'] as $index => $menu_id)
 			{
 				$remove_ids[(int) $index] = (int) $menu_id;
@@ -106,73 +110,73 @@ class ManagePortalMenus_Controller extends Action_Controller
 		}
 
 		// Build the list option array to display the menus
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'portal_menus',
 			'title' => $txt['sp_admin_menus_custom_menu_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['sp_error_no_custom_menus'],
 			'base_href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustommenu;',
 			'default_sort_col' => 'name',
-			'get_items' => array(
-				'function' => array($this, 'list_spLoadMenus'),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_spCountMenus'),
-			),
-			'columns' => array(
-				'name' => array(
-					'header' => array(
+			'get_items' => [
+				'function' => [$this, 'list_spLoadMenus'],
+			],
+			'get_count' => [
+				'function' => [$this, 'list_spCountMenus'],
+			],
+			'columns' => [
+				'name' => [
+					'header' => [
 						'value' => $txt['sp_admin_menus_col_name'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'name',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'cm.name ASC',
 						'reverse' => 'cm.name DESC',
-					),
-				),
-				'items' => array(
-					'header' => array(
+					],
+				],
+				'items' => [
+					'header' => [
 						'value' => $txt['sp_admin_menus_col_items'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'items',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'items',
 						'reverse' => 'items DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['sp_admin_menus_col_actions'],
 						'class' => ' grid8 centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=addcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('add') . '</a>
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('items') . '</a>
 						 		<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp_admin_menus_menu_delete_confirm'] . '\');">' . sp_embed_image('delete') . '</a>',
-							'params' => array(
+							'params' => [
 								'id' => true,
-							)
-						),
+							]
+						],
 						'class' => 'centertext nowrap',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustommenu',
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['sp_admin_menus_custom_menu_list'];
@@ -228,10 +232,10 @@ class ManagePortalMenus_Controller extends Action_Controller
 				throw new Elk_Exception('sp_error_menu_name_empty', false);
 			}
 
-			$menu_info = array(
+			$menu_info = [
 				'id' => (int) $_POST['menu_id'],
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
-			);
+			];
 
 			$menu_info['id'] = sp_add_menu($menu_info, $is_new);
 
@@ -241,10 +245,10 @@ class ManagePortalMenus_Controller extends Action_Controller
 		// Not saving so set up for the template display
 		if ($is_new)
 		{
-			$context['menu'] = array(
+			$context['menu'] = [
 				'id' => 0,
 				'name' => $txt['sp_menus_default_custom_menu_name'],
-			);
+			];
 		}
 		else
 		{
@@ -284,7 +288,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		{
 			checkSession();
 
-			$remove = array();
+			$remove = [];
 			foreach ($_POST['remove'] as $index => $item_id)
 			{
 				$remove[(int) $index] = (int) $item_id;
@@ -302,109 +306,109 @@ class ManagePortalMenus_Controller extends Action_Controller
 		}
 
 		// Build the list option array to display the custom items in this custom menu
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'portal_items',
 			'title' => $txt['sp_admin_menus_custom_item_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['sp_error_no_custom_menus'],
 			'base_href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;',
 			'default_sort_col' => 'title',
-			'get_items' => array(
-				'function' => array($this, 'list_sp_menu_item'),
-				'params' => array(
+			'get_items' => [
+				'function' => [$this, 'list_sp_menu_item'],
+				'params' => [
 					$menu_id,
-				),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_sp_menu_item_count'),
-				'params' => array(
+				],
+			],
+			'get_count' => [
+				'function' => [$this, 'list_sp_menu_item_count'],
+				'params' => [
 					$menu_id,
-				),
-			),
-			'columns' => array(
-				'title' => array(
-					'header' => array(
+				],
+			],
+			'columns' => [
+				'title' => [
+					'header' => [
 						'value' => $txt['sp_admin_menus_col_title'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'title',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'title ASC',
 						'reverse' => 'title DESC',
-					),
-				),
-				'namespace' => array(
-					'header' => array(
+					],
+				],
+				'namespace' => [
+					'header' => [
 						'value' => $txt['sp_admin_menus_col_namespace'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'namespace',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'namespace ASC',
 						'reverse' => 'namespace DESC',
-					),
-				),
-				'target' => array(
-					'header' => array(
+					],
+				],
+				'target' => [
+					'header' => [
 						'value' => $txt['sp_admin_menus_col_target'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'target',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'target',
 						'reverse' => 'target DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['sp_admin_menus_col_actions'],
 						'class' => ' grid8 centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustomitem;menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustomitem;menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp_admin_menus_item_delete_confirm'] . '\');">' . sp_embed_image('delete') . '</a>',
-							'params' => array(
+							'params' => [
 								'menu' => true,
 								'id' => true,
-							)
-						),
+							]
+						],
 						'class' => 'centertext nowrap',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($row) {
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=' . $menu_id,
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'position' => 'below_table_data',
 					'value' => '
 						<input type="submit" name="remove_items" value="' . $txt['sp_admin_items_remove'] . '" class="right_submit" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['sp_admin_menus_custom_item_list'];
@@ -474,22 +478,22 @@ class ManagePortalMenus_Controller extends Action_Controller
 			$validator = new Data_Validator();
 
 			// Clean and Review the post data for compliance
-			$validator->sanitation_rules(array(
+			$validator->sanitation_rules([
 				'title' => 'Util::htmltrim|Util::htmlspecialchars',
 				'namespace' => 'Util::htmltrim|Util::htmlspecialchars',
 				'item_id' => 'intval',
 				'url' => 'Util::htmlspecialchars',
 				'target' => 'intval',
-			));
-			$validator->validation_rules(array(
+			]);
+			$validator->validation_rules([
 				'title' => 'required',
 				'namespace' => 'alpha_numeric|required',
 				'item_id' => 'required',
-			));
-			$validator->text_replacements(array(
+			]);
+			$validator->text_replacements([
 				'title' => $txt['sp_error_item_title_empty'],
 				'namespace' => $txt['sp_error_item_namespace_empty'],
-			));
+			]);
 
 			// If you messed this up, back you go
 			if (!$validator->validate($_POST))
@@ -509,19 +513,19 @@ class ManagePortalMenus_Controller extends Action_Controller
 			}
 
 			// Can't have a simple numeric namespace
-			if (preg_replace('~[0-9]+~', '', $validator->namespace) === '')
+			if (preg_replace('~\d+~', '', $validator->namespace) === '')
 			{
 				throw new Elk_Exception('sp_error_item_namespace_numeric', false);
 			}
 
-			$item_info = array(
+			$item_info = [
 				'id' => $validator->item_id,
 				'id_menu' => $context['menu']['id'],
 				'namespace' => $validator->namespace,
 				'title' => $validator->title,
 				'href' => $validator->url,
 				'target' => $validator->target,
-			);
+			];
 
 			// Adjust the url for the link type
 			$link_type = !empty($_POST['link_type']) ? $_POST['link_type'] : '';
@@ -560,13 +564,13 @@ class ManagePortalMenus_Controller extends Action_Controller
 		// Prepare the items for the template
 		if ($is_new)
 		{
-			$context['item'] = array(
+			$context['item'] = [
 				'id' => 0,
 				'namespace' => 'item' . random_int(1, 5000),
 				'title' => $txt['sp_menus_default_menu_item_name'],
 				'url' => '',
 				'target' => 0,
-			);
+			];
 		}
 		// Not new so fetch what we know about the item
 		else
@@ -576,7 +580,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 		}
 
 		// Menu items
-		$context['items']['action'] = array(
+		$context['items']['action'] = [
 			'portal' => $txt['sp-portal'],
 			'forum' => $txt['sp-forum'],
 			'recent' => $txt['recent_posts'],
@@ -595,7 +599,7 @@ class ManagePortalMenus_Controller extends Action_Controller
 			'moderate' => $txt['moderate'],
 			'help' => $txt['help'],
 			'who' => $txt['who_title'],
-		);
+		];
 
 		$context['items'] = array_merge($context['items'], sp_block_template_helpers());
 		$context['page_title'] = $is_new ? $txt['sp_admin_menus_custom_item_add'] : $txt['sp_admin_menus_custom_item_edit'];

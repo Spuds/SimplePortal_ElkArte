@@ -4,10 +4,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
+
+use ElkArte\Hooks;
 
 if (file_exists(__DIR__ . '/SSI.php') && !defined('ELK'))
 {
@@ -36,7 +38,7 @@ if (!empty($modSettings['admin_features']))
 	$updates['admin_features'] = str_replace(',pt', '', $modSettings['admin_features']);
 }
 updateSettings($updates);
-Hooks::instance()->disableIntegration('Portal_Integrate');
+Hooks::instance()->disableIntegration('\Addons\SimplePortal\PortalIntegrate');
 
 // And let ElkArte know we have been mucking about so the cache is reset
 updateSettings(array('settings_updated' => time()));

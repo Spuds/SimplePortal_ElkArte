@@ -4,10 +4,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
+
+use ElkArte\Helper\Util;
 
 /**
  * The all template
@@ -18,7 +20,7 @@ function template_shoutbox_all()
 }
 
 /**
- * Template to display all of the shouts in a system
+ * Template to display all the shouts in a system
  */
 function template_shoutbox_all_default()
 {
@@ -92,7 +94,7 @@ function template_shoutbox_embed($shoutbox)
 	{
 		// Smiley box
 		echo '
-			<div id="sp_object_sb_smiley_', $shoutbox['id'], '" style="display: none;">';
+			<div id="sp_object_sb_smiley_', $shoutbox['id'], '" class="sp_smiley_container" style="display: none;">';
 
 		foreach ($shoutbox['smileys']['normal'] as $smiley)
 		{
@@ -114,7 +116,7 @@ function template_shoutbox_embed($shoutbox)
 		// For each bbc code we allow in this shoutbox
 		foreach ($shoutbox['bbc'] as $image => $tag)
 		{
-			if (!in_array($tag['code'], $shoutbox['allowed_bbc']))
+			if (!in_array($tag['code'], $shoutbox['allowed_bbc'], true))
 			{
 				continue;
 			}
@@ -158,7 +160,7 @@ function template_shoutbox_embed($shoutbox)
 		foreach ($shoutbox['shouts'] as $shout)
 		{
 			echo '
-					<li>', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> ' : '',
+					<li>', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> ' : ' ',
 						$shout['text'], '<br />', !empty($shout['delete_link_js'])
 							? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '', '
 						<span class="smalltext shoutbox_time">', $shout['time'], '</span>
@@ -181,7 +183,7 @@ function template_shoutbox_embed($shoutbox)
 		echo '
 			<div id="new_shout">
 				<input type="text" name="new_shout" id="new_shout_', $shoutbox['id'], '" class="shoutbox_input floatleft input_text" />
-				<button type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" class="right_submit" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;">', $txt['sp_shoutbox_button'], '</button>
+				<button type="submit" name="submit_shout" value="', $txt['sp_shoutbox_button'], '" onclick="sp_submit_shout(', $shoutbox['id'], ', \'', $context['session_var'], '\', \'', $context['session_id'], '\'); return false;">', $txt['sp_shoutbox_button'], '</button>
 			</div>';
 	}
 
@@ -244,20 +246,22 @@ function template_shoutbox_embed($shoutbox)
 					<html>
 						<head>
 							<title>' . $txt['more_smileys_title'] . '</title>
-							<link rel="stylesheet" type="text/css" href="' . $settings['theme_url'] . '/css/index' . $context['theme_variant'] . '.css" />
+							<link rel="stylesheet" href="' . $settings['theme_url'] . '/css/index.css' . CACHE_STALE . '" />
+							<link rel="stylesheet" href="' . $settings['theme_url'] . '/css/SimplePortal/portal.css' . CACHE_STALE . '" />
+							<link rel="stylesheet" href="' . $settings['theme_url'] . '/css/' . $context['theme_variant_url'] . 'index' . $context['theme_variant'] . '.css' . CACHE_STALE . '" />
 						</head>
 						<body id="help_popup">
-							<div class="padding">
-								<h3 class="category_header">
-									' . $txt['more_smileys_pick'] . '
-								</h3>
-								<div class="padding">
+							<h2 class="category_header">
+								' . $txt['more_smileys_pick'] . '
+							</h2>
+							<div class="description">
+								<div class="sp_smile_popup">
 									%smileyRows%
 								</div>
 								<div class="smalltext centertext">
-									<a href="javascript:window.close();">' . $txt['more_smileys_close_window'] . '</a>
+									<a href="javascript:self.close();">[' . $txt['more_smileys_close_window'] . ']</a>
 								</div>
-							</div>
+							</div>	
 						</body>
 					</html>'), '
 		}';
@@ -268,7 +272,7 @@ function template_shoutbox_embed($shoutbox)
 }
 
 /**
- * Return an xml response to a shoutbox
+ * Return an XML response to a shoutbox
  */
 function template_shoutbox_xml()
 {

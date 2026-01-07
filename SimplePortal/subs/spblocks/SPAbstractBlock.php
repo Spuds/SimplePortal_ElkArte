@@ -4,45 +4,45 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
-use ElkArte\ValuesContainer;
+use ElkArte\Database\QueryInterface;
+use ElkArte\Helper\ValuesContainer;
 
 /**
  * Abstract Simple Portal block
  *
- * - Implements Sp_Block
- * - Sets base functionality for use in blocks
+ * - Sets base functionality for use in all blocks
  */
-abstract class SP_Abstract_Block
+abstract class SPAbstractBlock
 {
-	/** @var \Database */
+	/** @var QueryInterface */
 	protected $_db;
 
-	/** @var array|\ElkArte\ValuesContainer */
-	protected $_modSettings = array();
+	/** @var array|ValuesContainer */
+	protected $_modSettings = [];
 
 	/** @var array Block parameters */
-	protected $block_parameters = array();
+	protected $block_parameters = [];
 
 	/** @var array Data array for use in the blocks */
-	protected $data = array();
+	protected $data = [];
 
 	/** @var string Name of the template function to call */
 	protected $template = '';
 
 	/** @var array If the block supports refreshing, sets the time in seconds */
-	protected $refresh = array();
+	protected $refresh = [];
 
 	/**
-	 * Class constructor, makes db and modSettings available to the blocks
+	 * Class constructor makes db and modSettings available to the blocks
 	 *
 	 * - Called by sp_instantiate_block function (via block constructor)
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
@@ -50,7 +50,7 @@ abstract class SP_Abstract_Block
 
 		$this->_db = $db;
 
-		$this->_modSettings = new ValuesContainer($modSettings ?: array());
+		$this->_modSettings = new ValuesContainer($modSettings ?: []);
 	}
 
 	/**
@@ -91,7 +91,7 @@ abstract class SP_Abstract_Block
 	{
 		if (is_callable($this->template))
 		{
-			call_user_func_array($this->template, array($this->data));
+			call_user_func_array($this->template, [$this->data]);
 		}
 	}
 
@@ -102,12 +102,12 @@ abstract class SP_Abstract_Block
 	 */
 	public static function permissionsRequired()
 	{
-		return array();
+		return [];
 	}
 
 	/**
 	 * Sets the name of the block in $txt string for use with custom
-	 * blocks. $txt['sp_function_Block_Name_label']
+	 * blocks. $txt['sp_function_BlockName_label']
 	 *
 	 * @return string
 	 */
@@ -118,7 +118,7 @@ abstract class SP_Abstract_Block
 
 	/**
 	 * Sets the description of the block in $txt for use with custom
-	 * blocks.  $txt['sp_function_Block_Name_desc']
+	 * blocks.  $txt['sp_function_BlockName_desc']
 	 *
 	 * @return string
 	 */
@@ -135,7 +135,7 @@ abstract class SP_Abstract_Block
 		// Lets be reasonable on the refresh, lets not beat on the server
 		$refresh = (max((int) $this->refresh['refresh_value'], 30)) * 1000;
 
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(document).ready(function()
 			{
 				let $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),

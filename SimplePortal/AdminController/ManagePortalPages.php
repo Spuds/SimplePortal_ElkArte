@@ -4,23 +4,30 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\AdminController;
+
 use BBC\PreparseCode;
+use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Errors\ErrorContext;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 
 /**
  * SimplePortal Page Administration controller class.
  *
  * - This class handles the adding/editing/listing of pages
  */
-class ManagePortalPages_Controller extends Action_Controller
+class ManagePortalPages extends AbstractController
 {
 	/** @var array */
-	protected $blocks = array();
+	protected $blocks = [];
 
 	/**
 	 * Main dispatcher.
@@ -37,18 +44,18 @@ class ManagePortalPages_Controller extends Action_Controller
 		}
 
 		// Can't do much without our little buddys
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(SUBSDIR . '/Portal.subs.php');
-		loadTemplate('PortalAdminPages');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalAdmin.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
+		theme()->getTemplates()->load('PortalAdminPages');
 
 		// The actions we know
-		$subActions = array(
-			'list' => array($this, 'action_list'),
-			'add' => array($this, 'action_edit'),
-			'edit' => array($this, 'action_edit'),
-			'status' => array($this, 'action_status'),
-			'delete' => array($this, 'action_delete'),
-		);
+		$subActions = [
+			'list' => [$this, 'action_list'],
+			'add' => [$this, 'action_edit'],
+			'edit' => [$this, 'action_edit'],
+			'status' => [$this, 'action_status'],
+			'delete' => [$this, 'action_delete'],
+		];
 
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_page');
@@ -57,15 +64,15 @@ class ManagePortalPages_Controller extends Action_Controller
 		$subAction = $action->initialize($subActions, 'list');
 		$context['sub_action'] = $subAction;
 
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $txt['sp_admin_pages_title'],
 			'help' => 'sp_PagesArea',
 			'description' => $txt['sp_admin_pages_desc'],
-			'tabs' => array(
-				'list' => array(),
-				'add' => array(),
-			),
-		);
+			'tabs' => [
+				'list' => [],
+				'add' => [],
+			],
+		];
 
 		// Go!
 		$action->dispatch($subAction);
@@ -79,138 +86,138 @@ class ManagePortalPages_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $modSettings;
 
 		// Build the listoption array to display the categories
-		$listOptions = array(
+		$listOptions = [
 			'id' => 'portal_pages',
 			'title' => $txt['sp_admin_pages_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['error_sp_no_pages'],
 			'base_href' => $scripturl . '?action=admin;area=portalpages;sa=list;',
 			'default_sort_col' => 'title',
-			'get_items' => array(
-				'function' => array($this, 'list_spLoadPages'),
-			),
-			'get_count' => array(
-				'function' => array($this, 'list_spCountPages'),
-			),
-			'columns' => array(
-				'title' => array(
-					'header' => array(
+			'get_items' => [
+				'function' => [$this, 'list_spLoadPages'],
+			],
+			'get_count' => [
+				'function' => [$this, 'list_spCountPages'],
+			],
+			'columns' => [
+				'title' => [
+					'header' => [
 						'value' => $txt['sp_admin_pages_col_title'],
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="?page=%1$s">%2$s</a>',
-							'params' => array(
+							'params' => [
 								'page_id' => true,
 								'title' => true
-							),
-						),
-					),
-					'sort' => array(
+							],
+						],
+					],
+					'sort' => [
 						'default' => 'title',
 						'reverse' => 'title DESC',
-					),
-				),
-				'namespace' => array(
-					'header' => array(
+					],
+				],
+				'namespace' => [
+					'header' => [
 						'value' => $txt['sp_admin_pages_col_namespace'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'page_id'
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'namespace',
 						'reverse' => 'namespace DESC',
-					),
-				),
-				'type' => array(
-					'header' => array(
+					],
+				],
+				'type' => [
+					'header' => [
 						'value' => $txt['sp_admin_pages_col_type'],
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'type',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'type',
 						'reverse' => 'type DESC',
-					),
-				),
-				'views' => array(
-					'header' => array(
+					],
+				],
+				'views' => [
+					'header' => [
 						'value' => $txt['sp_admin_pages_col_views'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'views',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'views',
 						'reverse' => 'views DESC',
-					),
-				),
-				'status' => array(
-					'header' => array(
+					],
+				],
+				'status' => [
+					'header' => [
 						'value' => $txt['sp_admin_pages_col_status'],
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'db' => 'status_image',
 						'class' => 'centertext',
-					),
-					'sort' => array(
+					],
+					'sort' => [
 						'default' => 'status',
 						'reverse' => 'status DESC',
-					),
-				),
-				'action' => array(
-					'header' => array(
+					],
+				],
+				'action' => [
+					'header' => [
 						'value' => $txt['sp_admin_pages_col_actions'],
 						'class' => 'centertext',
-					),
-					'data' => array(
-						'sprintf' => array(
+					],
+					'data' => [
+						'sprintf' => [
 							'format' => '<a href="?action=admin;area=portalpages;sa=edit;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . sp_embed_image('edit') . '</a>&nbsp;
 								<a href="?action=admin;area=portalpages;sa=delete;page_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['sp_admin_pages_delete_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . sp_embed_image('trash') . '</a>',
-							'params' => array(
+							'params' => [
 								'id' => true,
 								'page_id' => true
-							),
-						),
+							],
+						],
 						'class' => 'centertext nowrap',
-					),
-				),
-				'check' => array(
-					'header' => array(
+					],
+				],
+				'check' => [
+					'header' => [
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 						'class' => 'centertext',
-					),
-					'data' => array(
+					],
+					'data' => [
 						'function' => function ($row)
 						{
 							return '<input type="checkbox" name="remove[]" value="' . $row['id'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',
-					),
-				),
-			),
-			'form' => array(
+					],
+				],
+			],
+			'form' => [
 				'href' => $scripturl . '?action=admin;area=portalpages;sa=remove',
 				'include_sort' => true,
 				'include_start' => true,
-				'hidden_fields' => array(
+				'hidden_fields' => [
 					$context['session_var'] => $context['session_id'],
-				),
-			),
-			'additional_rows' => array(
-				array(
+				],
+			],
+			'additional_rows' => [
+				[
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '<a class="linkbutton" href="?action=admin;area=portalpages;sa=add;' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="a">' . $txt['sp_admin_pages_add'] . '</a>
 						<input type="submit" name="remove_pages" value="' . $txt['sp_admin_pages_remove'] . '" />',
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// Set the context values
 		$context['page_title'] = $txt['sp_admin_pages_title'];
@@ -218,7 +225,6 @@ class ManagePortalPages_Controller extends Action_Controller
 		$context['default_list'] = 'portal_pages';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -272,7 +278,7 @@ class ManagePortalPages_Controller extends Action_Controller
 		// Doing a quick look before you save or you messed up?
 		if (!empty($_POST['preview']) || $pages_errors->hasErrors())
 		{
-			$context['SPortal']['page'] = array(
+			$context['SPortal']['page'] = [
 				'id' => $_POST['page_id'],
 				'page_id' => $_POST['namespace'],
 				'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
@@ -281,37 +287,37 @@ class ManagePortalPages_Controller extends Action_Controller
 				'permissions' => $_POST['permissions'],
 				'styles' => (int) $_POST['styles'],
 				'status' => !empty($_POST['status']),
-			);
+			];
 
 			// Fix up bbc errors before we go to the preview
 			if ($context['SPortal']['page']['type'] === 'bbc')
 			{
-				PreparseCode::instance()->preparsecode($context['SPortal']['page']['body'], false);
+				PreparseCode::instance('')->preparsecode($context['SPortal']['page']['body'], false);
 			}
 
-			loadTemplate('PortalPages');
+			theme()->getTemplates()->load('PortalPages');
 
 			// Showing errors or a preview?
 			if ($pages_errors->hasErrors())
 			{
-				$context['pages_errors'] = array(
+				$context['pages_errors'] = [
 					'errors' => $pages_errors->prepareErrors(),
 					'type' => $pages_errors->getErrorType() == 0 ? 'minor' : 'serious',
 					'title' => $txt['sp_form_errors_detected'],
-				);
+				];
 			}
 			else
 			{
 				$context['SPortal']['preview'] = true;
 
 				// The editor will steal focus so we have to delay
-				addInlineJavascript('setTimeout(() => $("html, body").animate({scrollTop: $("#preview_section").offset().top}, 250), 750);', true);
+				theme()->addInlineJavascript('setTimeout(() => $("html, body").animate({scrollTop: $("#preview_section").offset().top}, 250), 750);', true);
 			}
 		}
 		// New page, set up with a random page ID
 		elseif ($context['SPortal']['is_new'])
 		{
-			$context['SPortal']['page'] = array(
+			$context['SPortal']['page'] = [
 				'id' => 0,
 				'page_id' => 'page' . random_int(1, 5000),
 				'title' => $txt['sp_pages_default_title'],
@@ -320,7 +326,7 @@ class ManagePortalPages_Controller extends Action_Controller
 				'permissions' => 3,
 				'styles' => 4,
 				'status' => 1,
-			);
+			];
 		}
 		// Used page :P
 		else
@@ -331,28 +337,32 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		if ($context['SPortal']['page']['type'] === 'bbc')
 		{
-			$context['SPortal']['page']['body'] = PreparseCode::instance()->un_preparsecode($context['SPortal']['page']['body']);
-			$context['SPortal']['page']['body'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $context['SPortal']['page']['body']);
+			$context['SPortal']['page']['body'] = PreparseCode::instance('')->un_preparsecode($context['SPortal']['page']['body']);
+			$context['SPortal']['page']['body'] = str_replace(['"', '<', '>', '&nbsp;'], ['&quot;', '&lt;', '&gt;', ' '], $context['SPortal']['page']['body']);
 		}
 
 		// Set up the editor, values, initial state, etc
 		$this->prepareEditor();
 
-		// Set the globals, spplugin will set the editor box as needed (editor or textbox, etc)
-		addConversionJS($context['SPortal']['page']['type']);
+		// Set the globals, portal.plugin will be called with editor init to set mode
+		theme()->addJavascriptVar([
+			'start_state' => $context['SPortal']['page']['type'],
+			'change_type' => 'page_type',
+			'initial_state' => $context['SPortal']['page']['type'],],
+			true);
 
 		// Permissions
 		$context['SPortal']['page']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 		if (empty($context['SPortal']['page']['permission_profiles']))
 		{
-			throw new Elk_Exception('error_sp_no_permission_profiles', false);
+			throw new Exception('error_sp_no_permission_profiles', false);
 		}
 
 		// Styles
 		$context['SPortal']['page']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 		if (empty($context['SPortal']['page']['style_profiles']))
 		{
-			throw new Elk_Exception('error_sp_no_style_profiles', false);
+			throw new Exception('error_sp_no_style_profiles', false);
 		}
 
 		// And for the template
@@ -377,20 +387,26 @@ class ManagePortalPages_Controller extends Action_Controller
 			$options['wysiwyg_default'] = false;
 		}
 
-		$editorOptions = array(
+		$editorOptions = [
 			'id' => 'content',
 			'value' => $context['SPortal']['page']['body'],
 			'width' => '100%',
 			'height' => '275px',
 			'preview_type' => 1,
-		);
-		$editorOptions['plugin_addons'] = array();
-		$editorOptions['plugin_addons'][] = 'spplugin';
+			'smiley_container' => 'smileyBox_message',
+			'bbc_container' => 'bbcBox_message',
+		];
+		$editorOptions['plugin_addons'] = [];
+		$editorOptions['plugin_addons'][] = 'portal';
 		create_control_richedit($editorOptions);
 
 		$context['post_box_name'] = $editorOptions['id'];
 		$context['post_box_class'] = $context['SPortal']['page']['type'] !== 'bbc' ? 'sceditor-container' : 'sp-sceditor-container';
 
+		// Plugin to handle type switching
+		loadJavascriptFile('SimplePortal/portal.plugin.js', ['defer' => true]);
+
+		// Restore their settings
 		if (isset($temp_editor))
 		{
 			$options['wysiwyg_default'] = $temp_editor;
@@ -411,28 +427,27 @@ class ManagePortalPages_Controller extends Action_Controller
 		$pages_errors = ErrorContext::context('pages', 0);
 
 		// Use our standard validation functions in a few spots
-		require_once(SUBSDIR . '/DataValidator.class.php');
-		$validator = new Data_Validator();
+		$validator = new DataValidator();
 
 		// Clean and Review the post data for compliance
-		$validator->sanitation_rules(array(
+		$validator->sanitation_rules([
 			'title' => 'trim|Util::htmlspecialchars',
 			'namespace' => 'trim|Util::htmlspecialchars',
 			'permissions' => 'intval',
 			'type' => 'trim',
 			'content' => 'trim'
-		));
-		$validator->validation_rules(array(
+		]);
+		$validator->validation_rules([
 			'title' => 'required',
 			'namespace' => 'alpha_numeric|required',
 			'type' => 'required',
 			'content' => 'required'
-		));
-		$validator->text_replacements(array(
+		]);
+		$validator->text_replacements([
 			'title' => $txt['sp_error_page_name_empty'],
 			'namespace' => $txt['sp_error_page_namespace_empty'],
 			'content' => $txt['sp_admin_pages_col_body'],
-		));
+		]);
 
 		// If you messed this up, back you go
 		if (!$validator->validate($_POST))
@@ -460,17 +475,17 @@ class ManagePortalPages_Controller extends Action_Controller
 
 		if ($_POST['type'] === 'php' && !allowedTo('admin_forum'))
 		{
-			throw new Elk_Exception('cannot_admin_forum', false);
+			throw new Exception('cannot_admin_forum', false);
 		}
 
 		// Running some php code, then we need to validate its legit code
 		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
 		{
-			$validator_php = new Data_Validator();
-			$validator_php->validation_rules(array('content' => 'php_syntax'));
+			$validator_php = new DataValidator();
+			$validator_php->validation_rules(['content' => 'php_syntax']);
 
 			// Bad PHP code
-			if (!$validator_php->validate(array('content' => $_POST['content'])))
+			if (!$validator_php->validate(['content' => $_POST['content']]))
 			{
 				$pages_errors->addError($validator_php->validation_errors());
 			}
@@ -483,20 +498,20 @@ class ManagePortalPages_Controller extends Action_Controller
 		}
 
 		// The data for the fields
-		$page_info = array(
+		$page_info = [
 			'id' => (int) $_POST['page_id'],
 			'namespace' => Util::htmlspecialchars($_POST['namespace'], ENT_QUOTES),
 			'title' => Util::htmlspecialchars($_POST['title'], ENT_QUOTES),
 			'body' => Util::htmlspecialchars($_POST['content'], ENT_QUOTES),
-			'type' => in_array($_POST['type'], array('bbc', 'html', 'php', 'markdown')) ? $_POST['type'] : 'bbc',
+			'type' => in_array($_POST['type'], ['bbc', 'html', 'php', 'markdown']) ? $_POST['type'] : 'bbc',
 			'permissions' => (int) $_POST['permissions'],
 			'styles' => (int) $_POST['styles'],
 			'status' => !empty($_POST['status']) ? 1 : 0,
-		);
+		];
 
 		if ($page_info['type'] === 'bbc')
 		{
-			PreparseCode::instance()->preparsecode($page_info['body'], false);
+			PreparseCode::instance('')->preparsecode($page_info['body'], false);
 		}
 
 		// Save away
@@ -526,8 +541,8 @@ class ManagePortalPages_Controller extends Action_Controller
 			$context['status'] = !empty($state) ? 'active' : 'deactive';
 
 			// Clear out any template layers, add the xml response
-			loadTemplate('PortalAdmin');
-			$template_layers = Template_Layers::instance();
+			theme()->getTemplates()->load('PortalAdmin');
+			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
 			$context['sub_template'] = 'change_status';
 
@@ -542,7 +557,7 @@ class ManagePortalPages_Controller extends Action_Controller
 	 */
 	public function action_delete()
 	{
-		$page_ids = array();
+		$page_ids = [];
 
 		// Get the page id's to remove
 		if (!empty($_POST['remove_pages']) && !empty($_POST['remove']) && is_array($_POST['remove']))

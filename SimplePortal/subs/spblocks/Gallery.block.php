@@ -4,11 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use Addons\Levertine\Source\LevGalBootstrap;
+use ElkArte\Database\QueryInterface;
 
 /**
  * Gallery Block, show a gallery box with gallery items
@@ -20,20 +22,20 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Gallery_Block extends SP_Abstract_Block
+class GalleryBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'limit' => 'int',
 			'type' => 'select',
 			'direction' => 'select',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -115,7 +117,7 @@ class Gallery_Block extends SP_Abstract_Block
 	 */
 	protected function _getItems($limit, $type)
 	{
-		$data = array();
+		$data = [];
 
 		if ($this->data['mod'] === 'aeva_media')
 		{
@@ -125,33 +127,33 @@ class Gallery_Block extends SP_Abstract_Block
 			aeva_loadSettings();
 
 			// Just images
-			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC', true, array(), 'm.type = "image"');
+			return aeva_getMediaItems(0, $limit, $type ? 'RAND()' : 'm.id_media DESC', true, [], 'm.type = "image"');
 		}
 
 		if ($this->data['mod'] === 'levgal')
 		{
-			if (!allowedTo(array('lgal_view', 'lgal_manage')))
+			if (!allowedTo(['lgal_view', 'lgal_manage']))
 			{
-				return array();
+				return [];
 			}
 
 			switch ($type)
 			{
 				case 0:
 				default:
-					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$itemList = LevGalBootstrap::getModel('ItemList');
 					$data = $itemList->getLatestItems($limit);
 					break;
 				case 1:
-					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$itemList = LevGalBootstrap::getModel('ItemList');
 					$data = $itemList->getRandomItems($limit);
 					break;
 				case 2:
-					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$itemList = LevGalBootstrap::getModel('ItemList');
 					$data = $itemList->getLatestImages($limit);
 					break;
 				case 3:
-					$itemList = LevGal_Bootstrap::getModel('LevGal_Model_ItemList');
+					$itemList = LevGalBootstrap::getModel('ItemList');
 					$data = $itemList->getRandomImages($limit);
 					break;
 			}

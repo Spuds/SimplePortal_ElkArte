@@ -4,12 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Database\QueryInterface;
 
 /**
  * Generic BBC Block, creates a BBC formatted block with parse_bbc
@@ -18,18 +19,18 @@ use BBC\ParserWrapper;
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Bbc_Block extends SP_Abstract_Block
+class BbcBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'content' => 'bbc',
-		);
+		];
 
 		parent::__construct($db);
 	}

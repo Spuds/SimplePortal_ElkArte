@@ -4,18 +4,28 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\AdminController;
+
 use BBC\PreparseCode;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\BoardsTree;
+use ElkArte\Converters\Html2BBC;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
+use ElkArte\Languages\Txt;
 
 /**
  * SimplePortal Blocks Administration controller class.
  * This class handles the adding/editing/listing of blocks
  */
-class ManagePortalBlocks_Controller extends Action_Controller
+class ManagePortalBlocks extends AbstractController
 {
 	/**
 	 * Main dispatcher.
@@ -33,60 +43,60 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		}
 
 		// We'll need the utility functions from here.
-		require_once(SUBSDIR . '/PortalAdmin.subs.php');
-		require_once(SUBSDIR . '/Portal.subs.php');
-		loadTemplate('PortalAdminBlocks');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalAdmin.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
+		theme()->getTemplates()->load('PortalAdminBlocks');
 
-		$subActions = array(
-			'list' => array($this, 'action_list'),
-			'header' => array($this, 'action_list'),
-			'left' => array($this, 'action_list'),
-			'top' => array($this, 'action_list'),
-			'bottom' => array($this, 'action_list'),
-			'right' => array($this, 'action_list'),
-			'footer' => array($this, 'action_list'),
-			'add' => array($this, 'action_edit'),
-			'edit' => array($this, 'action_edit'),
-			'delete' => array($this, 'action_delete'),
-			'move' => array($this, 'action_move'),
-			'statechange' => array($this, 'action_state_change'),
-		);
+		$subActions = [
+			'list' => [$this, 'action_list'],
+			'header' => [$this, 'action_list'],
+			'left' => [$this, 'action_list'],
+			'top' => [$this, 'action_list'],
+			'bottom' => [$this, 'action_list'],
+			'right' => [$this, 'action_list'],
+			'footer' => [$this, 'action_list'],
+			'add' => [$this, 'action_edit'],
+			'edit' => [$this, 'action_edit'],
+			'delete' => [$this, 'action_delete'],
+			'move' => [$this, 'action_move'],
+			'statechange' => [$this, 'action_state_change'],
+		];
 
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_blocks');
 
 		// Tabs for the menu
-		$context[$context['admin_menu_name']]['tab_data'] = array(
+		$context[$context['admin_menu_name']]['tab_data'] = [
 			'title' => $txt['sp-blocksBlocks'],
 			'help' => 'sp_BlocksArea',
 			'description' => $txt['sp-adminBlockListDesc'],
-			'tabs' => array(
-				'list' => array(
+			'tabs' => [
+				'list' => [
 					'description' => $txt['sp-adminBlockListDesc'],
-				),
-				'add' => array(
+				],
+				'add' => [
 					'description' => $txt['sp-adminBlockAddDesc'],
-				),
-				'header' => array(
+				],
+				'header' => [
 					'description' => $txt['sp-adminBlockHeaderListDesc'],
-				),
-				'left' => array(
+				],
+				'left' => [
 					'description' => $txt['sp-adminBlockLeftListDesc'],
-				),
-				'top' => array(
+				],
+				'top' => [
 					'description' => $txt['sp-adminBlockTopListDesc'],
-				),
-				'bottom' => array(
+				],
+				'bottom' => [
 					'description' => $txt['sp-adminBlockBottomListDesc'],
-				),
-				'right' => array(
+				],
+				'right' => [
 					'description' => $txt['sp-adminBlockRightListDesc'],
-				),
-				'footer' => array(
+				],
+				'footer' => [
 					'description' => $txt['sp-adminBlockFooterListDesc'],
-				),
-			),
-		);
+				],
+			],
+		];
 
 		// The default action will show the block list
 		$subAction = $action->initialize($subActions, 'list');
@@ -97,61 +107,61 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	}
 
 	/**
-	 * Show the Block List.
+	 * Show the Block listing.
 	 */
 	public function action_list()
 	{
 		global $txt, $context, $scripturl;
 
 		// We have 6 sides...like a cube!
-		$context['sides'] = array(
-			'header' => array(
+		$context['sides'] = [
+			'header' => [
 				'id' => '5',
 				'name' => 'adminHeader',
 				'label' => $txt['sp-positionHeader'],
 				'help' => 'sp-blocksHeaderList',
-			),
-			'left' => array(
+			],
+			'left' => [
 				'id' => '1',
 				'name' => 'adminLeft',
 				'label' => $txt['sp-positionLeft'],
 				'help' => 'sp-blocksLeftList',
-			),
-			'top' => array(
+			],
+			'top' => [
 				'id' => '2',
 				'name' => 'adminTop',
 				'label' => $txt['sp-positionTop'],
 				'help' => 'sp-blocksTopList',
-			),
-			'bottom' => array(
+			],
+			'bottom' => [
 				'id' => '3',
 				'name' => 'adminBottom',
 				'label' => $txt['sp-positionBottom'],
 				'help' => 'sp-blocksBottomList',
-			),
-			'right' => array(
+			],
+			'right' => [
 				'id' => '4',
 				'name' => 'adminRight',
 				'label' => $txt['sp-positionRight'],
 				'help' => 'sp-blocksRightList',
-			),
-			'footer' => array(
+			],
+			'footer' => [
 				'id' => '6',
 				'name' => 'adminFooter',
 				'label' => $txt['sp-positionFooter'],
 				'help' => 'sp-blocksFooterList',
-			),
-		);
+			],
+		];
 
-		$sides = array('header', 'left', 'top', 'bottom', 'right', 'footer');
+		$sides = ['header', 'left', 'top', 'bottom', 'right', 'footer'];
 
 		// Are we viewing any of the sub lists for an individual side?
-		if (in_array($context['sub_action'], $sides))
+		if (in_array($context['sub_action'], $sides, true))
 		{
 			// Remove any sides that we don't need to show. ;)
 			foreach ($sides as $side)
 			{
-				if ($context['sub_action'] != $side)
+				if ($context['sub_action'] !== $side)
 				{
 					unset($context['sides'][$side]);
 				}
@@ -161,27 +171,27 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		}
 
 		// Columns to show.
-		$context['columns'] = array(
-			'label' => array(
+		$context['columns'] = [
+			'label' => [
 				'width' => '40%',
 				'label' => $txt['sp-adminColumnName'],
 				'class' => 'first_th',
-			),
-			'type' => array(
+			],
+			'type' => [
 				'width' => '30%',
 				'label' => $txt['sp-adminColumnType'],
-			),
-			'status' => array(
+			],
+			'status' => [
 				'width' => '10%',
 				'label' => $txt['sp-blocksActive'],
 				'class' => 'centertext',
-			),
-			'action' => array(
+			],
+			'action' => [
 				'width' => '20%',
 				'label' => $txt['sp-adminColumnAction'],
 				'class' => 'centertext last_th',
-			),
-		);
+			],
+		];
 
 		// Get the block info for each side.
 		foreach ($context['sides'] as $side_id => $side)
@@ -193,10 +203,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				$context['blocks'][$side['name']][$block_id]['status'] = '<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=statechange;' . (empty($context['sp_blocks_single_side_list']) ? '' : 'redirect=' . $block['column'] . ';') . 'block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"
 					onclick="sp_change_status(\'' . $block['id']  . '\', \'block\');return false;">' .
 					sp_embed_image(empty($block['state']) ? 'deactive' : 'active', (!empty($block['state']) ? $txt['sp-blocksDeactivate'] : $txt['sp-blocksActivate']), null, null, true, 'status_image_' . $block['id']) . '</a>';
-				$context['blocks'][$side['name']][$block_id]['actions'] = array(
-					'edit' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>',
+				$context['blocks'][$side['name']][$block_id]['actions'] = [
+					'edit' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=edit;block_id=' . $block['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('edit') . '</a>',
 					'delete' => '&nbsp;<a href="' . $scripturl . '?action=admin;area=portalblocks;sa=delete;block_id=' . $block['id'] . ';col=' . $block['column'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp-deleteblock'] . '\');">' . sp_embed_image('trash') . '</a>',
-				);
+				];
 			}
 		}
 
@@ -208,13 +218,15 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 	/**
 	 * Adding or editing a block.
+	 *
+	 * @throws Exception
 	 */
 	public function action_edit()
 	{
 		global $txt, $context, $modSettings, $boards;
 
 		// Just in case, the admin could be doing something silly like editing a SP block while SP is disabled. ;)
-		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.php');
 
 		$context['SPortal']['is_new'] = empty($_REQUEST['block_id']);
 
@@ -224,7 +236,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Passing the selected type via $_GET instead of $_POST?
 		$start_parameters = $this->_getStartParameters();
 
-		// Want use a block on the portal?
+		// Want to use a block on the portal?
 		if ($context['SPortal']['is_new'] && empty($_POST['selected_type']) && empty($_POST['add_block']))
 		{
 			// Gather the blocks we have available
@@ -234,10 +246,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$in_use = getBlockInfo();
 			foreach ($in_use as $block)
 			{
-				$context['SPortal']['block_inuse'][$block['type']] = array('state' => $block['state'], 'column' => $block['column']);
+				$context['SPortal']['block_inuse'][$block['type']] = ['state' => $block['state'], 'column' => $block['column']];
 			}
 
-			$context['location'] = array(1 => $txt['sp-positionLeft'], $txt['sp-positionTop'], $txt['sp-positionBottom'], $txt['sp-positionRight'], $txt['sp-positionHeader'], $txt['sp-positionFooter']);
+			$context['location'] = [1 => $txt['sp-positionLeft'], $txt['sp-positionTop'], $txt['sp-positionBottom'], $txt['sp-positionRight'], $txt['sp-positionHeader'], $txt['sp-positionFooter']];
 
 			if (!empty($_REQUEST['col']))
 			{
@@ -251,7 +263,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		elseif ($context['SPortal']['is_new'] && !empty($_POST['selected_type']))
 		{
 			$block = sp_instantiate_block($_POST['selected_type'][0]);
-			$context['SPortal']['block'] = array(
+			$context['SPortal']['block'] = [
 				'id' => 0,
 				'label' => $txt['sp-blocksDefaultLabel'],
 				'type' => $_POST['selected_type'][0],
@@ -263,10 +275,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'visibility' => 14,
 				'state' => 1,
 				'force_view' => 0,
-				'parameters' => !empty($start_parameters) ? $start_parameters : array(),
+				'parameters' => !empty($start_parameters) ? $start_parameters : [],
 				'options' => $block->parameters(),
-				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo((int) $_POST['block_column']) : array(),
-			);
+				'list_blocks' => !empty($_POST['block_column']) ? getBlockInfo((int) $_POST['block_column']) : [],
+			];
 		}
 		// Saving the block to one of the zones
 		elseif (!$context['SPortal']['is_new'] && empty($_POST['add_block']))
@@ -275,10 +287,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
 
 			$block = sp_instantiate_block($context['SPortal']['block']['type']);
-			$context['SPortal']['block'] += array(
+			$context['SPortal']['block'] += [
 				'options' => $block->parameters(),
 				'list_blocks' => getBlockInfo($context['SPortal']['block']['column']),
-			);
+			];
 		}
 
 		// Want to take a look at how this block will appear, well we try our best
@@ -298,7 +310,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Just in case, the admin could be doing something silly like editing a SP block while SP is disabled. ;)
 			require_once(BOARDDIR . '/SSI.php');
 			sportal_init_headers();
-			loadTemplate('Portal');
+			theme()->getTemplates()->load('Portal');
 
 			// Start the block and get its parameters for display
 			$block = sp_instantiate_block((string) $_POST['block_type']);
@@ -316,32 +328,32 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			}
 			else
 			{
-				$_POST['parameters'] = array();
+				$_POST['parameters'] = [];
 			}
 
 			// Prepare a preview with the form parameters
 			$block->setup($_POST['parameters'], false);
 
 			// Create all the information we know about this block
-			$context['SPortal']['block'] = array(
+			$context['SPortal']['block'] = [
 				'id' => $_POST['block_id'],
 				'label' => Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES),
 				'type' => $_POST['block_type'],
 				'type_text' => !empty($txt['sp_function_' . $_POST['block_type'] . '_label']) ? $txt['sp_function_' . $_POST['block_type'] . '_label'] : $txt['sp_function_unknown_label'],
 				'column' => $_POST['block_column'],
 				'row' => !empty($_POST['block_row']) ? $_POST['block_row'] : 0,
-				'placement' => !empty($_POST['placement']) && in_array($_POST['placement'], array('before', 'after')) ? $_POST['placement'] : '',
+				'placement' => !empty($_POST['placement']) && in_array($_POST['placement'], ['before', 'after']) ? $_POST['placement'] : '',
 				'permissions' => $_POST['permissions'],
 				'styles' => $_POST['styles'],
 				'visibility' => $_POST['visibility'],
 				'state' => !empty($_POST['block_active']),
 				'force_view' => !empty($_POST['block_force']),
-				'parameters' => !empty($_POST['parameters']) ? $_POST['parameters'] : array(),
+				'parameters' => !empty($_POST['parameters']) ? $_POST['parameters'] : [],
 				'options' => $block->parameters(),
 				'list_blocks' => getBlockInfo($_POST['block_column']),
 				'collapsed' => false,
 				'instance' => $block,
-			);
+			];
 
 			if (strpos($modSettings['leftwidth'], '%') !== false || strpos($modSettings['leftwidth'], 'px') !== false)
 			{
@@ -380,35 +392,35 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Only the admin can use PHP blocks
 			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
 			{
-				throw new Elk_Exception('cannot_admin_forum', false);
+				throw new Exception('cannot_admin_forum', false);
 			}
 
-			loadLanguage('SPortalHelp');
+			Txt::load('SimplePortalHelp');
 
 			// Load up the permissions
 			$context['SPortal']['block']['permission_profiles'] = sportal_get_profiles(null, 1, 'name');
 			if (empty($context['SPortal']['block']['permission_profiles']))
 			{
-				throw new Elk_Exception('error_sp_no_permission_profiles', false);
+				throw new Exception('error_sp_no_permission_profiles', false);
 			}
 
 			// Load in the style profiles
 			$context['SPortal']['block']['style_profiles'] = sportal_get_profiles(null, 2, 'name');
 			if (empty($context['SPortal']['block']['style_profiles']))
 			{
-				throw new Elk_Exception('error_sp_no_style_profiles', false);
+				throw new Exception('error_sp_no_style_profiles', false);
 			}
 
 			// Load in the display profiles
 			$context['SPortal']['block']['visibility_profiles'] = sportal_get_profiles(null, 3, 'name');
 			if (empty($context['SPortal']['block']['visibility_profiles']))
 			{
-				throw new Elk_Exception('error_sp_no_visibility_profiles', false);
+				throw new Exception('error_sp_no_visibility_profiles', false);
 			}
 
 			$context['SPortal']['block']['style'] = sportal_select_style($context['SPortal']['block']['styles']);
 
-			// Prepare the Textcontent for BBC, only the first bbc will be detected correctly!
+			// Prepare the Text content for BBC, only the first bbc will be detected correctly!
 			$firstBBCFound = false;
 			foreach ($context['SPortal']['block']['options'] as $name => $type)
 			{
@@ -417,24 +429,24 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				{
 					if (empty($boards))
 					{
-						require_once(SUBSDIR . '/Boards.subs.php');
-						getBoardTree();
+						$boardTree = new BoardsTree(database());
+						$boards = $boardTree->getBoards();
 					}
 
 					// Merge the array ;)
 					if (!isset($context['SPortal']['block']['parameters'][$name]))
 					{
-						$context['SPortal']['block']['parameters'][$name] = array();
+						$context['SPortal']['block']['parameters'][$name] = [];
 					}
 					elseif (!empty($context['SPortal']['block']['parameters'][$name]) && is_array($context['SPortal']['block']['parameters'][$name]))
 					{
 						$context['SPortal']['block']['parameters'][$name] = implode('|', $context['SPortal']['block']['parameters'][$name]);
 					}
 
-					$context['SPortal']['block']['board_options'][$name] = array();
-					$config_variable = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : array();
+					$context['SPortal']['block']['board_options'][$name] = [];
+					$config_variable = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : [];
 					$config_variable = !is_array($config_variable) ? explode('|', $config_variable) : $config_variable;
-					$context['SPortal']['block']['board_options'][$name] = array();
+					$context['SPortal']['block']['board_options'][$name] = [];
 
 					// Create the list for this Item
 					foreach ($boards as $board)
@@ -445,11 +457,11 @@ class ManagePortalBlocks_Controller extends Action_Controller
 							continue;
 						}
 
-						$context['SPortal']['block']['board_options'][$name][$board['id']] = array(
+						$context['SPortal']['block']['board_options'][$name][$board['id']] = [
 							'value' => $board['id'],
 							'text' => $board['name'],
-							'selected' => in_array($board['id'], $config_variable),
-						);
+							'selected' => in_array($board['id'], $config_variable, true),
+						];
 					}
 				}
 				// Prepare the Text content for BBC, only the first bbc will be correct detected!
@@ -473,7 +485,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 							for ($i = 0, $n = count($parts); $i < $n; $i++)
 							{
 								// It goes 0 = outside, 1 = begin tag, 2 = inside, 3 = close tag, repeat.
-								if ($i % 4 == 0)
+								if ($i % 4 === 0)
 								{
 									$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', static function ($m) {
 										return '[html]' . preg_replace('~<br\s?/?>~i', '&lt;br /&gt;<br />', $m[1]) . '[/html]';
@@ -486,15 +498,15 @@ class ManagePortalBlocks_Controller extends Action_Controller
 						$form_message = preg_replace('~<br(?: /)?' . '>~i', "\n", $form_message);
 
 						// Prepare the data before i want them inside the textarea
-						$form_message = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
+						$form_message = str_replace(['"', '<', '>', '&nbsp;'], ['&quot;', '&lt;', '&gt;', ' '], $form_message);
 						$context['SPortal']['bbc'] = 'bbc_' . $name;
-						$message_data = array(
+						$message_data = [
 							'id' => $context['SPortal']['bbc'],
 							'width' => '95%',
 							'height' => '200px',
 							'value' => $form_message,
 							'form' => 'sp_block',
-						);
+						];
 
 						// Run the ELK bbc editor routine
 						create_control_richedit($message_data);
@@ -509,7 +521,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				}
 			}
 
-			loadJavascriptFile('portal.js?sp100rc1');
+			loadJavascriptFile('SimplePortal/portal.js', ['stale' => SPORTAL_STALE, 'defer' => false]);
 			$context['sub_template'] = 'block_edit';
 			$context['page_title'] = $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'];
 		}
@@ -522,22 +534,20 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Only the admin can do php here
 			if ($_POST['block_type'] === 'sp_php' && !allowedTo('admin_forum'))
 			{
-				throw new Elk_Exception('cannot_admin_forum', false);
+				throw new Exception('cannot_admin_forum', false);
 			}
 
-			// Make sure the block name is something safe
+			// Make sure the block name is safe
 			if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES)) === '')
 			{
-				throw new Elk_Exception('error_sp_name_empty', false);
+				throw new Exception('error_sp_name_empty', false);
 			}
 
 			if ($_POST['block_type'] === 'sp_php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
 			{
-				require_once(SUBSDIR . '/DataValidator.class.php');
-
-				$validator = new Data_Validator();
-				$validator->validation_rules(array('content' => 'php_syntax'));
-				$validator->validate(array('content' => $_POST['parameters']['content']));
+				$validator = new DataValidator();
+				$validator->validation_rules(['content' => 'php_syntax']);
+				$validator->validate(['content' => $_POST['parameters']['content']]);
 				$error = $validator->validation_errors();
 
 				if ($error)
@@ -611,10 +621,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			}
 			else
 			{
-				$_POST['parameters'] = array();
+				$_POST['parameters'] = [];
 			}
 
-			$blockInfo = array(
+			$blockInfo = [
 				'id' => (int) $_POST['block_id'],
 				'label' => Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES),
 				'type' => $_POST['block_type'],
@@ -625,7 +635,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 				'visibility' => (int) $_POST['visibility'],
 				'state' => !empty($_POST['block_active']) ? 1 : 0,
 				'force_view' => !empty($_POST['block_force']) ? 1 : 0,
-			);
+			];
 
 			// Insert a new block in to the portal
 			if ($context['SPortal']['is_new'])
@@ -656,11 +666,11 @@ class ManagePortalBlocks_Controller extends Action_Controller
 	 */
 	private function _getStartParameters()
 	{
-		$start_parameters = array();
+		$start_parameters = [];
 
 		if (!empty($_GET['selected_type']) && empty($_POST['selected_type']))
 		{
-			$_POST['selected_type'] = array($_GET['selected_type']);
+			$_POST['selected_type'] = [$_GET['selected_type']];
 
 			if (!empty($_GET['parameters']))
 			{
@@ -690,8 +700,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// If we came from WYSIWYG then turn it back into BBC regardless.
 			if (!empty($_REQUEST['bbc_' . $_POST['bbc_name'] . '_mode']) && isset($_POST['parameters'][$_POST['bbc_name']]))
 			{
-				require_once(SUBSDIR . '/Html2BBC.class.php');
-				$bbc_converter = new Html_2_BBC($_POST['parameters'][$_POST['bbc_name']]);
+				$bbc_converter = new Html2BBC($_POST['parameters'][$_POST['bbc_name']]);
 				$_POST['parameters'][$_POST['bbc_name']] = $bbc_converter->get_bbc();
 
 				// We need to unhtml it now as it gets done shortly.
@@ -748,13 +757,13 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Start off with nothing
-		$context['xml_data'] = array();
-		$errors = array();
-		$order = array();
+		$context['xml_data'] = [];
+		$errors = [];
+		$order = [];
 
 		// Chances are
-		loadLanguage('Errors');
-		loadLanguage('SPortalAdmin');
+		Txt::load('Errors');
+		Txt::load('SimplePortalAdmin');
 
 		// You have to be allowed to do this
 		$validation_token = validateToken('admin-sort', 'post', true, false);
@@ -765,18 +774,18 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// No questions that we are reordering the blocks
 			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
 			{
-				require_once(SUBSDIR . '/PortalAdmin.subs.php');
-				require_once(SUBSDIR . '/Portal.subs.php');
+				require_once(ADDONSDIR . '/SimplePortal/subs/PortalAdmin.subs.php');
+				require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
 
 				$target_side = (int) str_replace('side_', '', $_POST['received']);
 				$block_id = (int) str_replace('block_', '', $_POST['moved']);
 				list ($current_side,) = sp_block_get_position($block_id);
 
 				// The block ids arrive in 1-n view order ...
-				$blocks = $_POST['block'];
+				$blocks = array_map('intval',$_POST['block']);
 
 				// Find where the moved block is in the block stack
-				$moved_key = array_search($block_id, $blocks);
+				$moved_key = array_search($block_id, $blocks, true);
 				if ($moved_key !== false)
 				{
 					$check_above_row = 0;
@@ -794,12 +803,12 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					}
 
 					// The block above is in the same side, so we place it after that block
-					if (isset($check_above_side) && $check_above_side == $target_side)
+					if (isset($check_above_side) && $check_above_side === $target_side)
 					{
 						$target_row = $check_above_row + 1;
 					}
 					// The block above is not in the same side, but the block below is, move it above that one
-					elseif (isset($check_below_side) && $check_below_side == $target_side)
+					elseif (isset($check_below_side) && $check_below_side === $target_side)
 					{
 						$target_row = $check_below_row;
 					}
@@ -810,7 +819,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					}
 
 					// Is the block moving sides?
-					if ($current_side != $target_side)
+					if ($current_side !== $target_side)
 					{
 						sp_block_move_col($block_id, $target_side);
 					}
@@ -819,18 +828,18 @@ class ManagePortalBlocks_Controller extends Action_Controller
 					sp_blocks_move_row($block_id, $target_side, $target_row);
 
 					// Update the sides that may have been affected
-					foreach (array_unique(array($current_side, $target_side)) as $side)
+					foreach (array_unique([$current_side, $target_side]) as $side)
 					{
 						fixColumnRows($side);
 					}
 
-					$order[] = array(
+					$order[] = [
 						'value' => $txt['sp-blocks_success_moving'],
-					);
+					];
 				}
 				else
 				{
-					$errors[] = array('value' => $txt['sp-blocks_fail_moving']);
+					$errors[] = ['value' => $txt['sp-blocks_fail_moving']];
 				}
 			}
 		}
@@ -839,44 +848,44 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		{
 			if (!empty($validation_session) && $validation_session !== true)
 			{
-				$errors[] = array('value' => $txt['session_verify_fail'] . ' (' . $validation_session . ')');
+				$errors[] = ['value' => $txt['session_verify_fail'] . ' (' . $validation_session . ')'];
 			}
 
 			if (empty($validation_token))
 			{
-				$errors[] = array('value' => $txt['token_verify_fail']);
+				$errors[] = ['value' => $txt['token_verify_fail']];
 			}
 		}
 
 		// New generic token for use
 		createToken('admin-sort');
-		$tokens = array(
-			array(
+		$tokens = [
+			[
 				'value' => $context['admin-sort_token'],
-				'attributes' => array('type' => 'token'),
-			),
-			array(
+				'attributes' => ['type' => 'token'],
+			],
+			[
 				'value' => $context['admin-sort_token_var'],
-				'attributes' => array('type' => 'token_var'),
-			),
-		);
+				'attributes' => ['type' => 'token_var'],
+			],
+		];
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = array(
-			'orders' => array(
+		$context['xml_data'] = [
+			'orders' => [
 				'identifier' => 'order',
 				'children' => $order,
-			),
-			'tokens' => array(
+			],
+			'tokens' => [
 				'identifier' => 'token',
 				'children' => $tokens,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -891,7 +900,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// What block is being moved?
 		if (empty($_REQUEST['block_id']))
 		{
-			throw new Elk_Exception('error_sp_id_empty', false);
+			throw new Exception('error_sp_id_empty', false);
 		}
 
 		$block_id = (int) $_REQUEST['block_id'];
@@ -899,7 +908,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Can't move outside our known columns 1-6
 		if (empty($_REQUEST['col']) || $_REQUEST['col'] < 1 || $_REQUEST['col'] > 6)
 		{
-			throw new Elk_Exception('error_sp_side_wrong', false);
+			throw new Exception('error_sp_side_wrong', false);
 		}
 
 		$target_side = (int) $_REQUEST['col'];
@@ -918,10 +927,10 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		list ($current_side, $current_row) = sp_block_get_position($block_id);
 
 		// Is a move needed, new row, new column?
-		if ($current_side != $target_side || $current_row + 1 != $target_row)
+		if ($current_side !== $target_side || $current_row + 1 !== $target_row)
 		{
 			// Shift the column
-			if ($current_side != $target_side)
+			if ($current_side !== $target_side)
 			{
 				sp_block_move_col($block_id, $target_side);
 			}
@@ -929,7 +938,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			// Position it in the column
 			sp_blocks_move_row($block_id, $target_side, $target_row);
 
-			foreach (array_unique(array($current_side, $target_side)) as $side)
+			foreach (array_unique([$current_side, $target_side]) as $side)
 			{
 				fixColumnRows($side);
 			}
@@ -954,7 +963,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 		// Do we have that?
 		if (empty($_REQUEST['block_id']))
 		{
-			throw new Elk_Exception('error_sp_id_empty', false);
+			throw new Exception('error_sp_id_empty', false);
 		}
 
 		// Make sure column ID is an integer too.
@@ -966,7 +975,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
 			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
 			{
-				throw new Elk_Exception('cannot_admin_forum', false);
+				throw new Exception('cannot_admin_forum', false);
 			}
 		}
 
@@ -991,7 +1000,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 
 		$id = (int) $_REQUEST['block_id'];
 		$state = sp_changeState('block', $id);
-		$sides = array(1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right');
+		$sides = [1 => 'left', 2 => 'top', 3 => 'bottom', 4 => 'right'];
 		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
 
 		// Doing this the ajax way?
@@ -1001,8 +1010,7 @@ class ManagePortalBlocks_Controller extends Action_Controller
 			$context['status'] = !empty($state) ? 'active' : 'deactive';
 
 			// Clear out any template layers, add the xml response
-			loadTemplate('PortalAdmin');
-			$template_layers = Template_Layers::instance();
+			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
 			$context['sub_template'] = 'change_status';
 

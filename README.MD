@@ -2,13 +2,12 @@
 
 [![Open Issues](https://img.shields.io/github/issues/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/issues)
 [![Current Release](https://img.shields.io/github/release/SimplePortal/SimplePortal_ElkArte.svg?style=flat)](https://github.com/SimplePortal/SimplePortal_ElkArte/releases)
-[![License](https://img.shields.io/badge/License-BSD-green.svg?style=flat)](http://opensource.org/licenses/BSD-3-Clause)
+[![License](https://img.shields.io/badge/License-BSD-green.svg?style=flat)](https://opensource.org/licenses/BSD-3-Clause)
 [![Build Status](https://scrutinizer-ci.com/g/Spuds/SimplePortal_ElkArte/badges/build.png?b=myDevel)](https://scrutinizer-ci.com/g/Spuds/SimplePortal_ElkArte/build-status/myDevel)
 [![Downloads](https://img.shields.io/github/downloads/SimplePortal/SimplePortal_ElkArte/total)](https://github.com/SimplePortal/SimplePortal_ElkArte/releases)
 [![GitHub commits](https://img.shields.io/github/commits-since/SimplePortal/SimplePortal_ElkArte/1.0.2.svg)](https://github.com/SimplePortal/SimplePortal_ElkArte/commit/)
 
-### This is SimplePortal for the ElkArte Forum platform.
-This version is based on SimplePortal 2.4 and retains all functionality of that version.
+### This is SimplePortal for the ElkArte 2.0+ Forum platform.
 
 SimplePortal is always developing, and is produced with the user in mind first. User feedback is the number one method of growth for SimplePortal, and our users are always finding ways for Simpleportal to grow. SimplePortal stays competitive with other portal software by adding numerous user-requested features such as articles, block types, and the ability to completely customize the portal page.
 
@@ -24,6 +23,7 @@ This version adds **unique functionality** that is available only under the ElkA
 - Independent article system, supporting BBC, HTML, PHP and Markdown for your writing needs.  It also supports inline attachments for a full Blog feel.
 - Drag and drop capabilities in the Admin Panel, you can easily move a block to a new area.
 - Improved mobile capabilities, you can define which blocks appear on mobile devices.
+- Auto refresh of portal blocks on a defined interval.
 
 ### Blocks
 Blocks are small display areas you can add to the portal page or to forum pages. You can use blocks to provide many forms of information and content.  

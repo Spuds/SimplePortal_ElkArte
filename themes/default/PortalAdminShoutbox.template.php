@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 
@@ -35,8 +35,10 @@ function template_shoutbox_edit()
 							<select name="permissions" id="shoutbox_permissions">';
 
 	foreach ($context['SPortal']['shoutbox']['permission_profiles'] as $profile)
+	{
 		echo '
 								<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['shoutbox']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+	}
 
 	echo '
 							</select>
@@ -66,7 +68,7 @@ function template_shoutbox_edit()
 						</dd>
 						<dt>
 							<a href="', $scripturl, '?action=quickhelp;help=sp-shoutboxesWarning" onclick="return reqOverlayDiv(this.href);" class="help">
-								<img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" />
+								<i class="icon i-help" title="', $txt['help'], '"></i>
 							</a>
 							<label for="shoutbox_warning">', $txt['sp_admin_shoutbox_col_warning'], ':</label>
 						</dt>
@@ -75,7 +77,7 @@ function template_shoutbox_edit()
 						</dd>
 						<dt>
 							<a href="', $scripturl, '?action=quickhelp;help=sp-shoutboxesBBC" onclick="return reqOverlayDiv(this.href);" class="help">
-								<img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" />
+								<i class="icon i-help" title="', $txt['help'], '"></i>
 							</a>
 							<label for="shoutbox_bbc">', $txt['sp_admin_shoutbox_col_bbc'], ':</label>
 						</dt>
@@ -83,9 +85,13 @@ function template_shoutbox_edit()
 							<select name="allowed_bbc[]" id="shoutbox_bbc" size="7" multiple="multiple">';
 
 	foreach ($context['allowed_bbc'] as $tag => $label)
+	{
 		if (!isset($context['disabled_tags'][$tag]))
+		{
 			echo '
-								<option value="', $tag, '"', in_array($tag, $context['SPortal']['shoutbox']['allowed_bbc']) ? ' selected="selected"' : '', '>[', $tag, '] - ', $label, '</option>';
+								<option value="', $tag, '"', in_array($tag, $context['SPortal']['shoutbox']['allowed_bbc'], true) ? ' selected="selected"' : '', '>[', $tag, '] - ', $label, '</option>';
+		}
+	}
 
 	echo '
 							</select>
@@ -133,10 +139,12 @@ function template_shoutbox_edit()
 							<input type="checkbox" name="status" id="shoutbox_status" value="1"', $context['SPortal']['shoutbox']['status'] ? ' checked="checked"' : '', ' class="input_check" />
 						</dd>
 					</dl>
-					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
 				</div>
-			<input type="hidden" name="shoutbox_id" value="', $context['SPortal']['shoutbox']['id'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<div class="submitbutton">
+					<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
+					<input type="hidden" name="shoutbox_id" value="', $context['SPortal']['shoutbox']['id'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				</div>
 		</form>
 	</div>';
 }
@@ -173,13 +181,15 @@ function template_shoutbox_prune()
 						<input type="text" name="member" id="member" value="" onclick="document.getElementById(\'type_member\').checked = true;" size="15" class="input_text" />
 					</dd>
 				</dl>
-				<input type="submit" name="submit" value="', $context['page_title'], '" class="right_submit" />
+				<div class="submitbutton">
+					<input type="submit" name="submit" value="', $context['page_title'], '" />
+				</div>
 			</div>
 		<input type="hidden" name="shoutbox_id" value="', $context['shoutbox']['id'], '" />
 		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 	</form>';
 
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 		var oPruneSuggest = new smc_AutoSuggest({
 			sSelf: \'oPruneSuggest\',
 			sSessionId: elk_session_id,

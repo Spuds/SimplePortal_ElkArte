@@ -4,11 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Cache\Cache;
+use ElkArte\Database\QueryInterface;
 
 /**
  * Calendar Block, Displays a full calendar block
@@ -20,20 +22,20 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Calendar_Block extends SP_Abstract_Block
+class CalendarBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'events' => 'check',
 			'birthdays' => 'check',
 			'holidays' => 'check',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -55,25 +57,25 @@ class Calendar_Block extends SP_Abstract_Block
 		// Fetch the calendar data for today
 		$today = getTodayInfo();
 
-		$this->data['curPage'] = array(
+		$this->data['curPage'] = [
 			'day' => $today['day'],
 			'month' => $today['month'],
 			'year' => $today['year']
-		);
+		];
 
-		$calendarOptions = array(
+		$calendarOptions = [
 			'start_day' => !empty($options['calendar_start_day']) ? $options['calendar_start_day'] : 0,
 			'show_week_num' => false,
 			'show_events' => !empty($parameters['events']),
 			'show_birthdays' => !empty($parameters['birthdays']),
 			'show_holidays' => !empty($parameters['holidays']),
-		);
+		];
 
 		// Check cache or fetch
-		if (($this->data['calendar'] = cache_get_data('sp_calendar_data', 360)) === null)
+		if (($this->data['calendar'] = Cache::instance()->get('sp_calendar_data', 360)) === null)
 		{
 			$this->data['calendar'] = getCalendarGrid($this->data['curPage']['month'], $this->data['curPage']['year'], $calendarOptions);
-			cache_put_data('sp_calendar_data', $this->data['calendar'], 360);
+			Cache::instance()->put('sp_calendar_data', $this->data['calendar'], 360);
 		}
 
 		$title_text = $txt['months_titles'][$this->data['calendar']['current_month']] . ' ' . $this->data['calendar']['current_year'];
@@ -225,5 +227,5 @@ function template_sp_calendar($data)
 	echo '
 		<div class="centertext smalltext" id="sp_calendar_0" style="display: none;">', $txt['error_sp_no_items_day'], '</div>';
 
-	addInlineJavascript('var current_day = "sp_calendar_' . $data['curPage']['day'] . '";', true);
+	theme()->addInlineJavascript('var current_day = "sp_calendar_' . $data['curPage']['day'] . '";', true);
 }

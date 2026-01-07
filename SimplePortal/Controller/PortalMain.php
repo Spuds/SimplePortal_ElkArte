@@ -4,20 +4,30 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
-use ElkArte\sources\Frontpage_Interface;
+namespace Addons\SimplePortal\Controller;
+
+use Addons\SimplePortal\AdminController\ManagePortalMain;
+use ElkArte\AbstractController;
+use ElkArte\Action;
+use ElkArte\Cache\Cache;
+use ElkArte\EventManager;
+use ElkArte\FrontpageInterface;
+use ElkArte\Helper\Util;
+use ElkArte\Languages\Txt;
+use ElkArte\User;
 
 /**
- * PortalMain_Controller controller.
+ * PortalMain controller.
  *
  * - This class handles requests that allow viewing the main portal or the portal credits
  * - Handles the front page block arrangement, including resetting
  */
-class PortalMain_Controller extends Action_Controller implements Frontpage_Interface
+class PortalMain extends AbstractController implements FrontpageInterface
 {
 	/**
 	 * Common actions for all methods in the class
@@ -49,17 +59,15 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	 */
 	public function action_index()
 	{
-		require_once(SUBSDIR . '/Action.class.php');
-
 		// Where do you want to go today?
-		$subActions = array(
-			'index' => array($this, 'action_sportal_index'),
-			'credits' => array($this, 'action_sportal_credits'),
-			'resetlayout' => array($this, 'action_sportal_resetLayout'),
-			'userorder' => array($this, 'action_userblockorder'),
-			'spattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
-			'rmattach' => array('controller' => 'PortalArticles_Controller', 'dir' => CONTROLLERDIR, 'file' => 'PortalArticles.controller.php', 'function' => 'action_index'),
-		);
+		$subActions = [
+			'index' => [$this, 'action_sportal_index'],
+			'credits' => [$this, 'action_sportal_credits'],
+			'resetlayout' => [$this, 'action_sportal_resetLayout'],
+			'userorder' => [$this, 'action_userblockorder'],
+			'spattach' => ['controller' => '\Addons\SimplePortal\Controller\PortalArticles', 'function' => 'action_index'],
+			'rmattach' => ['controller' => '\Addons\SimplePortal\Controller\PortalArticles', 'function' => 'action_index'],
+		];
 
 		// We like action, so lets get ready for some
 		$action = new Action('');
@@ -72,11 +80,11 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	}
 
 	/**
-	 * Don't track for xml requests
+	 * Don't track for ajax requests
 	 */
 	public function trackStats($action = '')
 	{
-		if (isset($this->_req->xml))
+		if ($this->getApi())
 		{
 			return false;
 		}
@@ -97,51 +105,46 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 		global $modSettings;
 
 		// Need to determine if the portal is active
-		require_once(SUBSDIR . '/Portal.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
 
 		// Any actions we need to handle with the portal, set up the action here.
 		if (sp_is_active())
 		{
-			$file = null;
 			$function = null;
+			$namespace = '\Addons\SimplePortal\Controller\\';
 
 			if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
 			{
 				// View the portal front page
-				$file = CONTROLLERDIR . '/PortalMain.controller.php';
-				$controller = 'PortalMain_Controller';
+				$controller = $namespace . 'PortalMain';
 				$function = 'action_sportal_index';
 			}
 			elseif (!empty($_GET['page']))
 			{
 				// View a specific page
-				$file = CONTROLLERDIR . '/PortalPages.controller.php';
-				$controller = 'PortalPages_Controller';
+				$controller = $namespace . 'PortalPages';
 				$function = 'action_sportal_page';
 			}
 			elseif (!empty($_GET['article']))
 			{
 				// View a specific article
-				$file = CONTROLLERDIR . '/PortalArticles.controller.php';
-				$controller = 'PortalArticles_Controller';
+				$controller = $namespace . 'PortalArticles';
 				$function = 'action_sportal_article';
 			}
 			elseif (!empty($_GET['category']))
 			{
 				// View a specific category
-				$file = CONTROLLERDIR . '/PortalCategories.controller.php';
-				$controller = 'PortalCategories_Controller';
+				$controller = $namespace . 'PortalCategories';
 				$function = 'action_sportal_category';
 			}
 
 			// Something portal-ish, then set the new action
-			if (isset($file, $function))
+			if (isset($controller, $function))
 			{
-				$default_action = array(
-					'file' => $file,
-					'controller' => $controller ?? null,
+				$default_action = [
+					'controller' => $controller,
 					'function' => $function
-				);
+				];
 			}
 		}
 	}
@@ -149,10 +152,10 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	/**
 	 * If this controller is capable of being the front page.
 	 *
-	 * - damn right it can!
-	 * - Used by system to "find" front page controllers
+	 * - Damn right it can!
+	 * - Used by system front page controllers
 	 */
-	public static function canFrontPage()
+	public static function canFrontPage(): bool
 	{
 		return true;
 	}
@@ -168,14 +171,14 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 
 		parent::frontPageOptions();
 
-		loadLanguage('SPortalAdmin');
+		Txt::load('SimplePortalAdmin');
 
 		// Used to show/hide the portal front page options
-		addInlineJavascript('
+		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#sp_portal_mode\').parent();
 				
-				if ($(this).val() === \'PortalMain_Controller\')
+				if ($(this).val() === \'PortalMain\')
 				{
 					$base.fadeIn();
 					$base.prev().fadeIn();
@@ -188,7 +191,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			}).change();', true);
 
 		// Adds Frontpage, Integrate and Standalone portal mode options.
-		return array(array('select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])));
+		return [['select', 'sp_portal_mode', explode('|', $txt['sp_portal_mode_options'])]];
 	}
 
 	/**
@@ -201,7 +204,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 		// Showing articles on the index page?
 		if (!empty($modSettings['sp_articles_index']))
 		{
-			require_once(SUBSDIR . '/PortalArticle.subs.php');
+			require_once(ADDONSDIR . '/SimplePortal/subs/PortalArticle.subs.php');
 
 			// Set up the pages
 			$total_articles = sportal_get_articles_count();
@@ -215,8 +218,8 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			}
 
 			// If we have some articles
-			require_once(SUBSDIR . '/PortalArticle.subs.php');
-			$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', 0, $per_page, $start);
+			require_once(ADDONSDIR . '/SimplePortal/subs/PortalArticle.subs.php');
+			$context['articles'] = sportal_get_articles(null, true, true, 'spa.id_article DESC', null, $per_page, $start);
 
 			// Get the first "image/attachment" for blog views
 			$context['articles'] = setBlogAttachments(getBlogAttachments($context['articles']));
@@ -239,28 +242,43 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 			}
 		}
 
+		theme()->getTemplates()->load('Portal');
+		theme()->getLayers()->add('portal');
+
+		// If we are to show the articles above or below the index page, add the appropriate layer.
+		// This is not the article BLOCK, but the articles themselves.
+		if (!empty($modSettings['sp_articles_index_position']))
+		{
+			if ($modSettings['sp_articles_index_position'] === 'above')
+			{
+				theme()->getLayers()->addBegin('articlesabove');
+			}
+			elseif ($modSettings['sp_articles_index_position'] === 'below')
+			{
+				theme()->getLayers()->addBegin('articlesbelow');
+			}
+		}
+
 		$context['sub_template'] = 'portal_index';
 		$context['canonical_url'] = $scripturl;
-
-		Templates::instance()->load('Portal');
 	}
 
 	/**
-	 * Displays the credit page outside of the admin area,
+	 * Displays the credit page outside the admin area,
 	 *
-	 * - Forwards to admin controller to display credits outside the admin area
+	 * - Forwards to ManagePortalMain controller to display credits outside the admin area
 	 */
 	public function action_sportal_credits()
 	{
-		loadLanguage('SPortalAdmin');
+		Txt::load('SimplePortalAdmin');
 
-		require_once(ADMINDIR . '/PortalAdminMain.controller.php');
-		$admin_main = new ManagePortalConfig_Controller();
+		//require_once(ADDONSDIR . '/SimplePortal/AdminController/PortalAdminMain.php');
+		$admin_main = new ManagePortalMain(new EventManager());
 		$admin_main->action_information(false);
 	}
 
 	/**
-	 * Reset a users custom portal block arrangement
+	 * Reset a custom portal block arrangement
 	 */
 	public function action_sportal_resetLayout()
 	{
@@ -269,7 +287,7 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 		checkSession('request');
 
 		// Remove the block layout settings
-		require_once(SUBSDIR . '/Portal.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
 		resetMemberLayout();
 
 		// Redirect to the main page
@@ -281,39 +299,39 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 	 */
 	public function action_userblockorder()
 	{
-		global $context, $txt, $user_info, $settings, $modSettings;
+		global $context, $txt, $settings, $modSettings;
 
 		// Should not happen, but no guest processing
-		if ($user_info['is_guest'] || $user_info['id'] == 0)
+		if (User::$info->is_guest || User::$info->id === 0)
 		{
 			return;
 		}
 
 		// Start off with nothing
-		$context['xml_data'] = array();
-		$errors = array();
-		$order = array();
+		$context['xml_data'] = [];
+		$errors = [];
+		$order = [];
 
 		// Chances are
-		loadLanguage('SPortal');
+		Txt::load('SimplePortal');
 
 		// You have to be allowed to do this
 		$validation_session = checkSession();
 		if (empty($validation_session))
 		{
-			$block_tree = array();
+			$block_tree = [];
 
 			// No questions that we are rearranging the blocks
 			if (isset($_POST['order'], $_POST['received'], $_POST['moved']))
 			{
-				$column_numbers = array(
+				$column_numbers = [
 					'sp_left_div' => 1,
 					'sp_top_div' => 2,
 					'sp_bottom_div' => 3,
 					'sp_right_div' => 4,
 					'sp_header' => 5,
 					'sp_footer' => 6
-				);
+				];
 
 				// What block was drag and dropped? e.g. block_2,4
 				list ($block_moved,) = explode(',', $_POST['moved']);
@@ -339,34 +357,34 @@ class PortalMain_Controller extends Action_Controller implements Frontpage_Inter
 
 			// Update the option so its remembered
 			require_once(SUBSDIR . '/Themes.subs.php');
-			updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'sp_block_layout', serialize($block_tree)));
+			updateThemeOptions([$settings['theme_id'], User::$info['id'], 'sp_block_layout', serialize($block_tree)]);
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
 			{
-				cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
+				Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . User::$info['id'], null, 60);
 			}
 
-			$order[] = array(
+			$order[] = [
 				'value' => $txt['sp-blocks_success_arrange'],
-			);
+			];
 		}
 		// Failed validation, tough day for you
 		else
 		{
-			$errors[] = array('value' => $txt['sp-blocks_fail_arrange']);
+			$errors[] = ['value' => $txt['sp-blocks_fail_arrange']];
 		}
 
 		// Return the response
 		$context['sub_template'] = 'generic_xml';
-		$context['xml_data'] = array(
-			'orders' => array(
+		$context['xml_data'] = [
+			'orders' => [
 				'identifier' => 'order',
 				'children' => $order,
-			),
-			'errors' => array(
+			],
+			'errors' => [
 				'identifier' => 'error',
 				'children' => $errors,
-			),
-		);
+			],
+		];
 	}
 }

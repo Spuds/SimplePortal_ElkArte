@@ -4,11 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
+use ElkArte\User;
 
 /**
  * Recent Post or Topic block, shows the most recent posts or topics on the forum
@@ -21,22 +23,22 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Recent_Block extends SP_Abstract_Block
+class RecentBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'boards' => 'boards',
 			'limit' => 'int',
 			'type' => 'select',
 			'display' => 'select',
 			'refresh_value' => 'int'
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -51,8 +53,6 @@ class Recent_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $user_info;
-
 		// Clean the parameters for this block
 		$boards = !empty($parameters['boards']) ? explode('|', $parameters['boards']) : null;
 		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
@@ -76,9 +76,9 @@ class Recent_Block extends SP_Abstract_Block
 		$this->_colorids();
 
 		// Enabling auto refresh?
-		if (!empty($parameters['refresh_value']) && !$user_info['is_guest'])
+		if (!empty($parameters['refresh_value']) && !User::$info->is_guest)
 		{
-			$this->refresh = array('sa' => 'recent', 'class' => '.sp_recent', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->refresh = ['sa' => 'recent', 'class' => '.sp_recent', 'id' => $id, 'refresh_value' => $parameters['refresh_value']];
 			$this->auto_refresh();
 		}
 
@@ -93,11 +93,13 @@ class Recent_Block extends SP_Abstract_Block
 	{
 		global $color_profile;
 
-		$color_ids = array();
+		$color_ids = [];
 		foreach ($this->data['items'] as $item)
 		{
 			if (!empty($item['poster']) && isset($item['poster']['id']))
+			{
 				$color_ids[] = $item['poster']['id'];
+			}
 		}
 
 		if (!empty($color_ids) && sp_loadColors($color_ids) !== false)
@@ -139,7 +141,7 @@ function template_sp_recent($data)
 			', empty($item['is_new']) ? '' : ' <a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new" rel="nofollow"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 			<a href="', $item['href'], '">', $item['subject'], '</a>
 			<span class="smalltext">', $txt['by'], ' ', $item['poster']['link'],
-				'<br />[', $item['time'], '] ', $txt['in'], ' <em>', $item['board']['link'], '</em>
+			'<br />[', $item['time'], '] ', $txt['in'], ' <em>', $item['board']['link'], '</em>
 			</span>
 			<br />', empty($item['is_last']) ? '<hr />' : '';
 		}
@@ -152,14 +154,16 @@ function template_sp_recent($data)
 		$embed_class = sp_embed_class($data['class_type'], '', 'sp_recent_icon centertext');
 		foreach ($data['items'] as $item)
 		{
-			if (!empty($item['is_last']) || empty($item['html_time']))
+			if (empty($item['html_time']))
+			{
 				continue;
+			}
 
 			echo '
 				<tr>
 					<td ', $embed_class, '></td>
 					<td class="sp_recent_subject">',
-						empty($item['is_new']) ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
+			empty($item['is_new']) ? '' : '<a href="' . $scripturl . '?topic=' . $item['topic'] . '.msg' . $item['new_from'] . ';topicseen#new"><span class="new_posts">' . $txt['new'] . '</span></a>&nbsp;', '
 						<a href="', $item['href'], '">', $item['subject'], '</a>
 						<br />[', $item['board']['link'], ']
 					</td>
@@ -170,6 +174,11 @@ function template_sp_recent($data)
 				<tr>
 					<td colspan="3"><hr></td>
 				</tr>';
+
+			if (!empty($item['is_last']))
+			{
+				break;
+			}
 		}
 
 		echo '

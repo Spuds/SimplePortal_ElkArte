@@ -4,11 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
 
 /**
  * Top Posters block, shows the top posters on the site, with avatar and name
@@ -19,24 +20,22 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Top_Poster_Block extends SP_Abstract_Block
+class TopPosterBlock extends SPAbstractBlock
 {
-	/**
-	 * @var array
-	 */
-	protected $color_ids = array();
+	/** @var array */
+	protected $color_ids = [];
 
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'limit' => 'int',
 			'type' => 'select',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -62,20 +61,20 @@ class Top_Poster_Block extends SP_Abstract_Block
 			$start_time = time();
 
 			// Today
-			if ($type == 1)
+			if ($type === 1)
 			{
 				list($year, $month, $day) = explode('-', date('Y-m-d'));
 				$start_time = mktime(0, 0, 0, $month, $day, $year);
 			}
 			// This week
-			elseif ($type == 2)
+			elseif ($type === 2)
 			{
 				$start_time = mktime(0, 0, 0, date("n"), date("j"), date("Y")) - (date("N") * 3600 * 24);
 			}
 			// This month
-			elseif ($type == 3)
+			elseif ($type === 3)
 			{
-				$months = array(1 => 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31);
+				$months = [1 => 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 				$start_time = mktime(0, 0, 0, date("n"), date("j"), date("Y")) - (3600 * 24 * $months[(int) date("m", time())]);
 			}
 
@@ -93,10 +92,10 @@ class Top_Poster_Block extends SP_Abstract_Block
 				GROUP BY mem.id_member
 				ORDER BY posts DESC
 				LIMIT {int:limit}',
-				array(
+				[
 					'start_time' => $start_time,
 					'limit' => $limit,
-				)
+				]
 			);
 		}
 		// Or from the start of time
@@ -110,13 +109,13 @@ class Top_Poster_Block extends SP_Abstract_Block
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 				ORDER BY posts DESC
 				LIMIT {int:limit}',
-				array(
+				[
 					'limit' => $limit,
-				)
+				]
 			);
 		}
-		$this->data['members'] = array();
-		while ($row = $this->_db->fetch_assoc($request))
+		$this->data['members'] = [];
+		while ($row = $request->fetch_assoc())
 		{
 			if (!empty($row['id_member']))
 			{
@@ -124,22 +123,22 @@ class Top_Poster_Block extends SP_Abstract_Block
 			}
 
 			// Load the member data
-			$this->data['members'][] = array(
+			$this->data['members'][] = [
 				'id' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 				'posts' => comma_format($row['posts']),
-				'avatar' => determineAvatar(array(
+				'avatar' => determineAvatar([
 					'avatar' => $row['avatar'],
 					'filename' => $row['filename'],
 					'id_attach' => $row['id_attach'],
 					'email_address' => $row['email_address'],
 					'attachment_type' => $row['attachment_type'],
-				)),
-			);
+				]),
+			];
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		// Profile colors?
 		$this->_color_ids();

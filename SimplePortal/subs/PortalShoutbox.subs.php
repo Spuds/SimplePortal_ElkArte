@@ -4,14 +4,17 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 2.0.0
  */
 
 use BBC\BBCParser;
 use BBC\Codes;
 use BBC\ParserWrapper;
+use ElkArte\Cache\Cache;
+use ElkArte\Helper\Util;
+use ElkArte\User;
 
 /**
  * Load a shout box's parameters by ID
@@ -28,8 +31,8 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 
 	$db = database();
 
-	$query = array();
-	$parameters = array();
+	$query = [];
+	$parameters = [];
 
 	if ($shoutbox_id !== null)
 	{
@@ -48,7 +51,8 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 		$parameters['status'] = 1;
 	}
 
-	$request = $db->query('', '
+	$return = [];
+	$db->query('', '
 		SELECT
 			id_shoutbox, name, permissions, moderator_groups, warning, allowed_bbc, height,
 			num_show, num_max, refresh, reverse, caching, status, num_shouts, last_update
@@ -56,15 +60,12 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY name',
 		$parameters
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_shoutbox']] = array(
+	)->fetch_callback(function($row) use (&$return) {
+		$return[$row['id_shoutbox']] = [
 			'id' => $row['id_shoutbox'],
 			'name' => $row['name'],
 			'permissions' => $row['permissions'],
-			'moderator_groups' => $row['moderator_groups'] !== '' ? explode(',', $row['moderator_groups']) : array(),
+			'moderator_groups' => $row['moderator_groups'] !== '' ? explode(',', $row['moderator_groups']) : [],
 			'warning' => $row['warning'],
 			'allowed_bbc' => explode(',', $row['allowed_bbc']),
 			'height' => $row['height'],
@@ -76,11 +77,10 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
 			'status' => $row['status'],
 			'num_shouts' => $row['num_shouts'],
 			'last_update' => $row['last_update'],
-		);
-	}
-	$db->free_result($request);
+		];
+	});
 
-	return !empty($shoutbox_id) ? current($return) : $return;
+	return $shoutbox_id !== null ? current($return) : $return;
 }
 
 /**
@@ -93,7 +93,7 @@ function sportal_get_shoutbox($shoutbox_id = null, $active = false, $allowed = f
  */
 function sportal_get_shouts($shoutbox, $parameters)
 {
-	global $scripturl, $context, $user_info, $modSettings, $txt;
+	global $scripturl, $context, $modSettings, $txt;
 
 	$db = database();
 
@@ -101,13 +101,13 @@ function sportal_get_shouts($shoutbox, $parameters)
 	$shoutbox = !empty($shoutbox) ? (int) $shoutbox : 0;
 	$start = !empty($parameters['start']) ? (int) $parameters['start'] : 0;
 	$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 20;
-	$bbc = !empty($parameters['bbc']) ? $parameters['bbc'] : array();
+	$bbc = !empty($parameters['bbc']) ? $parameters['bbc'] : [];
 	$reverse = !empty($parameters['reverse']);
 	$cache = !empty($parameters['cache']);
 	$can_delete = !empty($parameters['can_moderate']);
 
 	// Cached, use it first
-	if (!empty($start) || !$cache || ($shouts = cache_get_data('shoutbox_shouts-' . $shoutbox, 240)) === null)
+	if (!empty($start) || !$cache || ($shouts = Cache::instance()->get('shoutbox_shouts-' . $shoutbox, 240)) === null)
 	{
 		// BBC Parser just for the shoutbox
 		$spParser = new BBCParser($spCodes = new Codes());
@@ -122,7 +122,8 @@ function sportal_get_shouts($shoutbox, $parameters)
 			}
 		}
 
-		$request = $db->query('', '
+		$shouts = [];
+		$db->query('', '
 			SELECT
 				sh.id_shout, sh.body, sh.log_time,
 				IFNULL(mem.id_member, 0) AS id_member,
@@ -136,21 +137,19 @@ function sportal_get_shouts($shoutbox, $parameters)
 			WHERE sh.id_shoutbox = {int:id_shoutbox}
 			ORDER BY sh.id_shout DESC
 			LIMIT {int:start}, {int:limit}',
-			array(
-				'id_shoutbox' => $shoutbox,
-				'start' => $start,
-				'limit' => $limit,
-			)
-		);
-		$shouts = array();
-		while ($row = $db->fetch_assoc($request))
-		{
+				[
+					'id_shoutbox' => $shoutbox,
+					'start' => $start,
+					'limit' => $limit,
+				]
+		)->fetch_callback(function($row) use (&$shouts, $spParser, $spSmiley, $scripturl, $txt) {
 			$online_color = !empty($row['member_group_color']) ? $row['member_group_color'] : $row['post_group_color'];
 			$message = $spParser->parse($row['body']);
 			$message = $spSmiley->setEnabled(true)->parse($message);
-			$shouts[$row['id_shout']] = array(
+
+			$shouts[$row['id_shout']] = [
 				'id' => $row['id_shout'],
-				'author' => array(
+				'author' => [
 					'id' => $row['id_member'],
 					'name' => $row['member_name'],
 					'link' => $row['id_member']
@@ -158,16 +157,15 @@ function sportal_get_shouts($shoutbox, $parameters)
 								? ' style="color: ' . $online_color . ';"' : '') . '>' . $row['member_name'] . '</a>')
 						: $row['member_name'],
 					'color' => $online_color,
-				),
+				],
 				'time' => $row['log_time'],
 				'text' => $message
-			);
-		}
-		$db->free_result($request);
+			];
+		});
 
 		if (empty($start) && $cache)
 		{
-			cache_put_data('shoutbox_shouts-' . $shoutbox, $shouts, 240);
+			Cache::instance()->put('shoutbox_shouts-' . $shoutbox, $shouts, 240);
 		}
 
 		// Restore BBC codes
@@ -177,19 +175,19 @@ function sportal_get_shouts($shoutbox, $parameters)
 	foreach ($shouts as $shout)
 	{
 		// Private shouts @username: only get shown to the shouter and shoutee, and the admin ;)
-		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower($user_info['name']) && $shout['author']['id'] != $user_info['id'] && !$user_info['is_admin'])
+		if (preg_match('~^@(.+?): ~u', $shout['text'], $target) && Util::strtolower($target[1]) !== Util::strtolower(User::$info['name']) && $shout['author']['id'] != User::$info['id'] && !User::$info['is_admin'])
 		{
 			unset($shouts[$shout['id']]);
 			continue;
 		}
 
-		$shouts[$shout['id']] += array(
-			'is_me' => preg_match('~^<div\sclass="meaction">\* ' . preg_quote($shout['author']['name'], '~') . '.+</div>$~', $shout['text']) != 0,
+		$shouts[$shout['id']] += [
+			'is_me' => preg_match('~^<div\sclass="meaction">&nbsp;' . preg_quote($shout['author']['name'], '~') . '.+</div>$~', $shout['text']) !== 0,
 			'delete_link' => $can_delete
 				? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '"></a> ' : '',
 			'delete_link_js' => $can_delete
 				? '<a class="dot dotdelete" href="' . $scripturl . '?action=shoutbox;shoutbox_id=' . $shoutbox . ';delete=' . $shout['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="sp_delete_shout(' . $shoutbox . ', ' . $shout['id'] . ', \'' . $context['session_var'] . '\', \'' . $context['session_id'] . '\'); return false;"></a> ' : '',
-		);
+		];
 
 		// Prepare for display in the box
 		$shouts[$shout['id']]['time'] = standardTime($shouts[$shout['id']]['time']);
@@ -228,12 +226,12 @@ function sportal_get_shoutbox_count($shoutbox_id)
 			COUNT(*)
 		FROM {db_prefix}sp_shouts
 		WHERE id_shoutbox = {int:current}',
-		array(
+		[
 			'current' => $shoutbox_id,
-		)
+		]
 	);
-	list ($total_shouts) = $db->fetch_row($request);
-	$db->free_result($request);
+	list ($total_shouts) = $request->fetch_row();
+	$request->free_result();
 
 	return $total_shouts;
 }
@@ -251,13 +249,11 @@ function sportal_get_shoutbox_count($shoutbox_id)
  */
 function sportal_create_shout($shoutbox, $shout)
 {
-	global $user_info;
-
 	$db = database();
 	$parser = ParserWrapper::instance();
 
 	// If a guest shouts in the woods, and no one is there to hear them
-	if ($user_info['is_guest'])
+	if (User::$info->is_guest)
 	{
 		return false;
 	}
@@ -276,31 +272,30 @@ function sportal_create_shout($shoutbox, $shout)
 	// Add the shout
 	$db->insert('', '
 		{db_prefix}sp_shouts',
-		array('id_shoutbox' => 'int', 'id_member' => 'int', 'member_name' => 'string', 'log_time' => 'int', 'body' => 'string',),
-		array($shoutbox['id'], $user_info['id'], $user_info['name'], time(), $shout,),
-		array('id_shout')
+		['id_shoutbox' => 'int', 'id_member' => 'int', 'member_name' => 'string', 'log_time' => 'int', 'body' => 'string',],
+		[$shoutbox['id'], User::$info['id'], User::$info['name'], time(), $shout,],
+		['id_shout']
 	);
 
 	// To many shouts in the box, then its archive maintenance time
 	$shoutbox['num_shouts']++;
 	if ($shoutbox['num_shouts'] > $shoutbox['num_max'])
 	{
-		$request = $db->query('', '
+		$old_shouts = [];
+		$db->query('', '
 			SELECT
 				id_shout
 			FROM {db_prefix}sp_shouts
 			WHERE id_shoutbox = {int:shoutbox}
 			ORDER BY log_time
 			LIMIT {int:limit}',
-			array(
+			[
 				'shoutbox' => $shoutbox['id'],
 				'limit' => $shoutbox['num_shouts'] - $shoutbox['num_max'],
-			)
-		);
-		$old_shouts = array();
-		while ($row = $db->fetch_assoc($request))
-			$old_shouts[] = $row['id_shout'];
-		$db->free_result($request);
+			]
+		)->fetch_callback(function($row) use (&$old_shouts) {
+				$old_shouts[] = $row['id_shout'];
+		});
 
 		sportal_delete_shout($shoutbox['id'], $old_shouts, true);
 	}
@@ -327,16 +322,16 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
 
 	if (!is_array($shouts))
 	{
-		$shouts = array($shouts);
+		$shouts = [$shouts];
 	}
 
 	// Remove it
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_shouts
 		WHERE id_shout IN ({array_int:shouts})',
-		array(
+		[
 			'shouts' => $shouts,
-		)
+		]
 	);
 
 	// Update the view
@@ -363,12 +358,12 @@ function sportal_update_shoutbox($shoutbox_id, $num_shouts = 0)
 		SET last_update = {int:time}' . ($num_shouts === 0 ? '' : ',
 			num_shouts = {raw:shouts}') . '
 		WHERE id_shoutbox = {int:shoutbox}',
-		array(
+		[
 			'shoutbox' => $shoutbox_id,
 			'time' => time(),
 			'shouts' => $num_shouts === true ? 'num_shouts + 1' : 'num_shouts - ' . $num_shouts,
-		)
+		]
 	);
 
-	cache_put_data('shoutbox_shouts-' . $shoutbox_id, null, 240);
+	Cache::instance()->put('shoutbox_shouts-' . $shoutbox_id, null, 240);
 }

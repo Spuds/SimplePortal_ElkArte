@@ -4,18 +4,22 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\Controller;
+
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
 
 /**
  * Pages controller.
  *
  * - This class handles requests for Page Functionality
  */
-class PortalPages_Controller extends Action_Controller
+class PortalPages extends AbstractController
 {
 	/**
 	 * Default method
@@ -32,7 +36,7 @@ class PortalPages_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		loadTemplate('PortalPages');
+		theme()->getTemplates()->load('PortalPages');
 	}
 
 	/**
@@ -44,10 +48,10 @@ class PortalPages_Controller extends Action_Controller
 
 		$context['SPortal']['pages'] = sportal_get_pages(0, true, true);
 
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=portal;sa=pages',
 			'name' => $txt['sp-pages'],
-		);
+		];
 
 		$context['page_title'] = $txt['sp-pages'];
 		$context['sub_template'] = 'view_pages';
@@ -67,7 +71,7 @@ class PortalPages_Controller extends Action_Controller
 		$context['SPortal']['page'] = sportal_get_pages($page_id, true, true);
 		if (empty($context['SPortal']['page']['id']))
 		{
-			throw new Elk_Exception('error_sp_page_not_found', false);
+			throw new Exception('error_sp_page_not_found', false);
 		}
 
 		// Fetch any style associated with the page
@@ -84,10 +88,10 @@ class PortalPages_Controller extends Action_Controller
 		}
 
 		// Prep the template for display
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?page=' . $page_id,
 			'name' => $context['SPortal']['page']['title'],
-		);
+		];
 
 		$context['page_title'] = $context['SPortal']['page']['title'];
 		$context['sub_template'] = 'view_page';

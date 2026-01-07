@@ -4,11 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
+use ElkArte\MembersList;
+use ElkArte\User;
 
 /**
  * User info block, shows avatar, group, icons, posts, karma, etc
@@ -17,7 +19,7 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class User_Info_Block extends SP_Abstract_Block
+class UserInfoBlock extends SPAbstractBlock
 {
 	/**
 	 * Initializes a block for use.
@@ -29,31 +31,31 @@ class User_Info_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $context, $scripturl, $txt, $user_info, $color_profile, $memberContext;
+		global $context, $scripturl, $txt, $color_profile;
 
 		$this->data['session_id'] = $context['session_id'];
 		$this->data['session_var'] = $context['session_var'];
 
 		if (isset($context['login_token_var']))
 		{
-			$this->data['tokens'] = array(
+			$this->data['tokens'] = [
 				'login_var' => $context['login_token_var'],
 				'login' => $context['login_token']
-			);
+			];
 		}
 
-		$this->data['username'] = !empty($user_info['username']) ? $user_info['username'] : '';
-		$this->data['urls'] = array(
+		$this->data['username'] = !empty(User::$info->username) ? User::$info->username : '';
+		$this->data['urls'] = [
 			'pm' => $scripturl . '?action=pm',
 			'login' => $scripturl . '?action=login2;quicklogin',
 			'profile' => $scripturl . '?action=profile',
 			'logout' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
 			'unread' => $scripturl . '?action=unread',
 			'unreadreplies' => $scripturl . '?action=unreadreplies',
-		);
+		];
 
-		// Give them a opportunity to logon
-		if ($user_info['is_guest'])
+		// Give them an opportunity to logon
+		if (User::$info->is_guest)
 		{
 			loadJavascriptFile('sha256.js');
 			$this->data['is_guest'] = true;
@@ -63,20 +65,21 @@ class User_Info_Block extends SP_Abstract_Block
 		else
 		{
 			$this->data['is_guest'] = false;
-			$context['admin_features'] = $context['admin_features'] ?? array();
+			$context['admin_features'] = $context['admin_features'] ?? [];
 
 			// load up the members details
-			loadMemberData($user_info['id']);
-			loadMemberContext($user_info['id'], true);
+			MembersList::load(User::$info->id);
+			$member = MembersList::get(User::$info->id);
+			$member->loadContext();
 
-			$this->data['member_info'] = $memberContext[$user_info['id']];
+			$this->data['member_info'] = $member;
 			$this->data['member_info']['can_pm'] = allowedTo('pm_read');
 			if ($this->data['member_info']['can_pm'])
 			{
-				$this->data['member_info']['pm'] = array(
-					'messages' => $user_info['messages'],
-					'unread' => $user_info['unread_messages'],
-				);
+				$this->data['member_info']['pm'] = [
+					'messages' => User::$info->messages,
+					'unread' => User::$info->unread_messages,
+				];
 			}
 
 			if (sp_loadColors($this->data['member_info']['id']) !== false)
@@ -102,7 +105,9 @@ class User_Info_Block extends SP_Abstract_Block
 			if (!empty($this->_modSettings['karmaMode']))
 			{
 				$this->data['show_karma'] = true;
-				$this->data['member_info']['karma']['total'] = $this->data['member_info']['karma']['good'] - $this->data['member_info']['karma']['bad'];
+				$karma = $this->data['member_info']['karma'];
+				$karma['total'] = $karma['good'] - $karma['bad'];
+				$this->data['member_info']['karma'] = $karma;
 				$this->data['karma_label'] = $this->_modSettings['karmaLabel'];
 
 				if ($this->_modSettings['karmaMode'] == 1)
@@ -134,7 +139,7 @@ class User_Info_Block extends SP_Abstract_Block
  */
 function template_sp_userInfo($data)
 {
-	global $txt, $scripturl, $user_info;
+	global $txt, $scripturl;
 
 	echo '
 		<div class="centertext">';
@@ -220,7 +225,7 @@ function template_sp_userInfo($data)
 		{
 			echo '
 				<li ', sp_embed_class('dot'), '>
-					<strong>', $txt['likes'], ': </strong><a href="', $scripturl, '?action=profile;area=showlikes;sa=given;u=', $user_info['id'], '">', $data['member_info']['likes']['given'], ' <span ', sp_embed_class('given'), '></span></a> / <a href="', $scripturl, '?action=profile;area=showlikes;sa=received;u=', $user_info['id'], '">', $data['member_info']['likes']['received'], ' <span ', sp_embed_class('received'), '></span></a>
+					<strong>', $txt['likes'], ': </strong><a href="', $scripturl, '?action=profile;area=showlikes;sa=given;u=', User::$info->id, '">', $data['member_info']['likes']['given'], ' <span ', sp_embed_class('given'), '></span></a> / <a href="', $scripturl, '?action=profile;area=showlikes;sa=received;u=', User::$info->id, '">', $data['member_info']['likes']['received'], ' <span ', sp_embed_class('received'), '></span></a>
 				</li>';
 		}
 

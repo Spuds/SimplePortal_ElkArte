@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 
@@ -29,7 +29,7 @@ function template_permission_profiles_edit()
 						</dd>
 						<dt>
 							<a href="', $scripturl, '?action=quickhelp;help=sp_ProfilesArea" onclick="return reqOverlayDiv(this.href);" class="help">
-								<img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" />
+								<i class="icon i-help" title="', $txt['help'], '"></i>
 							</a>
 							', $txt['sp_admin_profiles_col_permissions'], ':
 						</dt>
@@ -163,7 +163,7 @@ function template_style_profiles_edit()
 			</div>
 		</form>';
 
-		addInlineJavascript('check_style_options();', true);
+		theme()->addInlineJavascript('check_style_options();', true);
 }
 
 /**
@@ -223,7 +223,7 @@ function template_visibility_profiles_edit()
 				<dl class="sp_form">
 					<dt>
 						<a href="', $scripturl, '?action=quickhelp;help=sp-blocksCustomDisplayOptions" onclick="return reqOverlayDiv(this.href);" class="help">
-							<img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" />
+							<i class="icon i-help" title="', $txt['help'], '"></i>
 						</a>
 						<label for="profile_query">', $txt['sp_admin_profiles_col_query'], ':</label>
 					</dt>
@@ -258,7 +258,7 @@ function template_visibility_profiles_edit()
 		</form>';
 
 	// Swap the select value in to the query text box
-	addInlineJavascript('
+	theme()->addInlineJavascript('
 	$("#query_list").change(function() {
 		$("#profile_query").val(this.value);
 	}).change();',true);

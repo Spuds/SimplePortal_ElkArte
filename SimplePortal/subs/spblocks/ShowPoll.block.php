@@ -4,11 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
+use ElkArte\Languages\Txt;
 
 /**
  * Poll Block, Shows a specific poll, the most recent or a random poll
@@ -20,19 +22,19 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Show_Poll_Block extends SP_Abstract_Block
+class ShowPollBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'topic' => 'int',
 			'type' => 'select',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -59,7 +61,7 @@ class Show_Poll_Block extends SP_Abstract_Block
 		{
 			$this->setTemplate('template_sp_showPoll_error');
 
-			loadLanguage('Errors');
+			Txt::load('Errors');
 			$this->data['error_msg'] = $txt['cannot_poll_view'];
 
 			return;
@@ -79,23 +81,23 @@ class Show_Poll_Block extends SP_Abstract_Block
 					AND b.id_board != {int:recycle_enable}' : '') . '
 				ORDER BY {raw:type}
 				LIMIT 1',
-				array(
+				[
 					'boards_allowed_list' => $boardsAllowed,
 					'not_locked' => 0,
 					'is_approved' => 1,
 					'recycle_enable' => $this->_modSettings['recycle_board'],
 					'type' => $type == 1 ? 'p.id_poll DESC' : 'RAND()',
-				)
+				]
 			);
-			list ($topic) = $this->_db->fetch_row($request);
-			$this->_db->free_result($request);
+			list ($topic) = $request->fetch_row();
+			$request->free_result();
 		}
 
 		if (empty($topic) || $topic < 0)
 		{
 			$this->setTemplate('template_sp_showPoll_error');
 
-			loadLanguage('Errors');
+			Txt::load('Errors');
 			$this->data['error_msg'] = $txt['topic_doesnt_exist'];
 
 			return;

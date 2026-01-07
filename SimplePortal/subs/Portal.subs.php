@@ -4,43 +4,44 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.3
+ * @version 2.0.0
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Helper\Util;
+use ElkArte\Languages\Txt;
+use ElkArte\Request;
+use ElkArte\User;
+use ElkArte\Cache\Cache;
 
 /**
- * Return if the portal is active, or active in a given area.
+ * Return if the portal is active or active in a given area.
  *
  * @return bool
  */
 function sp_is_active()
 {
-	global $modSettings, $context, $settings, $maintenance, $user_info;
+	global $modSettings, $context, $settings, $maintenance;
 
 	$context['disable_sp'] = false;
 
-	// This to ensure BrowserDetector has run, Elkarte 1.1.4 will return this value properly, until then
-	// we need to make the call and then check browser_body_id below.
-	isBrowser('mobile');
-
 	// Frontpage hooks are called early in the flow
-	if (!isset($user_info['is_guest']))
+	if (!isset(User::$info->is_guest))
 	{
-		loadUserSettings();
+		User::load(true);
 	}
 
 	// Need to determine if we are even active
-	if (((!empty($modSettings['sp_disableMobile']) && $context['browser_body_id'] === 'mobile') && empty($_GET['page']) && empty($_GET['article']))
+	if ((!empty($modSettings['sp_disableMobile']) && empty($_GET['page']) && empty($_GET['article']))
+		|| isset($_GET['debug'])
 		|| !empty($settings['disable_sp'])
 		|| !empty($modSettings['disable_sp'])
 		|| empty($modSettings['sp_portal_mode'])
-		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum'))
-		|| isset($_GET['debug'])
-		|| (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'])
-		|| (empty($modSettings['front_page']) || $modSettings['front_page'] !== 'PortalMain_Controller'))
+		|| (empty($modSettings['allow_guestAccess']) && User::$info->is_guest)
+		|| (empty($modSettings['front_page']) || !str_ends_with($modSettings['front_page'], 'PortalMain'))
+		|| ((!empty($modSettings['sp_maintenance']) || !empty($maintenance)) && !allowedTo('admin_forum')))
 	{
 		$context['disable_sp'] = true;
 	}
@@ -52,16 +53,24 @@ function sp_is_active()
  * Initializes the portal, outputs all the blocks as needed
  *
  * @param bool $standalone
- * @throws Elk_Exception
  */
 function sportal_init($standalone = false)
 {
 	global $context, $scripturl, $modSettings, $settings;
 
-	defined('SPORTAL_VERSION') || define('SPORTAL_VERSION', '1.0.3');
-	defined('SPORTAL_STALE') || define('SPORTAL_STALE', 'sp103');
+	static $is_loading = false;
 
-	if ((isset($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
+	if ($is_loading)
+	{
+		return;
+	}
+
+	$is_loading = true;
+
+	defined('SPORTAL_VERSION') || define('SPORTAL_VERSION', '2.0.0');
+	defined('SPORTAL_STALE') || define('SPORTAL_STALE', 'sp200');
+
+	if (isset($_REQUEST['action']) && ($_REQUEST['action'] === 'dlattach' || $_REQUEST['action'] === 'mentions'))
 	{
 		return;
 	}
@@ -75,33 +84,33 @@ function sportal_init($standalone = false)
 	if (!$standalone)
 	{
 		// Load the portal css and the default css if it's not loaded.
-		loadCSSFile('portal.css', ['stale' => SPORTAL_STALE]);
+		loadCSSFile('SimplePortal/portal.css', ['stale' => SPORTAL_STALE]);
 
-		// rtl css as well?
+		// rtl CSS as well?
 		if (!empty($context['right_to_left']))
 		{
-			loadCSSFile('portal_rtl.css');
+			loadCSSFile('\SimplePortal\portal_rtl.css');
 		}
 
 		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'admin')
 		{
-			loadLanguage('SPortalAdmin');
+			Txt::load('SimplePortalAdmin');
 		}
 
 		if (!isset($settings['sp_images_url']))
 		{
-			if (file_exists($settings['theme_dir'] . '/images/sp'))
+			if (file_exists($settings['theme_dir'] . '/images/SimplePortal/sp'))
 			{
-				$settings['sp_images_url'] = $settings['theme_url'] . '/images/sp';
+				$settings['sp_images_url'] = $settings['theme_url'] . '/images/SimplePortal/sp';
 			}
 			else
 			{
-				$settings['sp_images_url'] = $settings['default_theme_url'] . '/images/sp';
+				$settings['sp_images_url'] = $settings['default_theme_url'] . '/images/SimplePortal/sp';
 			}
 		}
 	}
 
-	// Portal not enabled, or mobile, or debug, or maintenance, or .... then bow out now
+	// Portal isn't enabled, or mobile, or debug, or maintenance, or .... then bow out now
 	if (!sp_is_active())
 	{
 		if ($standalone)
@@ -121,7 +130,7 @@ function sportal_init($standalone = false)
 	// Not standalone means we need to load some portal specific information in to context
 	if (!$standalone)
 	{
-		require_once(SUBSDIR . '/spblocks/SPAbstractBlock.class.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.php');
 
 		// Not running via ssi then we need to get SSI for its functions
 		if (ELK !== 'SSI')
@@ -129,9 +138,9 @@ function sportal_init($standalone = false)
 			require_once(BOARDDIR . '/SSI.php');
 		}
 
-		// Portal specific templates and language
-		Templates::instance()->load('Portal');
-		loadLanguage('SPortal');
+		// Portal-specific templates and language
+		theme()->getTemplates()->load('Portal');
+		Txt::load('SimplePortal');
 
 		if (!empty($modSettings['sp_maintenance']) && !allowedTo('sp_admin'))
 		{
@@ -149,24 +158,24 @@ function sportal_init($standalone = false)
 
 		if ($modSettings['sp_portal_mode'] === 3)
 		{
-			$context += array(
+			$context += [
 				'portal_url' => $modSettings['sp_standalone_url'],
 				'page_title' => $context['forum_name'],
-			);
+			];
 		}
 		else
 		{
-			$context += array(
+			$context += [
 				'portal_url' => $scripturl,
-			);
+			];
 		}
 
 		if ($modSettings['sp_portal_mode'] === 1)
 		{
-			$context['linktree'][0] = array(
+			$context['linktree'][0] = [
 				'url' => $scripturl . '?action=forum',
 				'name' => $context['forum_name'],
-			);
+			];
 		}
 
 		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] === 1)
@@ -199,10 +208,9 @@ function sportal_init($standalone = false)
 	$context['SPortal']['on_portal'] = sportal_process_visibility('portal');
 
 	// Add the portal template
-	if (!Template_Layers::instance()->hasLayers(true) && !in_array('portal', Template_Layers::instance()->getLayers()))
-	{
-		Template_Layers::instance()->add('portal');
-	}
+	theme()->getTemplates()->load('Portal');
+
+	$is_loading = false;
 }
 
 /**
@@ -210,10 +218,10 @@ function sportal_init($standalone = false)
  */
 function sportal_init_headers()
 {
-	global $modSettings, $txt, $user_info, $scripturl;
+	global $modSettings, $txt, $scripturl;
 	static $initialized;
 
-	// If already loaded just return
+	// If already loaded, return
 	if (!empty($initialized))
 	{
 		return $initialized;
@@ -233,20 +241,21 @@ function sportal_init_headers()
 	}
 
 	// The shoutbox may fail to function in certain cases without using a safe scripturl
-	addJavascriptVar(array('sp_script_url' => '\'' . $safe_scripturl . '\''));
+	theme()->addJavascriptVar(['sp_script_url' => '\'' . $safe_scripturl . '\'']);
 
 	// Load up some javascript!
-	loadJavascriptFile('portal.js', ['stale' => SPORTAL_STALE]);
+	loadJavascriptFile('SimplePortal/portal.js', ['stale' => SPORTAL_STALE, 'defer' => true]);
 
 	// Load in any optional javascript
 	$javascript = '';
 
-	// Javascript to allow D&D ordering of the front page blocks, not for guests
+	// JavaScript to allow D&D ordering of the front page blocks, not for guests
 	if (empty($modSettings['sp_disableUserArrange'])
 		&& (int) $modSettings['sp_portal_mode'] === 1
-		&& empty($_REQUEST['action']) && empty($_REQUEST['board'])
-		&& !($user_info['is_guest'] || (int) $user_info['id'] === 0))
+		&& empty($_REQUEST['action']) && empty($_REQUEST['board']) && empty($_REQUEST['article'])
+		&& !(User::$info->is_guest || (int) User::$info->id === 0))
 	{
+		loadJavascriptFile('admin.js');
 		$modSettings['jquery_include_ui'] = true;
 		$javascript .= '
 			// Set up our sortable call
@@ -269,14 +278,15 @@ function sportal_init_headers()
 	if ($modSettings['sp_resize_images'])
 	{
 		$javascript .= '
-		createEventListener(window);
-		window.addEventListener("load", sp_image_resize, false);';
+		document.addEventListener("DOMContentLoaded", function() {
+		    sp_image_resize();
+		});';
 	}
 
 	// Let the template know we have some inline JS to display
 	if (!empty($javascript))
 	{
-		addInlineJavascript($javascript, true);
+		theme()->addInlineJavascript($javascript, true);
 	}
 
 	// Mark it as done so we don't do it again
@@ -288,20 +298,20 @@ function sportal_init_headers()
  */
 function sportal_load_permissions()
 {
-	global $context, $user_info;
+	global $context;
 
 	$profiles = sportal_get_profiles(null, 1);
-	$allowed = array();
+	$allowed = [];
 
 	foreach ($profiles as $profile)
 	{
 		$result = false;
 
-		if (!empty($profile['groups_denied']) && count(array_intersect($user_info['groups'], $profile['groups_denied'])) > 0)
+		if (!empty($profile['groups_denied']) && count(array_intersect(User::$info->groups, $profile['groups_denied'])) > 0)
 		{
 			$result = false;
 		}
-		elseif (!empty($profile['groups_allowed']) && count(array_intersect($user_info['groups'], $profile['groups_allowed'])) > 0)
+		elseif (!empty($profile['groups_allowed']) && count(array_intersect(User::$info->groups, $profile['groups_allowed'])) > 0)
 		{
 			$result = true;
 		}
@@ -312,10 +322,10 @@ function sportal_load_permissions()
 		}
 	}
 
-	$context['SPortal']['permissions'] = array(
+	$context['SPortal']['permissions'] = [
 		'profiles' => $allowed,
 		'query' => empty($allowed) ? '0=1' : 'FIND_IN_SET(%s, "' . implode(',', $allowed) . '")',
-	);
+	];
 }
 
 /**
@@ -325,38 +335,38 @@ function sportal_load_blocks()
 {
 	global $context, $modSettings, $options;
 
-	$context['SPortal']['sides'] = array(
-		1 => array(
+	$context['SPortal']['sides'] = [
+		1 => [
 			'id' => '1',
 			'name' => 'left',
 			'active' => !empty($modSettings['showleft']),
-		),
-		2 => array(
+		],
+		2 => [
 			'id' => '2',
 			'name' => 'top',
 			'active' => true,
-		),
-		3 => array(
+		],
+		3 => [
 			'id' => '3',
 			'name' => 'bottom',
 			'active' => true,
-		),
-		4 => array(
+		],
+		4 => [
 			'id' => '4',
 			'name' => 'right',
 			'active' => !empty($modSettings['showright']),
-		),
-		5 => array(
+		],
+		5 => [
 			'id' => '5',
 			'name' => 'header',
 			'active' => true,
-		),
-		6 => array(
+		],
+		6 => [
 			'id' => '6',
 			'name' => 'footer',
 			'active' => true,
-		),
-	);
+		],
+	];
 
 	// Get the blocks in the system
 	$blocks = getBlockInfo(null, null, true, true, true);
@@ -408,7 +418,7 @@ function sportal_load_blocks()
 
 	if (!isset($context['SPortal']['blocks']))
 	{
-		$context['SPortal']['blocks'] = array();
+		$context['SPortal']['blocks'] = [];
 	}
 
 	// For each active block, determine the style and get an instance of it for use
@@ -444,28 +454,28 @@ function sportal_load_blocks()
 /**
  * A shortcut that takes care of instantiating the block and returning the instance
  *
- * @param string $name The type of the block (without "_Block" at the end)
+ * @param string $name The type of the block (without "Block" at the end)
  * @param int $id The id of the block, to allow multiple same types on the page
  * @return object
  */
 function sp_instantiate_block($name, $id = 0)
 {
-	static $instances = array(), $db = null;
+	static $instances = [], $db = null;
 
 	if ($db === null)
 	{
 		$db = database();
 	}
 
-	if (!isset($instances[$name . '_' . $id]))
+	if (!isset($instances[$name . $id]))
 	{
-		require_once(SUBSDIR . '/spblocks/' . str_replace('_', '', $name) . '.block.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/' . $name . '.block.php');
 
-		$class = $name . '_Block';
-		$instances[$name. '_' . $id] = new $class($db);
+		$class = $name . 'Block';
+		$instances[$name. $id] = new $class($db);
 	}
 
-	return $instances[$name. '_' . $id];
+	return $instances[$name . $id];
 }
 
 /**
@@ -474,7 +484,7 @@ function sp_instantiate_block($name, $id = 0)
  */
 function resetMemberLayout()
 {
-	global $settings, $user_info;
+	global $settings;
 
 	$db = database();
 
@@ -483,19 +493,19 @@ function resetMemberLayout()
 		WHERE id_theme = {int:current_theme}
 			AND variable = {string:theme_variable}
 			AND id_member = {int:id_member}',
-		array(
+		[
 			'current_theme' => $settings['theme_id'],
 			'theme_variable' => 'sp_block_layout',
-			'id_member' => $user_info['id'],
-		)
+			'id_member' => User::$info->id,
+		]
 	);
 
 	// Clear the user theme cache to reflect the changes now
-	cache_put_data('theme_settings-' . $settings['theme_id'] . ':' . $user_info['id'], null, 60);
+	Cache::instance()->put('theme_settings-' . $settings['theme_id'] . ':' . User::$info->id, null, 60);
 }
 
 /**
- * This function, returns all information about particular blocks.
+ * This function returns all information about particular blocks.
  *
  * @param int|null $column_id
  * @param int|null $block_id
@@ -511,59 +521,59 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 
 	$db = database();
 
-	$query = array();
-	$parameters = array();
+	$query = [];
+	$parameters = [];
 
-	if (!empty($column_id))
+	if ($column_id !== null)
 	{
 		$query[] = 'spb.col = {int:col}';
 		$parameters['col'] = $column_id;
 	}
 
-	if (!empty($block_id))
+	if ($block_id !== null)
 	{
 		$query[] = 'spb.id_block = {int:id_block}';
 		$parameters['id_block'] = $block_id;
 	}
 
-	if (!empty($permission))
+	if ($permission !== null)
 	{
 		$query[] = sprintf($context['SPortal']['permissions']['query'], 'spb.permissions');
 	}
 
-	if (!empty($state))
+	if ($state !== null)
 	{
 		$query[] = 'spb.state = {int:state}';
 		$parameters['state'] = 1;
 	}
 
-	$request = $db->query('', '
-		SELECT
-			spb.id_block, spb.label, spb.type, spb.col, spb.`row`, spb.permissions, spb.state,
-			spb.force_view, spb.visibility, spb.styles, spp.variable, spp.value
-		FROM {db_prefix}sp_blocks AS spb
-			LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
-		WHERE ' . implode(' AND ', $query) : '') . '
-		ORDER BY spb.col, spb.`row`', $parameters
-	);
-	$return = array();
-	$show_it = array();
-	while ($row = $db->fetch_assoc($request))
-	{
+	$return = [];
+	$show_it = [];
+
+	$db->query('', '
+	SELECT
+		spb.id_block, spb.label, spb.type, spb.col, spb.`row`, spb.permissions, spb.state,
+		spb.force_view, spb.visibility, spb.styles, spp.variable, spp.value
+	FROM {db_prefix}sp_blocks AS spb
+		LEFT JOIN {db_prefix}sp_parameters AS spp ON (spp.id_block = spb.id_block)' . (!empty($query) ? '
+	WHERE ' . implode(' AND ', $query) : '') . '
+	ORDER BY spb.col, spb.`row`', $parameters
+	)->fetch_callback(function($row) use (&$return, &$show_it, &$show, &$txt, &$context, &$options) {
+		$row['type'] = str_replace('_', '', $row['type']);
+
 		if (!empty($show))
 		{
 			if (isset($show_it[$row['visibility']]) && $show_it[$row['visibility']] === false)
 			{
-				continue;
+				return;
 			}
 
 			if (!isset($show_it[$row['visibility']]))
 			{
 				$show_it[$row['visibility']] = sportal_check_visibility($row['visibility']);
-
 				if ($show_it[$row['visibility']] === false)
 				{
-					continue;
+					return;
 				}
 			}
 		}
@@ -576,7 +586,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 				sp_instantiate_block($row['type']);
 			}
 
-			$return[$row['id_block']] = array(
+			$return[$row['id_block']] = [
 				'id' => $row['id_block'],
 				'label' => $row['label'],
 				'type' => $row['type'],
@@ -589,16 +599,15 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
 				'state' => empty($row['state']) ? 0 : 1,
 				'force_view' => $row['force_view'],
 				'collapsed' => $context['user']['is_guest'] ? !empty($_COOKIE['sp_block_' . $row['id_block']]) : !empty($options['sp_block_' . $row['id_block']]),
-				'parameters' => array(),
-			);
+				'parameters' => [],
+			];
 		}
 
 		if (!empty($row['variable']))
 		{
 			$return[$row['id_block']]['parameters'][$row['variable']] = $row['value'];
 		}
-	}
-	$db->free_result($request);
+	});
 
 	return $return;
 }
@@ -628,7 +637,7 @@ function sportal_process_visibility($query)
 
 	if (!empty($_GET['article']) && empty($article_info) && (empty($context['current_action']) || $context['current_action'] === 'portal'))
 	{
-		require_once(SUBSDIR . '/PortalArticle.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalArticle.subs.php');
 		$article_info = sportal_get_articles($_GET['article'], true, true);
 	}
 
@@ -644,7 +653,7 @@ function sportal_process_visibility($query)
 	$forum = (empty($action) && empty($sub_action) && empty($board) && empty($topic) && empty($page) && empty($category) && empty($article) && ELK !== 'SSI' && $modSettings['sp_portal_mode'] != 1) || $action === 'forum';
 
 	// Will hopefully get larger in the future.
-	$portal_actions = array(
+	$portal_actions = [
 		'articles' => true,
 		'start' => true,
 		'theme' => true,
@@ -653,19 +662,19 @@ function sportal_process_visibility($query)
 		'www' => true,
 		'variant' => true,
 		'language' => true,
-		'action' => array('portal'),
-	);
+		'action' => ['portal'],
+	];
 
 	// Set some action exceptions, so they use a common root name
-	$exceptions = array(
-		'post' => array('announce', 'editpoll', 'emailuser', 'post2', 'sendtopic'),
-		'register' => array('activate', 'coppa'),
-		'forum' => array('collapse'),
-		'admin' => array('credits', 'theme', 'viewquery', 'viewsmfile'),
-		'moderate' => array('groups'),
-		'login' => array('reminder'),
-		'profile' => array('trackip', 'viewprofile'),
-	);
+	$exceptions = [
+		'post' => ['announce', 'editpoll', 'emailuser', 'post2', 'sendtopic'],
+		'register' => ['activate', 'coppa'],
+		'forum' => ['collapse'],
+		'admin' => ['credits', 'theme', 'viewquery', 'viewsmfile'],
+		'moderate' => ['groups'],
+		'login' => ['reminder'],
+		'profile' => ['trackip', 'viewprofile'],
+	];
 
 	// Still, we might not be in portal!
 	if (!empty($_GET) && empty($context['standalone']))
@@ -702,7 +711,7 @@ function sportal_process_visibility($query)
 	{
 		$code = substr($query, $boundary + 4);
 
-		$variables = array(
+		$variables = [
 			'{$action}' => "'$action'",
 			'{$sa}' => "'$sub_action'",
 			'{$board}' => "'$board'",
@@ -712,13 +721,13 @@ function sportal_process_visibility($query)
 			'{$article}' => "'$article'",
 			'{$portal}' => $portal,
 			'{$forum}' => $forum,
-		);
+		];
 
 		try
 		{
 			return eval(str_replace(array_keys($variables), array_values($variables), un_htmlspecialchars($code)) . ';');
 		}
-		catch (\Throwable $e)
+		catch (Throwable $e)
 		{
 			return un_htmlspecialchars($code);
 		}
@@ -734,8 +743,8 @@ function sportal_process_visibility($query)
 	}
 
 	// Take care of custom actions.
-	$special = array();
-	$exclude = array();
+	$special = [];
+	$exclude = [];
 	foreach ($query as $value)
 	{
 		if (!isset($value[0]))
@@ -798,7 +807,7 @@ function sportal_process_visibility($query)
 	}
 
 	// We don't want to show it on this action/page/board?
-	if (!empty($exclude['regular']) && count(array_intersect(array($action, $page, $board, $category, $article), $exclude['regular'])) > 0)
+	if (!empty($exclude['regular']) && count(array_intersect([$action, $page, $board, $category, $article], $exclude['regular'])) > 0)
 	{
 		return false;
 	}
@@ -890,8 +899,6 @@ function sportal_process_visibility($query)
  */
 function sportal_check_visibility($visibility_id)
 {
-	global $context;
-
 	static $visibilities;
 
 	// Load the visibility profiles, so we can put them to use on the blocks
@@ -910,7 +917,8 @@ function sportal_check_visibility($visibility_id)
 	if (isset($visibilities[$visibility_id]))
 	{
 		// Can we show it here, should we?
-		if ($context['browser_body_id'] === 'mobile' && empty($visibilities[$visibility_id]['mobile_view']))
+		if (empty($visibilities[$visibility_id]['mobile_view'])
+			&& strpos(Request::instance()->user_agent(), 'Mobi'))
 		{
 			return false;
 		}
@@ -939,11 +947,11 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 	{
 		require_once(SUBSDIR . '/Calendar.subs.php');
 
-		$loaded = array(
+		$loaded = [
 			'getEvents' => 'getEventRange',
 			'getBirthdays' => 'getBirthdayRange',
 			'getHolidays' => 'getHolidayRange',
-		);
+		];
 	}
 
 	if (!empty($loaded[$type]))
@@ -951,7 +959,7 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
 		return $loaded[$type]($low_date, ($high_date === false ? $low_date : $high_date));
 	}
 
-	return array();
+	return [];
 }
 
 /**
@@ -961,7 +969,7 @@ function sp_loadCalendarData($type, $low_date, $high_date = false)
  *
  * @return bool|array
  */
-function sp_loadColors($users = array())
+function sp_loadColors($users = [])
 {
 	global $color_profile, $scripturl, $modSettings;
 
@@ -980,7 +988,7 @@ function sp_loadColors($users = array())
 	}
 
 	// Make sure it's an array.
-	$users = !is_array($users) ? array($users) : array_unique($users);
+	$users = !is_array($users) ? [$users] : array_unique($users);
 
 	// Check up the array :)
 	foreach ($users as $k => $u)
@@ -997,12 +1005,12 @@ function sp_loadColors($users = array())
 		}
 	}
 
-	$loaded_ids = array();
+	$loaded_ids = [];
 
 	// Is this a totally new variable?
 	if (empty($color_profile))
 	{
-		$color_profile = array();
+		$color_profile = [];
 	}
 	// Otherwise, we will need to do some reformatting of the old data.
 	else
@@ -1036,13 +1044,13 @@ function sp_loadColors($users = array())
 			LEFT JOIN {db_prefix}membergroups AS pg ON (pg.id_group = mem.id_post_group)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
 		WHERE mem.id_member ' . ((count($users) == 1) ? '= {int:current}' : 'IN ({array_int:users})'),
-		array(
+		[
 			'users' => $users,
 			'current' => (int) current($users),
-		)
+		]
 	);
 	// Go through each of the users.
-	while ($row = $db->fetch_assoc($request))
+	while ($row = $request->fetch_assoc())
 	{
 		$loaded_ids[] = $row['id_member'];
 		$color_profile[$row['id_member']] = $row;
@@ -1051,7 +1059,7 @@ function sp_loadColors($users = array())
 		$color_profile[$row['id_member']]['link'] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '"' . (!empty($onlineColor) ? ' style="color: ' . $onlineColor . ';"' : '') . '>' . $row['real_name'] . '</a>';
 		$color_profile[$row['id_member']]['colored_name'] = (!empty($onlineColor) ? '<span style="color: ' . $onlineColor . ';">' : '') . $row['real_name'] . (!empty($onlineColor) ? '</span>' : '');
 	}
-	$db->free_result($request);
+	$request->free_result();
 
 	// Return the necessary data.
 	return empty($loaded_ids) ? false : $loaded_ids;
@@ -1074,12 +1082,12 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	global $modSettings, $settings, $txt;
 	static $default_alt, $randomizer;
 
-	loadLanguage('SPortal');
+	Txt::load('SimplePortal');
 
 	// Some default alt text settings for our standard images
 	if (!isset($default_alt))
 	{
-		$default_alt = array(
+		$default_alt = [
 			'dot' => $txt['sp-dot'],
 			'stars' => $txt['sp-star'],
 			'arrow' => $txt['sp-arrow'],
@@ -1098,7 +1106,7 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 			'items' => $txt['sp_items'],
 			'given' => $txt['sp_likes_given'],
 			'received' => $txt['sp_likes_received'],
-		);
+		];
 	}
 
 	if (!isset($randomizer) || $randomizer > 7)
@@ -1126,19 +1134,19 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	}
 
 	// dots using random colors
-	if (in_array($name, array('dot', 'star')) && empty($modSettings['sp_disable_random_bullets']))
+	if (in_array($name, ['dot', 'star']) && empty($modSettings['sp_disable_random_bullets']))
 	{
 		$name .= $randomizer;
 	}
 
-	// Build the image tag, with default fallback
+	// Build the image tag, with a default fallback
 	if (file_exists($settings['sp_images_url'] . '/' . $name . '.png'))
 	{
 		$file_name = $settings['sp_images_url'] . '/' . $name . '.png';
 	}
 	else
 	{
-		$file_name = $settings['default_images_url'] . '/sp/' . $name . '.png';
+		$file_name = $settings['default_images_url'] . '/SimplePortal/sp/' . $name . '.png';
 	}
 
 	return '<img src="' . $file_name . '" alt="' . $alt . '"' .
@@ -1163,12 +1171,12 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	global $modSettings, $txt;
 	static $default_title, $randomizer;
 
-	loadLanguage('SPortal');
+	Txt::load('SimplePortal');
 
 	// Some default title text settings for our standard sprites
 	if (!isset($default_title))
 	{
-		$default_title = array(
+		$default_title = [
 			'dot' => '',
 			'stars' => $txt['sp-star'],
 			'arrow' => $txt['sp-arrow'],
@@ -1187,7 +1195,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 			'items' => $txt['sp_items'],
 			'given' => $txt['sp_likes_given'],
 			'received' => $txt['sp_likes_received'],
-		);
+		];
 	}
 
 	// Use a default title text if available and none was supplied
@@ -1197,7 +1205,7 @@ function sp_embed_class($name, $title = '', $extraclass = '', $spriteclass = 'do
 	}
 
 	// dots / start using colors
-	if (in_array($name, array('dot', 'star')) && empty($modSettings['sp_disable_random_bullets']))
+	if (in_array($name, ['dot', 'star']) && empty($modSettings['sp_disable_random_bullets']))
 	{
 		// Loop through the dot colors
 		if (!isset($randomizer) || $randomizer > 7)
@@ -1226,12 +1234,12 @@ function sportal_parse_style($action, $setting = '', $process = false)
 {
 	static $process_cache;
 
-	$style = array();
+	$style = [];
 
 	if ($action === 'implode')
 	{
 		$style = '';
-		$style_parameters = array(
+		$style_parameters = [
 			'title_default_class',
 			'title_custom_class',
 			'title_custom_style',
@@ -1240,7 +1248,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 			'body_custom_style',
 			'no_title',
 			'no_body',
-		);
+		];
 
 		foreach ($style_parameters as $parameter)
 		{
@@ -1273,7 +1281,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 		}
 		else
 		{
-			$style = array(
+			$style = [
 				'title_default_class' => 'category_header',
 				'title_custom_class' => '',
 				'title_custom_style' => '',
@@ -1282,7 +1290,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 				'body_custom_style' => '',
 				'no_title' => false,
 				'no_body' => false,
-			);
+			];
 		}
 
 		// Set the style values for use in the templates
@@ -1330,7 +1338,7 @@ function sportal_parse_style($action, $setting = '', $process = false)
 /**
  * Loads a category by id, or category's by namespace
  *
- * @param int|string|null $category_id
+ * @param int|string|null $category_id Either an id or a namespace
  * @param bool $active
  * @param bool $allowed
  * @param string $sort
@@ -1343,8 +1351,8 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 
 	$db = database();
 
-	$query = array();
-	$parameters = array('sort' => $sort);
+	$query = [];
+	$parameters = ['sort' => $sort];
 
 	// Asking for a specific category or the namespace
 	if (!empty($category_id) && is_int($category_id))
@@ -1372,19 +1380,18 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 	}
 
 	// Let us see what we can find
-	$request = $db->query('', '
+	$return = [];
+	$db->query('', '
 		SELECT
 			id_category, namespace, name, description, permissions, articles, status
 		FROM {db_prefix}sp_categories' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}', $parameters
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_category']] = array(
+	)->fetch_callback( function ($row) use (&$return, $scripturl) {
+		$return[$row['id_category']] = [
 			'id' => $row['id_category'],
-			'category_id' => $row['namespace'],
+			'category_id' => $row['id_category'],
+			'namespace' => $row['namespace'],
 			'name' => $row['name'],
 			'href' => $scripturl . '?category=' . $row['namespace'],
 			'link' => '<a href="' . $scripturl . '?category=' . $row['namespace'] . '">' . $row['name'] . '</a>',
@@ -1392,9 +1399,8 @@ function sportal_get_categories($category_id = null, $active = false, $allowed =
 			'permissions' => $row['permissions'],
 			'articles' => $row['articles'],
 			'status' => $row['status'],
-		);
-	}
-	$db->free_result($request);
+		];
+	});
 
 	// Return the id or the whole batch
 	return !empty($category_id) ? current($return) : $return;
@@ -1414,19 +1420,19 @@ function sportal_increase_viewcount($name, $id)
 
 	if ($name === 'page')
 	{
-		$query = array(
+		$query = [
 			'table' => 'sp_pages',
 			'query_id' => 'id_page',
 			'id' => $id
-		);
+		];
 	}
 	elseif ($name === 'article')
 	{
-		$query = array(
+		$query = [
 			'table' => 'sp_articles',
 			'query_id' => 'id_article',
 			'id' => $id
-		);
+		];
 	}
 	else
 	{
@@ -1437,11 +1443,11 @@ function sportal_increase_viewcount($name, $id)
 		UPDATE {db_prefix}{raw:table}
 		SET views = views + 1
 		WHERE {raw:query_id} = {int:id}',
-		array(
+		[
 			'table' => $query['table'],
 			'query_id' => $query['query_id'],
 			'id' => $query['id'],
-		)
+		]
 	);
 
 	return null;
@@ -1466,16 +1472,16 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 
 	$page_id = is_int($page_id) || is_string($page_id) ? $page_id : 0;
 
-	// If we already have the information, just return it
-	$cache_name = implode(':', array($page_id, $active, $allowed));
+	// If we already have the information, return it
+	$cache_name = implode(':', [$page_id, $active, $allowed]);
 	if (isset($cache[$cache_name]))
 	{
 		$return = $cache[$cache_name];
 	}
 	else
 	{
-		$query = array();
-		$parameters = array('sort' => $sort);
+		$query = [];
+		$parameters = ['sort' => $sort];
 
 		// Page id or Page Namespace
 		if (!empty($page_id) && is_int($page_id))
@@ -1503,17 +1509,15 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 		}
 
 		// Make the page request
-		$request = $db->query('', '
+		$return = [];
+		$db->query('', '
 			SELECT
 				id_page, namespace, title, body, type, permissions, views, styles, status
 			FROM {db_prefix}sp_pages' . (!empty($query) ? '
 			WHERE ' . implode(' AND ', $query) : '') . '
 			ORDER BY {raw:sort}', $parameters
-		);
-		$return = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$return[$row['id_page']] = array(
+		)->fetch_callback( function ($row) use (&$return, $scripturl) {
+			$return[$row['id_page']] = [
 				'id' => $row['id_page'],
 				'page_id' => $row['namespace'],
 				'title' => $row['title'],
@@ -1525,9 +1529,8 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
 				'views' => $row['views'],
 				'styles' => $row['styles'],
 				'status' => $row['status'],
-			);
-		}
-		$db->free_result($request);
+			];
+		});
 
 		// Save this, so we don't have to do it again
 		$cache[$cache_name] = $return;
@@ -1608,13 +1611,13 @@ function sportal_parse_cutoff_content(&$body, $type, $length = 0, $link_id = nul
  *
  * @param string $body the string of text to treat as $type
  * @param string $type one of html, bbc, php
- * @param string $output_method if echo will echo the results, otherwise returns the string
+ * @param string $output_method if echo echoes the results, otherwise returns the string
  *
  * @return string|bool
  */
 function sportal_parse_content($body, $type, $output_method = 'echo')
 {
-	if (in_array($type, array('bbc', 'html', 'markdown')) && strpos($body, '[cutoff]') !== false)
+	if (in_array($type, ['bbc', 'html', 'markdown']) && strpos($body, '[cutoff]') !== false)
 	{
 		$body = str_replace('[cutoff]', '', $body);
 	}
@@ -1667,11 +1670,11 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 				eval($body);
 				$result = ob_get_contents();
 			}
-			catch (\Throwable $e)
+			catch (Throwable $e)
 			{
 				$result = $txt['sp_php_validation_fail'] . ', "' . $e->getMessage() . '", ' . $txt['line'] . ' ' . $e->getLine();
 			}
-			ob_end_clean();
+			@ob_end_clean();
 
 			if ($output_method !== 'echo')
 			{
@@ -1697,8 +1700,8 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
 {
 	$db = database();
 
-	$query = array();
-	$parameters = array('sort' => $sort);
+	$query = [];
+	$parameters = ['sort' => $sort];
 
 	if (isset($menu_id))
 	{
@@ -1706,6 +1709,7 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
 		$parameters['menu_id'] = (int) $menu_id;
 	}
 
+	$return = [];
 	$request = $db->query('', '
 		SELECT
 			id_menu, name
@@ -1713,16 +1717,12 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
 			WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}',
 		$parameters
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_menu']] = array(
+	)->fetch_callback( function ($row) use (&$return) {
+		$return[$row['id_menu']] = [
 			'id' => $row['id_menu'],
 			'name' => $row['name'],
-		);
-	}
-	$db->free_result($request);
+		];
+	});
 
 	return !empty($menu_id) ? current($return) : $return;
 }
@@ -1739,8 +1739,8 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
 {
 	$db = database();
 
-	$query = array();
-	$parameters = array('sort' => $sort);
+	$query = [];
+	$parameters = ['sort' => $sort];
 
 	if (isset($item_id))
 	{
@@ -1748,27 +1748,24 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
 		$parameters['item_id'] = (int) $item_id;
 	}
 
-	$request = $db->query('', '
+	$return = [];
+	$db->query('', '
 		SELECT
 			id_item, id_menu, namespace, title, href, target
 		FROM {db_prefix}sp_menu_items' . (!empty($query) ? '
 			WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}',
 		$parameters
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_item']] = array(
+	)->fetch_callback( function ($row) use (&$return) {
+		$return[$row['id_item']] = [
 			'id' => $row['id_item'],
 			'id_menu' => $row['id_menu'],
 			'namespace' => $row['namespace'],
 			'title' => $row['title'],
 			'url' => $row['href'],
 			'target' => $row['target'],
-		);
-	}
-	$db->free_result($request);
+		];
+	});
 
 	return !empty($item_id) ? current($return) : $return;
 }
@@ -1793,8 +1790,8 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 
 	$db = database();
 
-	$query = array();
-	$parameters = array('sort' => $sort);
+	$query = [];
+	$parameters = ['sort' => $sort];
 
 	if (isset($profile_id))
 	{
@@ -1808,56 +1805,52 @@ function sportal_get_profiles($profile_id = null, $type = null, $sort = null)
 		$parameters['type'] = (int) $type;
 	}
 
-	$request = $db->query('', '
+	$return = [];
+	$db->query('', '
 		SELECT
 			id_profile, type, name, value
 		FROM {db_prefix}sp_profiles' . (!empty($query) ? '
 		WHERE ' . implode(' AND ', $query) : '') . (!empty($sort) ? '
 		ORDER BY {raw:sort}' : ''),
 		$parameters
-	);
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$return[$row['id_profile']] = array(
+	)->fetch_callback( function ($row) use (&$return, $txt) {
+		$return[$row['id_profile']] = [
 			'id' => $row['id_profile'],
 			'name' => $row['name'],
 			'label' => $txt['sp_admin_profiles' . substr($row['name'], 1)] ?? $row['name'],
 			'type' => $row['type'],
 			'value' => $row['value'],
-		);
+		];
 
 		// Get the permissions
-		if ($row['type'] == 1)
+		if ((int) $row['type'] === 1)
 		{
 			list ($groups_allowed, $groups_denied) = explode('|', $row['value']);
 
-			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], array(
-				'groups_allowed' => $groups_allowed !== '' ? explode(',', $groups_allowed) : array(),
-				'groups_denied' => $groups_denied !== '' ? explode(',', $groups_denied) : array(),
-			));
+			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], [
+				'groups_allowed' => $groups_allowed !== '' ? explode(',', $groups_allowed) : [],
+				'groups_denied' => $groups_denied !== '' ? explode(',', $groups_denied) : [],
+			]);
 		}
 		// Styles
-		elseif ($row['type'] == 2)
+		elseif ((int) $row['type'] === 2)
 		{
 			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], sportal_parse_style('explode', $row['value'], true));
 		}
 		// Visibility
-		elseif ($row['type'] == 3)
+		elseif ((int) $row['type'] === 3)
 		{
 			list ($selections, $query, $mobile_view) = array_pad(explode('|', $row['value']), 3, '');
 			$query = str_replace('&vert;', '|', $query);
 
-			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], array(
+			$return[$row['id_profile']] = array_merge($return[$row['id_profile']], [
 				'selections' => explode(',', $selections),
 				'query' => $query,
 				'mobile_view' => $mobile_view,
-				'final' => implode(',', array($selections, $query, $mobile_view)),
-			));
+				'final' => implode(',', [$selections, $query, $mobile_view]),
+			]);
 		}
-	}
-
-	$db->free_result($request);
+	});
 
 	return !empty($profile_id) ? current($return) : $return;
 }
@@ -1893,13 +1886,14 @@ function sportal_select_style($style_id)
  */
 function sp_prevent_flood($type, $fatal = true)
 {
-	global $modSettings, $user_info, $txt;
+	global $modSettings, $txt;
 
+	/** @var \ElkArte\Database\QueryInterface $db */
 	$db = database();
 
-	$limits = array(
+	$limits = [
 		'spsbp' => 5,
-	);
+	];
 
 	if (!allowedTo('admin_forum'))
 	{
@@ -1915,26 +1909,26 @@ function sp_prevent_flood($type, $fatal = true)
 		DELETE FROM {db_prefix}log_floodcontrol
 		WHERE log_time < {int:log_time}
 			AND log_type = {string:log_type}',
-		array(
+		[
 			'log_time' => time() - $time_limit,
 			'log_type' => $type,
-		)
+		]
 	);
 
 	// Update existing ones that were still inside the time limit
-	$db->insert('replace', '
+	$result = $db->insert('replace', '
 		{db_prefix}log_floodcontrol',
-		array('ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'),
-		array($user_info['ip'], time(), $type),
-		array('ip', 'log_type')
+		['ip' => 'string-16', 'log_time' => 'int', 'log_type' => 'string'],
+		[User::$info->ip, time(), $type],
+		['ip', 'log_type']
 	);
 
 	// To many entries, need to slow them down
-	if ($db->affected_rows() != 1)
+	if ($result->affected_rows() !== 1)
 	{
 		if ($fatal)
 		{
-			throw new Elk_Exception('error_sp_flood_' . $type, false, array($time_limit));
+			throw new ElkArte\Exceptions\Exception('error_sp_flood_' . $type, false, [$time_limit]);
 		}
 
 		return isset($txt['error_sp_flood_' . $type]) ? sprintf($txt['error_sp_flood_' . $type], $time_limit) : true;

@@ -4,11 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
 
 /**
  * Top stats block, shows the top x members who has achieved top position of various stats
@@ -24,22 +25,22 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Top_Stats_Member_Block extends SP_Abstract_Block
+class TopStatsMemberBlock extends SPAbstractBlock
 {
-	protected $sp_topStatsSystem = array();
-	protected $color_ids = array();
+	protected $sp_topStatsSystem = [];
+	protected $color_ids = [];
 
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
 		global $txt;
 
-		$this->block_parameters = array(
-			'type' => array(
+		$this->block_parameters = [
+			'type' => [
 				'0' => $txt['sp_topStatsMember_total_time_logged_in'],
 				'1' => $txt['sp_topStatsMember_Posts'],
 				'2' => $txt['sp_topStatsMember_Karma_Good'],
@@ -48,13 +49,13 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'5' => $txt['sp_topStatsMember_Likes_Received'],
 				'6' => $txt['sp_topStatsMember_Likes_Given'],
 				'7' => $txt['sp_topStatsMember_Likes_Total'],
-			),
+			],
 			'limit' => 'int',
 			'sort_asc' => 'check',
 			'last_active_limit' => 'int',
 			'enable_label' => 'check',
 			'list_label' => 'text',
-		);
+		];
 
 		parent::__construct($db);
 		$this->setupSystemArray();
@@ -78,8 +79,8 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		* 'enabled' - true = mod exists or is possible to use :D
 		* 'error_msg' => $txt['my_error_msg']; You can insert here what kind of error message should appear if the modification not exists =D
 		*/
-		$this->sp_topStatsSystem = array(
-			'0' => array(
+		$this->sp_topStatsSystem = [
+			'0' => [
 				'name' => 'Total time logged in',
 				'field' => 'mem.total_time_logged_in',
 				'order' => 'mem.total_time_logged_in',
@@ -108,15 +109,15 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_text' => ' %timelogged%',
 				'reverse_sort_asc' => false,
 				'enabled' => true,
-			),
-			'1' => array(
+			],
+			'1' => [
 				'name' => 'Posts',
 				'field' => 'mem.posts',
 				'order' => 'mem.posts',
 				'output_text' => ' %posts% ' . $txt['posts'],
 				'enabled' => true,
-			),
-			'2' => array(
+			],
+			'2' => [
 				'name' => 'Karma Good',
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'mem.karma_good',
@@ -126,8 +127,8 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
-			),
-			'3' => array(
+			],
+			'3' => [
 				'name' => 'Karma Bad',
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'mem.karma_bad',
@@ -137,8 +138,8 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
-			),
-			'4' => array(
+			],
+			'4' => [
 				'name' => 'Karma Total',
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'FLOOR(1000000+karma_good-karma_bad)',
@@ -148,32 +149,32 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 				'output_text' => $this->_modSettings['karmaLabel'] . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' &plusmn;%karma_good%\%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
 				'error_msg' => $txt['sp_karma_is_disabled'],
-			),
-			'5' => array(
+			],
+			'5' => [
 				'name' => 'Likes Received/Given',
 				'field' => 'mem.likes_received',
 				'order' => 'mem.likes_received',
 				'output_text' => '%likes_received% ' . $txt['sp_topStatsMember_Likes_Received'],
 				'enabled' => !empty($this->_modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
-			),
-			'6' => array(
+			],
+			'6' => [
 				'name' => 'Likes Given',
 				'field' => 'mem.likes_given',
 				'order' => 'mem.likes_given',
 				'output_text' => '%likes_given% ' . $txt['sp_topStatsMember_Likes_Given'],
 				'enabled' => !empty($this->_modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
-			),
-			'7' => array(
+			],
+			'7' => [
 				'name' => 'Likes Totals',
 				'field' => 'mem.likes_received, mem.likes_given',
 				'order' => 'mem.likes_received',
 				'output_text' => $txt['sp_topStatsMember_Likes_Received'] . ':&nbsp;%likes_received% / ' . $txt['sp_topStatsMember_Likes_Given'] . ':&nbsp;%likes_given%',
 				'enabled' => !empty($this->_modSettings['likes_enabled']),
 				'error_msg' => $txt['sp_likes_is_disabled'],
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -217,7 +218,7 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		$sort_asc = !empty($current_system['reverse']) ? !$sort_asc : $sort_asc;
 
 		// Build the where statement
-		$where = array();
+		$where = [];
 
 		// If this is already cached, use it
 		$chache_id = 'sp_chache_' . $id . '_topStatsMember';
@@ -258,7 +259,10 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 		}
 
 		// Finally make the query with the parameters we built
-		$request = $this->_db->query('', '
+		$this->data['members'] = [];
+		$count = 1;
+		$cache_member_ids = [];
+		$this->_db->query('', '
 			SELECT
 				mem.id_member, mem.real_name, mem.avatar, mem.email_address,
 				a.id_attach, a.attachment_type, a.filename,
@@ -268,25 +272,18 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			{raw:where}
 			ORDER BY {raw:order} {raw:sort}
 			LIMIT {int:limit}',
-			array(
-				// Prevent delete of user if the cache was available
+			[
 				'limit' => isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 100 ? ($limit + 5) : $limit,
 				'field' => $current_system['field'],
 				'where' => $where,
 				'order' => $current_system['order'],
 				'sort' => ($sort_asc ? 'ASC' : 'DESC'),
-			)
-		);
-		$this->data['members'] = array();
-		$count = 1;
-		$chache_member_ids = array();
-		while ($row = $this->_db->fetch_assoc($request))
-		{
+			]
+		)->fetch_callback((function($row) use (&$count, $limit, &$cache_member_ids, $current_system, $scripturl) {
 			// Collect some to cache data
-			$chache_member_ids[$row['id_member']] = $row['id_member'];
-			if ($count++ > $limit)
-			{
-				continue;
+			$cache_member_ids[$row['id_member']] = $row['id_member'];
+			if ($count++ > $limit) {
+				return;
 			}
 
 			$this->color_ids[$row['id_member']] = $row['id_member'];
@@ -295,48 +292,44 @@ class Top_Stats_Member_Block extends SP_Abstract_Block
 			$output = '';
 
 			// Prepare some data of the row?
-			if (!empty($current_system['output_function']))
-			{
+			if (!empty($current_system['output_function'])) {
 				$current_system['output_function']($row);
 			}
 
-			if (!empty($current_system['output_text']))
-			{
+			if (!empty($current_system['output_text'])) {
 				$output = $current_system['output_text'];
-				foreach ($row as $item => $replacewith)
-				{
+				foreach ($row as $item => $replacewith) {
 					$output = str_replace('%' . $item . '%', $replacewith, $output);
 				}
 			}
 
-			$this->data['members'][] = array(
+			$this->data['members'][] = [
 				'id' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 				'link' => '<a style="font-size: 90%" href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-				'avatar' => determineAvatar(array(
+				'avatar' => determineAvatar([
 					'avatar' => $row['avatar'],
 					'filename' => $row['filename'],
 					'id_attach' => $row['id_attach'],
 					'email_address' => $row['email_address'],
 					'attachment_type' => $row['attachment_type'],
-				)),
+				]),
 				'output' => $output,
 				'complete_row' => $row,
-			);
-		}
-		$this->_db->free_result($request);
+			];
+		})->bindTo($this));
 
 		// Update the cache, at least around 100 members are needed for a good working version
-		if (empty($this->_modSettings['sp_disableChache']) && isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 0 && !empty($chache_member_ids) && count($chache_member_ids) > $limit && empty($this->_modSettings[$chache_id]))
+		if (empty($this->_modSettings['sp_disableChache']) && isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 0 && !empty($cache_member_ids) && count($cache_member_ids) > $limit && empty($this->_modSettings[$chache_id]))
 		{
-			$toCache = array($type, $limit, ($sort_asc ? 1 : 0), time(), implode(',', $chache_member_ids));
-			updateSettings(array($chache_id => implode(';', $toCache)));
+			$toCache = [$type, $limit, ($sort_asc ? 1 : 0), time(), implode(',', $cache_member_ids)];
+			updateSettings([$chache_id => implode(';', $toCache)]);
 		}
 		// One time error, if this happens the cache needs an update
 		elseif (!empty($this->_modSettings[$chache_id]))
 		{
-			updateSettings(array($chache_id => '0;0;0;1000;0'));
+			updateSettings([$chache_id => '0;0;0;1000;0']);
 		}
 
 		// Color the id's

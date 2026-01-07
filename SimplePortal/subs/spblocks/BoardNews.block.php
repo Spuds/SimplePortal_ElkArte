@@ -4,15 +4,18 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Attachments\AttachmentsDisplay;
+use ElkArte\Database\QueryInterface;
+use ElkArte\Languages\Txt;
 
 /**
- * Board Block, Displays a list of posts from selected board(s)
+ * Board Block, Displays a list of posts from the selected board(s)
  *
  * @param array $parameters
  * 			'board' => Board(s) to select posts from
@@ -25,25 +28,25 @@ use BBC\ParserWrapper;
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Board_News_Block extends SP_Abstract_Block
+class BoardNewsBlock extends SPAbstractBlock
 {
-	/** @var array */
-	protected $attachments = array();
+	/** @var AttachmentsDisplay */
+	protected $attachments = [];
 
 	/** @var array */
-	protected $color_ids = array();
+	protected $color_ids = [];
 
 	/** @var array */
-	protected $icon_sources = array();
+	protected $icon_sources = [];
 
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'board' => 'boards',
 			'limit' => 'int',
 			'start' => 'int',
@@ -51,7 +54,7 @@ class Board_News_Block extends SP_Abstract_Block
 			'avatar' => 'check',
 			'attachment' => 'check',
 			'per_page' => 'int',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -80,13 +83,14 @@ class Board_News_Block extends SP_Abstract_Block
 		$limit = max(0, $limit);
 		$start = max(0, $start);
 
-		loadLanguage('Stats');
+		Txt::load('Stats');
 
 		// Common message icons
 		$this->_stable_icons();
 
 		// Load the topics they can see
-		$request = $this->_db->query('', '
+		$posts = [];
+		$this->_db->query('', '
 			SELECT
 				t.id_first_msg
 			FROM {db_prefix}topics AS t
@@ -98,21 +102,17 @@ class Board_News_Block extends SP_Abstract_Block
 				AND (t.locked != {int:locked} OR m.icon != {string:icon})
 			ORDER BY t.id_first_msg DESC
 			LIMIT {int:limit}',
-			array(
+			[
 				'current_board' => $board,
 				'min_msg_id' => $this->_modSettings['maxMsgID'] - 45 * min($limit, 5),
 				'is_approved' => 1,
 				'locked' => 1,
 				'icon' => 'moved',
 				'limit' => $limit,
-			)
-		);
-		$posts = array();
-		while ($row = $this->_db->fetch_assoc($request))
-		{
+			]
+		)->fetch_callback(function($row) use (&$posts) {
 			$posts[] = $row['id_first_msg'];
-		}
-		$this->_db->free_result($request);
+		});
 
 		// No posts, basic error message it is
 		$current_url = '';
@@ -131,10 +131,10 @@ class Board_News_Block extends SP_Abstract_Block
 			$start = !empty($_REQUEST['news' . $id]) ? (int) $_REQUEST['news' . $id] : 0;
 
 			$clean_url = str_replace('%', '%%', preg_replace('~news' . $id . '=[^;]+;?~', '', $_SERVER['REQUEST_URL']));
-			$current_url = $clean_url . (strpos($clean_url, '?') !== false ? (in_array(substr($clean_url, -1), array(';', '?')) ? '' : ';') : '?');
+			$current_url = $clean_url . (strpos($clean_url, '?') !== false ? (in_array(substr($clean_url, -1), [';', '?']) ? '' : ';') : '?');
 		}
 
-		// Load the actual post details for the topics
+		// Load the actual post-details for the topics
 		$request = $this->_db->query('', '
 			SELECT
 				m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
@@ -147,11 +147,11 @@ class Board_News_Block extends SP_Abstract_Block
 			WHERE t.id_first_msg IN ({array_int:post_list})
 			ORDER BY t.id_first_msg DESC
 			LIMIT ' . (!empty($per_page) ? '{int:start}, ' : '') . '{int:limit}',
-			array(
+			[
 				'post_list' => $posts,
 				'start' => $start,
 				'limit' => !empty($per_page) ? $per_page : $limit,
-			)
+			]
 		);
 
 		// Get the first attachment for each post for this group
@@ -160,9 +160,9 @@ class Board_News_Block extends SP_Abstract_Block
 			$this->loadAttachments($posts);
 		}
 
-		$this->data['news'] = array();
+		$this->data['news'] = [];
 
-		while ($row = $this->_db->fetch_assoc($request))
+		while ($row = $request->fetch_assoc())
 		{
 			// Good time to do this is ... now
 			censor($row['subject']);
@@ -196,11 +196,11 @@ class Board_News_Block extends SP_Abstract_Block
 			if (!empty($this->_modSettings['attachment_inline_enabled'])
 				&& strpos($row['body'], '<img src="' . $scripturl . '?action=dlattach;attach=') !== false)
 			{
-				$attach = array();
+				$attach = [];
 			}
 
 			// Build an array of message information for output
-			$this->data['news'][] = array(
+			$this->data['news'][] = [
 				'id' => $row['id_topic'],
 				'message_id' => $row['id_msg'],
 				'icon' => '<img src="' . $settings[$this->icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="icon" alt="' . $row['icon'] . '" />',
@@ -215,19 +215,19 @@ class Board_News_Block extends SP_Abstract_Block
 				'comment_href' => !empty($row['locked']) ? '' : $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'],
 				'comment_link' => !empty($row['locked']) ? '' : '<a class="linkbutton" href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'] . '">' . $txt['reply'] . '</a>',
 				'new_comment' => !empty($row['locked']) ? '' : '<a class="linkbutton" href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . '">' . $txt['reply'] . '</a>',
-				'poster' => array(
+				'poster' => [
 					'id' => $row['id_member'],
 					'name' => $row['poster_name'],
 					'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 					'link' => !empty($row['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['poster_name'] . '</a>' : $row['poster_name']
-				),
+				],
 				'locked' => !empty($row['locked']),
 				'is_last' => false,
-				'avatar' => $avatars ? determineAvatar($row) : array(),
+				'avatar' => $avatars ? determineAvatar($row) : [],
 				'attachment' => $attach,
-			);
+			];
 		}
-		$this->_db->free_result($request);
+		$request->free_result();
 
 		// Nothing found, set the message and return
 		if (empty($this->data['news']))
@@ -258,35 +258,47 @@ class Board_News_Block extends SP_Abstract_Block
 	 *
 	 * @param array $posts
 	 */
-	protected function loadAttachments($posts)
+	protected function loadAttachments(array $posts): void
 	{
-		global $attachments;
-
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
-		// We will show attachments in the block, regardless, so save and restore
-		$attachmentShowImages = $this->_modSettings['attachmentShowImages'];
+		// Save and restore attachment display settings
+		$originalShowImages = $this->_modSettings['attachmentShowImages'];
 		$this->_modSettings['attachmentShowImages'] = 1;
-		$this->attachments = getAttachments($posts);
-		$this->_modSettings['attachmentShowImages'] = $attachmentShowImages;
 
-		if (!isset($attachments))
-		{
-			$attachments = array();
-		}
+		$this->attachments = new AttachmentsDisplay($posts, [], false);
 
-		// For each message, use the first attachment in that message and no more
-		foreach ($this->attachments as $id_msg => $attachs)
-		{
-			if (!isset($attachments[$id_msg]))
-			{
-				foreach ($attachs as $key => $val)
-				{
-					$attachments[$id_msg][$key] = $val;
-					break;
-				}
+		// Restore original setting
+		$this->_modSettings['attachmentShowImages'] = $originalShowImages;
+
+		// Initialize attachment array if none exists
+		$messageAttachments = [];
+
+		// Process attachments
+		$tempAttachments = $this->attachments->getAttachmentsArray();
+		$messageAttachments = $this->assignFirstAttachmentPerMessage($tempAttachments, $messageAttachments);
+
+		// Update global attachments state
+		$GLOBALS['attachments'] = $messageAttachments;
+	}
+
+	/**
+	 * Assigns the first attachment for each message that doesn't have one
+	 *
+	 * @param array $sourceAttachments Array of message attachments
+	 * @param array $targetAttachments Current attachments array
+	 * @return array Updated attachments array
+	 */
+	private function assignFirstAttachmentPerMessage(array $sourceAttachments, array $targetAttachments): array
+	{
+		foreach ($sourceAttachments as $messageId => $messageAttachments) {
+			if (!isset($targetAttachments[$messageId]) && !empty($messageAttachments)) {
+				$firstAttachment = reset($messageAttachments);
+				$targetAttachments[$messageId][key($messageAttachments)] = $firstAttachment;
 			}
 		}
+
+		return $targetAttachments;
 	}
 
 	/**
@@ -305,29 +317,27 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	protected function getMessageAttach($id_msg, $id_topic, &$body)
 	{
-		global $topic;
+		global $topic, $attachments;
 
-		if (!empty($this->attachments[$id_msg]))
+		if (!empty($attachments[$id_msg]))
 		{
-			// A little razzle dazzle since loadAttachment is dependant on this
-			// poor behavior
 			$o_topic = $topic ?? null;
 			$topic = $id_topic;
-			$this_attachs = loadAttachmentContext($id_msg);
+			$this_attachs = $this->attachments->getAttachmentData($id_msg);
 			$topic = $o_topic;
 
-			// Just one, and it must be an image
-			$attachment = array_shift($this_attachs);
-			if (!$attachment['is_image'])
+			// Just one, from attachments and not ILA, and it must be an image
+			$attachment = !empty($this_attachs) ? reset($this_attachs) : null;
+			if ($attachment === null || !$attachment['is_image'])
 			{
-				return array();
+				return [];
 			}
 
-			return array(
+			return [
 				'id' => $attachment['id'],
 				'href' => $attachment['href'] . ';image',
 				'name' => $attachment['name'],
-			);
+			];
 		}
 
 		// No attachments, perhaps an IMG tag then?
@@ -342,7 +352,7 @@ class Board_News_Block extends SP_Abstract_Block
 		$img_html = $parser->parseMessage($img_tag, true);
 		$body = str_replace($img_tag, '<div class="sp_attachment_thumb">' . $img_html . '</div>', $body);
 
-		return array();
+		return [];
 	}
 
 	/**
@@ -369,7 +379,7 @@ class Board_News_Block extends SP_Abstract_Block
 	 */
 	private function _stable_icons()
 	{
-		$stable_icons = array('xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'moved', 'recycled', 'wireless');
+		$stable_icons = ['xx', 'thumbup', 'thumbdown', 'exclamation', 'question', 'lamp', 'smiley', 'angry', 'cheesy', 'grin', 'sad', 'wink', 'moved', 'recycled', 'wireless'];
 
 		foreach ($stable_icons as $icon)
 		{
@@ -400,10 +410,13 @@ function template_sp_boardNews($data)
 	// Auto video embedding enabled?
 	if ($data['embed_videos'])
 	{
-		addInlineJavascript('
-		$(document).ready(function() {
-			$().linkifyvideo(oEmbedtext);
-		});', true);
+		theme()->addInlineJavascript('
+			document.addEventListener("DOMContentLoaded", () => {
+				if ($.isFunction($.fn.linkifyvideo))
+				{
+					$().linkifyvideo(oEmbedtext);
+				}
+			});', true);
 	}
 
 	// Output all the details we have found
@@ -463,7 +476,7 @@ function template_sp_boardNews($data)
 	{
 		echo '
 		<div class="sp_page_index">',
-			template_pagesection(false, '', array('page_index' => 'sp_boardNews_page_index')), '
+			template_pagesection(false, '', ['page_index' => 'sp_boardNews_page_index']), '
 		</div>';
 	}
 }

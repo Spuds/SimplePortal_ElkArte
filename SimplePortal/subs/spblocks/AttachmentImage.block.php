@@ -4,11 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
 
 /**
  * Image Attachment Block, Displays a list of recent post image attachments
@@ -22,22 +23,22 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Attachment_Image_Block extends SP_Abstract_Block
+class AttachmentImageBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'limit' => 'int',
 			'direction' => 'select',
 			'disablePoster' => 'check',
 			'disableDownloads' => 'check',
 			'disableLink' => 'check',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -55,7 +56,7 @@ class Attachment_Image_Block extends SP_Abstract_Block
 		global $txt;
 
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
-		$type = array('jpg', 'jpeg', 'png', 'gif', 'bmp');
+		$type = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
 
 		$this->data['direction'] = empty($parameters['direction']) ? 0 : 1;
 		$this->data['showPoster'] = empty($parameters['disablePoster']);
@@ -87,7 +88,7 @@ class Attachment_Image_Block extends SP_Abstract_Block
 	{
 		global $color_profile;
 
-		$color_ids = array();
+		$color_ids = [];
 		foreach ($this->data['items'] as $item)
 		{
 			$color_ids[] = $item['member']['id'];
@@ -146,7 +147,7 @@ function template_sp_attachmentImage($data)
 		echo $before, '
 				<td>
 					<div class="sp_image smalltext">',
-						($data['showLink'] ? '<a href="' . $item['file']['href'] . '">' . str_replace(array('_', '-'), ' ', $item['file']['filename']) . '</a><br />' : '') . '
+						($data['showLink'] ? '<a href="' . $item['file']['href'] . '">' . str_replace(['_', '-'], ' ', $item['file']['filename']) . '</a><br />' : '') . '
 						<a id="link_' . $id . '" href="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $id . ';image">
 							<img id="thumb_' . $id . '" src="' . $scripturl . '?action=dlattach;topic=' . $item['topic']['id'] . '.0;attach=' . $item['file']['image']['id'] . ';image" alt="' . $item['file']['filename'] . '" />
 						</a>

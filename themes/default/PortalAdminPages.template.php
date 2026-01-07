@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 
@@ -110,5 +110,5 @@ function template_pages_edit()
 		</form>
 	</div>';
 
-	addInlineJavascript('sp_editor_change_type("page_type");', true);
+	theme()->addInlineJavascript('sp_editor_change_type("page_type");', true);
 }

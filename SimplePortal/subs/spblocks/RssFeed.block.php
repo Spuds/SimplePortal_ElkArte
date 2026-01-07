@@ -4,11 +4,13 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
+use ElkArte\Helper\Util;
 
 /**
  * RSS Block, Displays rss feed in a block.
@@ -24,16 +26,16 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Rss_Feed_Block extends SP_Abstract_Block
+class RssFeedBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'url' => 'text',
 			'show_title' => 'check',
 			'show_content' => 'check',
@@ -41,7 +43,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 			'strip_preserve' => 'text',
 			'count' => 'int',
 			'limit' => 'int',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -63,7 +65,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		$this->data['show_content'] = !empty($parameters['show_content']);
 		$this->data['show_date'] = !empty($parameters['show_date']);
 		$strip_preserve = !empty($parameters['strip_preserve']) ? $parameters['strip_preserve'] : 'br';
-		$strip_preserve = preg_match_all('~[A-Za-z0-9]+~', $strip_preserve, $match) ? $match[0] : array();
+		$strip_preserve = preg_match_all('~[A-Za-z0-9]+~', $strip_preserve, $match) ? $match[0] : [];
 		$count = !empty($parameters['count']) ? (int) $parameters['count'] : 5;
 		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 0;
 
@@ -76,7 +78,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 			return;
 		}
 
-		$rss = array();
+		$rss = [];
 
 		require_once(SUBSDIR . '/Package.subs.php');
 		$data = fetch_web_data($feed);
@@ -84,7 +86,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 
 		// Convert it to UTF8 if we can and its not already
 		preg_match('~encoding="([^"]*)"~', $data, $charset);
-		if (!empty($charset[1]) && $charset != 'UTF-8')
+		if (!empty($charset[1]) && $charset !== 'UTF-8')
 		{
 			// Use iconv if its available
 			if (function_exists('iconv'))
@@ -114,7 +116,7 @@ class Rss_Feed_Block extends SP_Abstract_Block
 			}
 		}
 
-		$data = str_replace(array("\n", "\r", "\t"), '', $data);
+		$data = str_replace(["\n", "\r", "\t"], '', $data);
 		$data = preg_replace_callback('~<\!\[CDATA\[(.+?)\]\]>~u', static function($m) {
 			return "#cdata_escape_encode#" . Util::htmlspecialchars($m[1]);
 		}, $data);
@@ -151,19 +153,19 @@ class Rss_Feed_Block extends SP_Abstract_Block
 		}
 
 		// Add all the items to an array
-		$this->data['items'] = array();
+		$this->data['items'] = [];
 		foreach ($rss as $item)
 		{
 			$item['title'] = isset($item['title']) ? strip_tags($item['title']) : '';
 			$item['description'] = isset($item['description']) ? strip_tags($item['description'], empty($strip_preserve) ? '' : '<' . implode('><', $strip_preserve) . '>') : '';
 
-			$this->data['items'][] = array(
+			$this->data['items'][] = [
 				'title' => $item['title'],
 				'href' => $item['link'],
 				'link' => $item['title'] === '' ? '' : ($item['link'] === '' ? $item['title'] : '<a href="' . $item['link'] . '" target="_blank" class="new_win">' . $item['title'] . '</a>'),
 				'content' => $limit > 0 ? Util::shorten_text($item['description'], $limit, true) : $item['description'],
 				'date' => !empty($item['pubdate']) ? standardTime(strtotime($item['pubdate']), '%d %B') : '',
-			);
+			];
 		}
 
 		// No items in the feed

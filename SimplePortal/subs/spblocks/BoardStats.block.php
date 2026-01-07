@@ -4,35 +4,37 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
+use ElkArte\Languages\Txt;
+use ElkArte\User;
 
 /**
  * Board Stats block, shows count of users online names
  *
- * @param array $parameters
- *		'averages' => Will calculate the daily average (posts, topics, registrations, etc)
+ * @param array $parameters 'averages' => Will calculate the daily average (posts, topics, registrations, etc)
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Board_Stats_Block extends SP_Abstract_Block
+class BoardStatsBlock extends SPAbstractBlock
 {
 	protected $total_days_up = 0;
 
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'averages' => 'check',
 			'refresh_value' => 'int'
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -47,18 +49,16 @@ class Board_Stats_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $user_info;
-
 		$this->data['averages'] = !empty($parameters['averages']);
 
-		loadLanguage('Stats');
+		Txt::load('Stats');
 
-		// Basic totals are easy
+		// Basic totals
 		$stats = ssi_boardStats('array');
 		$this->data['totals'] = $stats === false ? [] : $stats;
-		$this->data['totals'] += array('mostOnline' => empty($this->_modSettings['mostOnline']) ? 0 : $this->_modSettings['mostOnline']);
+		$this->data['totals'] += ['mostOnline' => empty($this->_modSettings['mostOnline']) ? 0 : $this->_modSettings['mostOnline']];
 
-		// Get the averages from the activity log, its the most recent snapshot
+		// Get the averages from the activity log, its most recent snapshot
 		if ($this->data['averages'])
 		{
 			require_once(SUBSDIR . '/Stats.subs.php');
@@ -69,21 +69,21 @@ class Board_Stats_Block extends SP_Abstract_Block
 			// The number of days the forum has been up...
 			$this->total_days_up = ceil((time() - strtotime($averages['date'])) / (60 * 60 * 24));
 
-			$this->data['totals'] += array(
+			$this->data['totals'] += [
 				'average_members' => $this->formatAvg($averages['registers']),
 				'average_posts' => $this->formatAvg($averages['posts']),
 				'average_topics' => $this->formatAvg($averages['topics']),
 				'average_online' => $this->formatAvg($averages['most_on']),
-			);
+			];
 		}
 
 		// Set the template to use
 		$this->setTemplate('template_sp_boardStats');
 
 		// Enabling auto refresh?
-		if (!empty($parameters['refresh_value']) && !$user_info['is_guest'])
+		if (!empty($parameters['refresh_value']) && !User::$info->is_guest)
 		{
-			$this->refresh = array('sa' => 'boardstats', 'class' => '.sp_board_stats', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->refresh = ['sa' => 'boardstats', 'class' => '.sp_board_stats', 'id' => $id, 'refresh_value' => $parameters['refresh_value']];
 			$this->auto_refresh();
 		}
 	}
@@ -98,7 +98,9 @@ class Board_Stats_Block extends SP_Abstract_Block
 	protected function formatAvg($value)
 	{
 		if (empty($this->total_days_up))
+		{
 			return null;
+		}
 
 		return comma_format(round($value / $this->total_days_up, 2));
 	}
@@ -118,7 +120,8 @@ function template_sp_boardStats($data)
 
 	if (!isset($data['totals']['members']))
 	{
-		echo '<li>' . $txt['error_sp_no_stats_found'] . '</li>
+		echo '
+			<li>' . $txt['error_sp_no_stats_found'] . '</li>
 		</ul>';
 
 		return;

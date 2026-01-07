@@ -4,11 +4,10 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
-
 
 function template_information()
 {
@@ -20,7 +19,7 @@ function template_information()
 	<div id="sp_admin_main">
 		<div id="admin_main_section">
 			<div id="sp_live_info" class="floatleft">
-				<h3 class="category_header hdicon cat_img_talk">
+				<h3 class="category_header hdicon i-comment">
 					', $txt['sp-info_live'], '
 				</h3>
 				<div class="content">
@@ -28,10 +27,12 @@ function template_information()
 				</div>
 			</div>
 			<div id="sp_general_info" class="floatright">
-				<h3 class="category_header hdicon cat_img_config">
+				<h3 class="category_header hdicon i-info">
 					', $txt['sp-info_general'], '
 				</h3>
 				<div class="content">
+					<strong>', $txt['sp_portal_mode'], ':</strong><br />',
+		$context['portal_mode'], '<br />
 					<strong>', $txt['sp-info_versions'], ':</strong><br />
 					', $txt['sp-info_your_version'], ':
 					<em id="spYourVersion" style="white-space: nowrap;">', $context['sp_version'], '</em><br />
@@ -43,11 +44,9 @@ function template_information()
 			</div>
 		</div>
 		<script>
-			var func = function ()
-			{
-				sp_currentVersion();
-			}
-			addLoadEvent(func);
+			document.addEventListener("DOMContentLoaded", function() {
+			    sp_currentVersion();
+			});	
 		</script>';
 	}
 

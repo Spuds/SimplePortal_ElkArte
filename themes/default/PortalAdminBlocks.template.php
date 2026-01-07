@@ -4,11 +4,10 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 2.0.0
  */
-
 
 /**
  * Show the list of available blocks in the system
@@ -19,34 +18,36 @@ function template_block_list()
 {
 	global $context, $scripturl, $txt;
 
-	$sortables = array();
+	$sortables = [];
 
 	echo '
 	<div id="sp_manage_blocks">';
 
 	// Show each portal area with the blocks in each one
-	foreach($context['sides'] as $id => $side)
+	foreach ($context['sides'] as $id => $side)
 	{
 		$sortables[] = '#side_' . $side['id'];
 
 		echo '
-		<h3 class="category_header">
+		<h2 class="category_header">
 			<a class="floatright" href="', $scripturl, '?action=admin;area=portalblocks;sa=add;col=', $side['id'], '">', sp_embed_image('add', sprintf($txt['sp-blocksCreate'], $side['label'])), '</a>
-			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
+			<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=', $side['help'], '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			<a href="', $scripturl, '?action=admin;area=portalblocks;sa=', $id, '">', $side['label'], ' ', $txt['sp-blocksBlocks'], '</a>
-		</h3>
+		</h2>
 		<table class="table_grid">
 			<thead>
 				<tr class="table_head">';
 
 		foreach ($context['columns'] as $column)
+		{
 			echo '
 					<th scope="col"', isset($column['class']) ? ' class="' . $column['class'] . '"' : '', isset($column['width']) ? ' style="width:' . $column['width'] . ';"' : '', '>', $column['label'], '</th>';
+		}
 
 		echo '
 				</tr>
 			</thead>
-			<tbody id="side_', $side['id'] ,'" class="sortme">';
+			<tbody id="side_', $side['id'], '" class="sortme">';
 
 		if (empty($context['blocks'][$side['name']]))
 		{
@@ -56,10 +57,10 @@ function template_block_list()
 				</tr>';
 		}
 
-		foreach($context['blocks'][$side['name']] as $block)
+		foreach ($context['blocks'][$side['name']] as $block)
 		{
 			echo '
-				<tr id="block_',$block['id'],'" class="content">
+				<tr id="block_', $block['id'], '" class="content">
 					<td>', $block['label'], '</td>
 					<td>', $block['type_text'], '</td>
 					<td class="centertext">', $block['status'], '</td>
@@ -93,7 +94,7 @@ function template_block_list()
 }
 
 /**
- * Used to edit a blocks details when using the block on the portal
+ * Used to edit a blocks detail when using the block on the portal
  */
 function template_block_edit()
 {
@@ -103,8 +104,10 @@ function template_block_edit()
 	if (!empty($context['SPortal']['preview']))
 	{
 		if (!empty($context['SPortal']['error']))
+		{
 			echo '
-	<div class="errorbox">' , $context['SPortal']['error'], '</div>';
+	<div class="errorbox">', $context['SPortal']['error'], '</div>';
+		}
 
 		echo '
 	<div class="sp_auto_align" style="width: ', $context['widths'][$context['SPortal']['block']['column']], ';">';
@@ -117,13 +120,13 @@ function template_block_edit()
 
 	echo '
 	<div id="sp_edit_block">
-		<form id="admin_form_wrapper" name="sp_edit_block_form" id="sp_edit_block_form" action="', $scripturl, '?action=admin;area=portalblocks;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
-			<h3 class="category_header">
-				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
+		<form id="admin_form_wrapper" name="sp_edit_block_form" action="', $scripturl, '?action=admin;area=portalblocks;sa=edit" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
+			<h2 class="category_header">
+				<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=sp-blocks', $context['SPortal']['is_new'] ? 'Add' : 'Edit', '" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 				', $context['SPortal']['is_new'] ? $txt['sp-blocksAdd'] : $txt['sp-blocksEdit'], '
-			</h3>
+			</h2>
 				<div class="sp_content_padding">
-					<h3 class="secondary_header">',$context['SPortal']['block']['type_text'], '</h3>
+					<h3 class="secondary_header">', $context['SPortal']['block']['type_text'], '</h3>
 					<dl class="sp_form content">
 						<dt>
 							<label for="block_name">', $txt['sp-adminColumnName'], ':</label>
@@ -138,8 +141,10 @@ function template_block_edit()
 							<select name="permissions" id="block_permissions">';
 
 	foreach ($context['SPortal']['block']['permission_profiles'] as $profile)
+	{
 		echo '
 									<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['permissions'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+	}
 
 	echo '
 							</select>
@@ -151,8 +156,10 @@ function template_block_edit()
 							<select name="styles" id="block_styles">';
 
 	foreach ($context['SPortal']['block']['style_profiles'] as $profile)
+	{
 		echo '
 							<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['styles'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+	}
 
 	echo '
 							</select>
@@ -164,8 +171,10 @@ function template_block_edit()
 							<select name="visibility" id="block_visibility">';
 
 	foreach ($context['SPortal']['block']['visibility_profiles'] as $profile)
+	{
 		echo '
 					<option value="', $profile['id'], '"', $profile['id'] == $context['SPortal']['block']['visibility'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+	}
 
 	echo '
 							</select>
@@ -178,7 +187,9 @@ function template_block_edit()
 	foreach ($context['SPortal']['block']['options'] as $name => $type)
 	{
 		if (empty($context['SPortal']['block']['parameters'][$name]))
+		{
 			$context['SPortal']['block']['parameters'][$name] = '';
+		}
 
 		echo '
 						<dt>';
@@ -189,16 +200,22 @@ function template_block_edit()
 		$helpvar = 'sp_param_sp_' . $helpvar . '_' . $name;
 
 		if (!empty($helptxt[$helpvar]))
+		{
 			echo '
 							<a class="help" href="', $scripturl, '?action=quickhelp;help=', $helpvar, '" onclick="return reqOverlayDiv(this.href);">
-								<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
+								<i class="icon i-help" title="', $txt['help'], '"></i>
 							</a>';
+		}
 
 		if ($type === 'space')
+		{
 			echo '';
+		}
 		else
+		{
 			echo '
 							<label for="', $type === 'bbc' ? 'bbc_content' : $name, '">', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name], ':</label>';
+		}
 
 		echo '
 						</dt>
@@ -211,8 +228,11 @@ function template_block_edit()
 					</dl>
 					<div id="sp_rich_editor">
 						<div id="sp_rich_bbc"></div>
-						<div id="sp_rich_smileys"></div>
-						', template_control_richedit($context['SPortal']['bbc'], 'sp_rich_smileys', 'sp_rich_bbc'), '
+						<div id="sp_rich_smileys"></div>';
+
+			template_control_richedit($context['SPortal']['bbc']);
+
+			echo '
 						<input type="hidden" name="bbc_name" value="', $name, '" />
 						<input type="hidden" name="bbc_parameter" value="', $context['SPortal']['bbc'], '" />
 					</div>
@@ -224,52 +244,68 @@ function template_block_edit()
 							<input type="hidden" name="parameters[', $name, ']" value="" />';
 
 			if ($type === 'boards')
-					echo '
+			{
+				echo '
 							<select name="parameters[', $name, '][]" id="', $name, '" size="7" multiple="multiple">';
+			}
 			else
-					echo '
+			{
+				echo '
 							<select name="parameters[', $name, '][]" id="', $name, '">';
+			}
 
 			foreach ($context['SPortal']['block']['board_options'][$name] as $option)
+			{
 				echo '
 								<option value="', $option['value'], '"', ($option['selected'] ? ' selected="selected"' : ''), ' >', $option['text'], '</option>';
+			}
 
 			echo '
 							</select>';
 		}
 		elseif ($type === 'int')
+		{
 			echo '
-							<input type="text" name="parameters[', $name, ']" id="', $name, '" value="', $context['SPortal']['block']['parameters'][$name],'" size="7" class="input_text" />';
+							<input type="text" name="parameters[', $name, ']" id="', $name, '" value="', $context['SPortal']['block']['parameters'][$name], '" size="7" class="input_text" />';
+		}
 		elseif ($type === 'text')
+		{
 			echo '
-							<input type="text" name="parameters[', $name, ']" id="', $name, '" value="', $context['SPortal']['block']['parameters'][$name],'" size="25" class="input_text" />';
+							<input type="text" name="parameters[', $name, ']" id="', $name, '" value="', $context['SPortal']['block']['parameters'][$name], '" size="25" class="input_text" />';
+		}
 		elseif ($type === 'check')
-				echo '
+		{
+			echo '
 							<input type="checkbox" name="parameters[', $name, ']" id="', $name, '"', !empty($context['SPortal']['block']['parameters'][$name]) ? ' checked="checked"' : '', ' class="input_check" />';
+		}
 		elseif ($type === 'select')
 		{
-				$options = explode('|', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name . '_options']);
+			$options = explode('|', $txt['sp_param_' . $context['SPortal']['block']['type'] . '_' . $name . '_options']);
 
-				echo '
+			echo '
 							<select name="parameters[', $name, ']" id="', $name, '">';
 
-				foreach ($options as $key => $option)
-					echo '
-								<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
-
+			foreach ($options as $key => $option)
+			{
 				echo '
+								<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
+			}
+
+			echo '
 							</select>';
 		}
 		elseif (is_array($type))
 		{
-				echo '
+			echo '
 							<select name="parameters[', $name, ']" id="', $name, '">';
 
-				foreach ($type as $key => $option)
-					echo '
-								<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
-
+			foreach ($type as $key => $option)
+			{
 				echo '
+								<option value="', $key, '"', $context['SPortal']['block']['parameters'][$name] == $key ? ' selected="selected"' : '', '>', $option, '</option>';
+			}
+
+			echo '
 							</select>';
 		}
 		elseif ($type === 'textarea')
@@ -293,9 +329,11 @@ function template_block_edit()
 					<dl class="sp_form">';
 		}
 
-		if ($type != 'bbc' && $type != 'textarea')
+		if ($type !== 'bbc' && $type !== 'textarea')
+		{
 			echo '
 						</dd>';
+		}
 	}
 
 	if (empty($context['SPortal']['block']['column']))
@@ -307,10 +345,12 @@ function template_block_edit()
 						<dd>
 							<select id="block_column" name="block_column">';
 
-		$block_sides = array(1 => 'Left', 2 => 'Top', 3 => 'Bottom', 4 => 'Right', 5 => 'Header', 6 => 'Footer');
+		$block_sides = [1 => 'Left', 2 => 'Top', 3 => 'Bottom', 4 => 'Right', 5 => 'Header', 6 => 'Footer'];
 		foreach ($block_sides as $id => $side)
+		{
 			echo '
 								<option value="', $id, '">', $txt['sp-position' . $side], '</option>';
+		}
 
 		echo '
 							</select>
@@ -334,8 +374,11 @@ function template_block_edit()
 		foreach ($context['SPortal']['block']['list_blocks'] as $block)
 		{
 			if ($block['id'] != $context['SPortal']['block']['id'])
+			{
 				echo '
-								<option value="', $block['row'], '"', (!empty($context['SPortal']['block']['row']) && $context['SPortal']['block']['row'] == $block['row'] ? ' selected="selected"' : ''), '>', $block['label'], '</option>';		}
+								<option value="', $block['row'], '"', (!empty($context['SPortal']['block']['row']) && $context['SPortal']['block']['row'] == $block['row'] ? ' selected="selected"' : ''), '>', $block['label'], '</option>';
+			}
+		}
 
 		echo '
 							</select>
@@ -368,8 +411,10 @@ function template_block_edit()
 		</div>';
 
 	if (!empty($context['SPortal']['block']['column']))
+	{
 		echo '
 			<input type="hidden" name="block_column" value="', $context['SPortal']['block']['column'], '" />';
+	}
 
 	echo '
 			<input type="hidden" name="block_type" value="', $context['SPortal']['block']['type'], '" />
@@ -388,15 +433,15 @@ function template_block_select_type()
 
 	echo '
 	<div id="sp_select_block_type">
-		<h3 class="category_header">
-			<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=sp-blocksSelectType" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
+		<h2 class="category_header">
+			<a class="hdicon i-help help" href="', $scripturl, '?action=quickhelp;help=sp-blocksSelectType" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a>
 			', $txt['sp-blocksSelectType'], '
-		</h3>
+		</h2>
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=portalblocks;sa=add" method="post" accept-charset="UTF-8">
 			<ul class="reset">';
 
 	// For every block type defined in the system
-	foreach($context['SPortal']['block_types'] as $index => $type)
+	foreach ($context['SPortal']['block_types'] as $index => $type)
 	{
 		$this_block = $context['SPortal']['block_inuse'][$type['function']] ?? false;
 		$this_title = !empty($this_block) ? sprintf($txt['sp-adminBlockInuse'], $context['location'][$this_block['column']]) . ': ' . (!empty($this_block['state']) ? '(' . $txt['sp-blocksActive'] . ')' : '') : '';
@@ -404,7 +449,9 @@ function template_block_select_type()
 		echo '
 				<li class="content">
 					<input type="radio" name="selected_type[]" id="block_', $type['function'], '" value="', $type['function'], '" class="input_radio" />
-					<strong><label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', $txt['sp_function_' . $type['function'] . '_label'] ?? $type['function'], '</label></strong>
+					<strong>
+						<label ', (!empty($this_block) ? 'class="sp_block_active" ' : ''), 'for="block_', $type['function'], '" title="', $this_title, '">', $txt['sp_function_' . $type['function'] . '_label'] ?? $type['function'], '</label>
+					</strong>
 					<p class="smalltext">', $txt['sp_function_' . $type['function'] . '_desc'] ?? $txt['not_applicable'], '</p>
 				</li>';
 	}
@@ -414,8 +461,10 @@ function template_block_select_type()
 				<input type="submit" name="select_type" value="', $txt['sp-blocksSelectType'], '" class="right_submit" />';
 
 	if (!empty($context['SPortal']['block']['column']))
+	{
 		echo '
 			<input type="hidden" name="block_column" value="', $context['SPortal']['block']['column'], '" />';
+	}
 
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

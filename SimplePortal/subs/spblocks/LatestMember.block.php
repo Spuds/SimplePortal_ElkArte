@@ -4,11 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
 
 /**
  * Latest member block, shows name and join date for X latest members
@@ -18,20 +19,20 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Latest_Member_Block extends SP_Abstract_Block
+class LatestMemberBlock extends SPAbstractBlock
 {
-	protected $colorids = array();
+	protected $colorids = [];
 
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'limit' => 'int',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -54,7 +55,7 @@ class Latest_Member_Block extends SP_Abstract_Block
 		$rows = recentMembers($limit);
 
 		// Get them ready the template
-		$this->data['members'] = array();
+		$this->data['members'] = [];
 
 		foreach ($rows as $row)
 		{
@@ -63,13 +64,13 @@ class Latest_Member_Block extends SP_Abstract_Block
 				$this->colorids[$row['id_member']] = $row['id_member'];
 			}
 
-			$this->data['members'][] = array(
+			$this->data['members'][] = [
 				'id' => $row['id_member'],
 				'name' => $row['real_name'],
 				'href' => $scripturl . '?action=profile;u=' . $row['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 				'date' => standardTime($row['date_registered'], '%d %b'),
-			);
+			];
 		}
 
 		// Using member profile colors

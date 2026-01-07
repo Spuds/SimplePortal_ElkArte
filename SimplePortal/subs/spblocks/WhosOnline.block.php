@@ -4,31 +4,33 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.1
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
+use ElkArte\Languages\Txt;
 
 /**
  * Who's online block, shows count of users online names
  *
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Whos_Online_Block extends SP_Abstract_Block
+class WhosOnlineBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'online_today' => 'select',
 			'avatars' => 'check',
 			'refresh_value' => 'int'
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -50,11 +52,11 @@ class Whos_Online_Block extends SP_Abstract_Block
 
 		// Interface with the online today addon?
 		$this->data['online_today'] = '';
-		if (!empty($parameters['online_today']) && !empty($this->_modSettings['onlinetoday']) && file_exists(SUBSDIR . '/OnlineToday.class.php'))
+		if (!empty($parameters['online_today']) && !empty($this->_modSettings['onlinetoday']) && file_exists(ADDONSDIR . '/OnlineToday.php'))
 		{
-			require_once(SUBSDIR . '/OnlineToday.class.php');
+			require_once(ADDONSDIR . '/OnlineToday.php');
 
-			$context['info_center_callbacks'] = array();
+			$context['info_center_callbacks'] = [];
 			Online_Today_Integrate::get();
 			$this->data['online_today'] = (int) $parameters['online_today'];
 		}
@@ -62,7 +64,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		// Spiders
 		$this->data['show_spiders'] = !empty($this->_modSettings['show_spider_online']) && ($this->_modSettings['show_spider_online'] < 3 || allowedTo('admin_forum'));
 
-		loadLanguage('index', '', false, true);
+		Txt::load('index');
 
 		$this->data['stats'] = ssi_whosOnline('array');
 
@@ -79,7 +81,7 @@ class Whos_Online_Block extends SP_Abstract_Block
 		// Enabling auto refresh?
 		if (!empty($parameters['refresh_value']))
 		{
-			$this->refresh = array('sa' => 'whos', 'class' => '.sp_whos_online', 'id' => $id, 'refresh_value' => $parameters['refresh_value']);
+			$this->refresh = ['sa' => 'whos', 'class' => '.sp_whos_online', 'id' => $id, 'refresh_value' => $parameters['refresh_value']];
 			$this->auto_refresh();
 		}
 	}
@@ -94,36 +96,32 @@ class Whos_Online_Block extends SP_Abstract_Block
 			return;
 		}
 
-		$users = array();
+		$users = [];
 		foreach ($this->data['stats']['users_online'] as $user)
 		{
 			$users[] = $user['id'];
 		}
 
-		$request = $this->_db->query('', '
+		$avatars = [];
+		$this->_db->query('', '
 			SELECT
 				m.id_member,  m.avatar, m.email_address,
 				a.id_attach, a.attachment_type, a.filename
 			FROM {db_prefix}members AS m
 				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 			WHERE m.id_member IN ({array_int:users})',
-			array(
+			[
 				'users' => $users,
-			)
-		);
-		$avatars = array();
-		while ($row = $this->_db->fetch_assoc($request))
-		{
-			// Load the member data
-			$avatars[$row['id_member']] = determineAvatar(array(
-					'avatar' => $row['avatar'],
-					'filename' => $row['filename'],
-					'id_attach' => $row['id_attach'],
-					'email_address' => $row['email_address'],
-					'attachment_type' => $row['attachment_type'])
+			]
+		)->fetch_callback(function($row) use (&$avatars) {
+			$avatars[$row['id_member']] = determineAvatar([
+				'avatar' => $row['avatar'],
+				'filename' => $row['filename'],
+				'id_attach' => $row['id_attach'],
+				'email_address' => $row['email_address'],
+				'attachment_type' => $row['attachment_type']]
 			);
-		}
-		$this->_db->free_result($request);
+		});
 
 		foreach (array_keys($this->data['stats']['users_online']) as $key)
 		{

@@ -4,18 +4,23 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+namespace Addons\SimplePortal\Controller;
+
+use ElkArte\AbstractController;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\Util;
 
 /**
  * Category controller.
  *
  * - This class handles requests for Category Functionality
  */
-class PortalCategories_Controller extends Action_Controller
+class PortalCategories extends AbstractController
 {
 	/**
 	 * Default method
@@ -32,8 +37,8 @@ class PortalCategories_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		loadTemplate('PortalCategories');
-		loadCSSFile('portal.css', ['stale' => SPORTAL_STALE]);
+		theme()->getTemplates()->load('PortalCategories');
+		loadCSSFile('SimplePortal/portal.css', ['stale' => SPORTAL_STALE]);
 	}
 
 	/**
@@ -43,12 +48,12 @@ class PortalCategories_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $txt;
 
-		$context['categories'] = sportal_get_categories(0, true, true);
+		$context['categories'] = sportal_get_categories(null, true, true);
 
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?action=portal;sa=categories',
 			'name' => $txt['sp-categories'],
-		);
+		];
 
 		$context['page_title'] = $txt['sp-categories'];
 		$context['sub_template'] = 'view_categories';
@@ -62,7 +67,7 @@ class PortalCategories_Controller extends Action_Controller
 		global $context, $scripturl, $modSettings, $txt;
 
 		// Basic article support
-		require_once(SUBSDIR . '/PortalArticle.subs.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/PortalArticle.subs.php');
 
 		$category_id = !empty($_REQUEST['category']) ? $_REQUEST['category'] : 0;
 
@@ -75,7 +80,7 @@ class PortalCategories_Controller extends Action_Controller
 
 		if (empty($context['category']['id']))
 		{
-			throw new Elk_Exception('error_sp_category_not_found', false);
+			throw new Exception('error_sp_category_not_found', false);
 		}
 
 		// Set up the pages
@@ -89,7 +94,7 @@ class PortalCategories_Controller extends Action_Controller
 		}
 
 		// Load the articles in this category
-		$context['articles'] = sportal_get_articles(0, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
+		$context['articles'] = sportal_get_articles(null, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
 
 		// Get the first "image/attachment" when in blog view
 		$context['articles'] = setBlogAttachments(getBlogAttachments($context['articles']));
@@ -107,27 +112,20 @@ class PortalCategories_Controller extends Action_Controller
 			// We have to wait until we cut to see if we need the attachment or not
 			if (strpos($context['articles'][$article['id']]['preview'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article=') !== false)
 			{
-				$context['articles'][$article['id']]['attachments'] = array();
+				$context['articles'][$article['id']]['attachments'] = [];
 			}
 		}
 
-		// Auto video embedding enabled?
-		if (!empty($modSettings['enableVideoEmbeding']))
-		{
-			addInlineJavascript('
-				$(document).ready(function() {
-					$().linkifyvideo(oEmbedtext);
-				});', true
-			);
-		}
+		// Account for videos, pretty print, spoilers and more
+		theme()->addInlineJavascript('sp_prep_articles();', true);
 
 		// Needed for basic Lightbox functionality
 		loadJavascriptFile('topic.js', ['defer' => false]);
 
-		$context['linktree'][] = array(
+		$context['linktree'][] = [
 			'url' => $scripturl . '?category=' . $context['category']['category_id'],
 			'name' => $context['category']['name'],
-		);
+		];
 
 		$context['page_title'] = sprintf($txt['sp_articles_in_category'], $context['category']['name']);
 		$context['sub_template'] = 'view_category';

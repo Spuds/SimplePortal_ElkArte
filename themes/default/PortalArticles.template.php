@@ -4,10 +4,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 2.0.0
  */
+
+use ElkArte\Helper\Util;
 
 
 /**
@@ -27,7 +29,7 @@ function template_view_articles()
 	{
 		echo '
 		<div class="infobox">',
-			$txt['error_sp_no_articles'], '
+		$txt['error_sp_no_articles'], '
 		</div>';
 	}
 
@@ -66,10 +68,14 @@ function template_view_articles()
 
 	// Pages as well?
 	if (!empty($context['page_index']))
+	{
 		template_pagesection();
+	}
 
 	if (!empty($context['using_relative_time']))
-		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
+	{
+		theme()->addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
+	}
 }
 
 /**
@@ -96,35 +102,43 @@ function template_view_article()
 			<div class="sp_article_detail category_header">';
 
 	if (!empty($context['article']['author']['avatar']['image']))
+	{
 		echo $context['article']['author']['avatar']['image'];
+	}
 
 	echo '
 				<span class="sp_article_latest">
 					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']);
 
 	if (!empty($context['article']['author']['avatar']['image']))
+	{
 		echo '
 					<br />';
+	}
 	else
+	{
 		echo '
 				</span>
 				<br />
 				<span class="sp_article_latest">';
+	}
 
 	echo '
 				', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
-				sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
+	sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
 				</span>
 			</div>
-			<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">' ,
-				$context['article']['body'];
+			<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">',
+	$context['article']['body'];
 
 	if (empty($context['preview']) && $context['article']['can_moderate'])
+	{
 		echo '
 				<div class="submitbutton">
 					<a class="linkbutton" href="?action=admin;area=portalarticles;sa=edit;article_id=' . $context['article']['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" accesskey="e">' . $txt['edit'] . '</a>
 					<a class="linkbutton" href="?action=admin;area=portalarticles;sa=delete;article_id=' . $context['article']['id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . JavaScriptEscape($txt['quickmod_confirm']) . ') && submitThisOnce(this);" accesskey="d">' . $txt['delete'] . '</a>
 				</div>';
+	}
 
 	// Assuming there are attachments...
 	if (!empty($context['article']['attachment']))
@@ -161,15 +175,19 @@ function template_view_article()
 					<div class="sp_comment_detail">';
 
 			if (!empty($comment['author']['avatar']['image']))
+			{
 				echo $comment['author']['avatar']['image'];
+			}
 
 			// Show the edit icons if they are allowed
 			if ($comment['can_moderate'])
+			{
 				echo '
 						<div class="floatright">
 							<a href="', $context['article']['href'], ';modify=', $comment['id'], ';', $context['session_var'], '=', $context['session_id'], '#sp_comment">', sp_embed_image('modify'), '</a>
 							<a href="', $context['article']['href'], ';delete=', $comment['id'], ';', $context['session_var'], '=', $context['session_id'], '">', sp_embed_image('delete'), '</a>
 						</div>';
+			}
 
 			echo '
 						<span class="sp_article_latest">', sprintf($txt['sp_posted_by'], $comment['time'], $comment['author']['link']), '</span>
@@ -184,7 +202,9 @@ function template_view_article()
 
 		// Pages as well?
 		if (!empty($context['page_index']))
+		{
 			template_pagesection();
+		}
 
 		// Show the comment box
 		if ($context['article']['can_comment'])
@@ -204,7 +224,7 @@ function template_view_article()
 			// If adding a comment, set them in the textarea
 			if (isset($_GET['sa']) && $_GET['sa'] === 'write')
 			{
-				addInlineJavascript('
+				theme()->addInlineJavascript('
 				setTimeout(function() {
 					let textarea = document.getElementById("body");
 					textarea.focus();
@@ -222,11 +242,13 @@ function template_view_article()
 
 	if (empty($context['preview']))
 	{
-	template_article_schema_script();
+		template_article_schema_script();
 	}
 
 	if (!empty($context['using_relative_time']))
-		addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
+	{
+		theme()->addInlineJavascript('$(\'.sp_article_latest\').addClass(\'relative\');', true);
+	}
 }
 
 /**
@@ -317,19 +339,23 @@ function template_sp_display_attachments($article, $ignoring)
 		if ($attachment['is_image'])
 		{
 			if ($attachment['thumbnail']['has_thumb'])
+			{
 				echo '
 										<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" ', $attachment['thumbnail']['lightbox'], '>
 											<img class="attachment_image" src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" />
 										</a>';
+			}
 			else
+			{
 				echo '
 										<img class="attachment_image" src="', $attachment['href'], ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;" />';
+			}
 		}
 
 		echo '
 										<figcaption>
 											<a href="', $attachment['href'], '" class="attachment_name">',
-												$attachment['name'], '
+		$attachment['name'], '
 											</a>
 											<span class="attachment_details">', $attachment['size'], ($attachment['is_image'] ? ' / ' . $attachment['real_width'] . 'x' . $attachment['real_height'] : ''), '</span>
 										</figcaption>

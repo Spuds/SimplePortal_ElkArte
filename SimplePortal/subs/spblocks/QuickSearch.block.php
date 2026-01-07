@@ -4,11 +4,10 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
-
 
 /**
  * Quick Search Block, Displays a quick search box
@@ -17,7 +16,7 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Quick_Search_Block extends SP_Abstract_Block
+class QuickSearchBlock extends SPAbstractBlock
 {
 	/**
 	 * Initializes a block for use.

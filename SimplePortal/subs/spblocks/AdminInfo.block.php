@@ -4,12 +4,14 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 use ElkArte\Errors\Log;
+use ElkArte\Languages\Txt;
+use ElkArte\User;
 
 /**
  * Admin info block
@@ -18,7 +20,7 @@ use ElkArte\Errors\Log;
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Admin_Info_Block extends SP_Abstract_Block
+class AdminInfoBlock extends SPAbstractBlock
 {
 	/**
 	 * Initializes a block for use.
@@ -30,13 +32,11 @@ class Admin_Info_Block extends SP_Abstract_Block
 	 */
 	public function setup($parameters, $id)
 	{
-		global $user_info;
-
-		$this->data['admin'] = array();
-		$this->data['moderation'] = array();
+		$this->data['admin'] = [];
+		$this->data['moderation'] = [];
 
 		// Only admins/moderators, no matter what the block permissions say
-		if ($user_info['is_admin'] || allowedTo('moderate_forum'))
+		if (User::$info->is_admin || allowedTo('moderate_forum'))
 		{
 			// Function to get the stats
 			require_once(SUBSDIR . '/Moderation.subs.php');
@@ -46,16 +46,16 @@ class Admin_Info_Block extends SP_Abstract_Block
 			$totals = loadModeratorMenuCounts();
 
 			// The admin may want to know about errors and users waiting activation
-			if ($user_info['is_admin'])
+			if (User::$info->is_admin)
 			{
 				$errorLog = new Log(database());
-				$this->data['admin']['errors'] = $errorLog->numErrors(array());
+				$this->data['admin']['errors'] = $errorLog->numErrors([]);
 
 				$activation_numbers = countInactiveMembers();
 				$this->data['admin']['awaiting_activation'] = 0;
 				foreach ($activation_numbers as $activation_type => $total_members)
 				{
-					if (in_array($activation_type, array(0, 2)))
+					if (in_array($activation_type, [0, 2]))
 					{
 						$this->data['admin']['awaiting_activation'] += $total_members;
 					}
@@ -63,7 +63,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			}
 
 			// Do they have board approval?
-			$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
+			$approve_boards = !empty(User::$info->mod_cache['ap']) ? User::$info->mod_cache['ap'] : boardsAllowedTo('approve_posts');
 
 			// Any posts / topics / attachments awaiting approval
 			if ($this->_modSettings['postmod_active'] && !empty($approve_boards))
@@ -74,7 +74,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			}
 
 			// Open moderation reports
-			if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
+			if (!empty(User::$info->mod_cache) && User::$info->mod_cache['bq'] !== '0=1')
 			{
 				$this->data['moderation']['reports'] = $totals['reports'];
 			}
@@ -86,7 +86,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 			}
 
 			// Pending group requests
-			if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['gq'] != '0=1')
+			if (!empty(User::$info->mod_cache) && User::$info->mod_cache['gq'] !== '0=1')
 			{
 				$this->data['moderation']['groupreq'] = $totals['groupreq'];
 			}
@@ -106,7 +106,7 @@ class Admin_Info_Block extends SP_Abstract_Block
 	 */
 	public static function permissionsRequired()
 	{
-		return array('admin_forum');
+		return ['admin_forum'];
 	}
 }
 
@@ -119,7 +119,7 @@ function template_sp_admininfo($data)
 {
 	global $txt;
 
-	loadLanguage('ModerationCenter');
+	Txt::load('ModerationCenter');
 
 	echo '
 		<div>

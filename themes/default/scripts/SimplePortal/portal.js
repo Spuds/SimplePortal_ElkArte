@@ -2,12 +2,12 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.2
+ * @version 2.0.0
  */
 
-/** global: editor, start_state */
+/** global: start_state, post_box_name */
 
 /**
  * Used to collapse an individual block
@@ -131,16 +131,13 @@ function sp_image_resize()
  */
 function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
 {
-	if (window.XMLHttpRequest)
-	{
-		shoutbox_indicator(shoutbox_id, true);
+	shoutbox_indicator(shoutbox_id, true);
 
-		let shout_body = document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#38;#").php_urlencode();
+	let shout_body = document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#38;#").php_urlencode();
 
-		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
+	sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;api=xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 
-		document.getElementById('new_shout_' + shoutbox_id).value = '';
-	}
+	document.getElementById('new_shout_' + shoutbox_id).value = '';
 
 	return false;
 }
@@ -159,7 +156,7 @@ function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
 	{
 		shoutbox_indicator(shoutbox_id, true);
 
-		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
+		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;api=xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 	}
 
 	return false;
@@ -177,7 +174,7 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
 	{
 		shoutbox_indicator(shoutbox_id, true);
 
-		getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';xml', onShoutReceived);
+		getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';api=xml', onShoutReceived);
 	}
 
 	return false;
@@ -292,7 +289,7 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
 		{
 			sp_smileys[i][2] = sp_smileys[i][2].replace(/"/g, '&quot;');
 			sp_smileys[i][0] = sp_smileys[i][0].replace(/"/g, '&quot;');
-			sp_smileyRowsContent += '<a href="javascript:void(0);" onclick="window.opener.replaceText(\' ' + sp_smileys[i][0].php_addslashes() + '\', window.opener.document.getElementById(\'new_shout_' + postbox + '\')); window.focus(); return false;"><img src="' + elk_smileys_url + '/' + sp_smileys[i][1] + '" id="sml_' + sp_smileys[i][1] + '" alt="' + sp_smileys[i][2] + '" title="' + sp_smileys[i][2] + '" style="padding: 4px;" border="0" /></a> ';
+			sp_smileyRowsContent += '<a href="javascript:void(0);" onclick="window.opener.replaceText(\' ' + sp_smileys[i][0] + '\', window.opener.document.getElementById(\'new_shout_' + postbox + '\')); window.focus(); return false;"><img src="' + elk_smileys_url + '/' + sp_smileys[i][1] + '" id="sml_' + sp_smileys[i][1] + '" alt="' + sp_smileys[i][2] + '" title="' + sp_smileys[i][2] + '" style="padding: 4px;" /></a> ';
 		}
 	}
 
@@ -440,9 +437,9 @@ function sp_currentVersion()
 	let oSPVersionContainer = document.getElementById("spCurrentVersion"),
 		oinstalledVersionContainer = document.getElementById("spYourVersion"),
 		sCurrentVersion = oinstalledVersionContainer.innerHTML,
-		spIndex = new elk_AdminIndex(),
+		spIndex = new Elk_AdminIndex(),
 		spVersion = '???',
-		verCompare = new elk_ViewVersions();
+		verCompare = new Elk_ViewVersions();
 
 	$.getJSON('https://api.github.com/repos/SimplePortal/SimplePortal_ElkArte/releases', {format: "json"},
 		function (data, textStatus, jqXHR)
@@ -535,22 +532,22 @@ function sp_change_status(id, type)
 {
 	if (type === 'articles')
 	{
-		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalarticles;sa=status;xml', 'article_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalarticles;sa=status;api=xml', 'article_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
 	}
 
 	if (type === 'category')
 	{
-		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalcategories;sa=status;xml', 'category_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalcategories;sa=status;api=xml', 'category_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
 	}
 
 	if (type === 'page')
 	{
-		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalpages;sa=status;xml', 'page_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalpages;sa=status;api=xml', 'page_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
 	}
 
 	if (type === 'block')
 	{
-		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalblocks;sa=statechange;xml', 'block_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalblocks;sa=statechange;api=xml', 'block_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
 	}
 
 	return false;
@@ -595,8 +592,6 @@ function sp_on_status_received(XMLDoc)
  */
 function sp_editor_change_type(element)
 {
-	var initial_state;
-
 	$('#' + element).on('focus', function ()
 	{
 		// Store the current value on focus
@@ -604,7 +599,7 @@ function sp_editor_change_type(element)
 	}).change(function ()
 	{
 		// Handle the editor change of format
-		$.sceditor.plugins.spplugin(initial_state, this.value);
+		sceditor.plugins.portal(initial_state, this.value);
 
 		// Make sure the previous value is updated
 		initial_state = this.value;
@@ -618,18 +613,21 @@ function sp_editor_change_type(element)
  * @param {string} new_state one of bbc, html, markdown, php
  */
 function sp_to_new(initial_state, new_state) {
+	let $id = document.getElementById(post_box_name),
+		instance = sceditor.instance($id);
+
 	// Get the current contents and send to off for conversion
-	let val = editor.getSourceEditorValue(false);
+	let val = instance.getSourceEditorValue(false);
 
 	// Send it to the server for conversion
 	sp_change_format(val, initial_state, new_state);
 
-	// If BBC show the editor toolbar
+	// Only show the toolbar when in BBC mode
 	document.getElementById("editor_toolbar_container").style.display = (new_state === 'bbc' ? 'block' : 'none');
 }
 
 /**
- * Sends an xml request to change the format of the editor box
+ * Sends an XML request to change the format of the editor box
  *
  * @param {string} text The current text
  * @param {string} from Going to bbc, html, php, markdown
@@ -639,13 +637,13 @@ function sp_to_new(initial_state, new_state) {
 function sp_change_format(text, from, to)
 {
 	text = text.replace(/&#/g, "&#38;#").php_urlencode();
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalconfig;sa=formatchange;xml', 'text=' + text + '&' + 'from=' + from + '&' + 'to=' + to + '&' + elk_session_var + '=' + elk_session_id, sp_on_format_received);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalconfig;sa=formatchange;api=xml', 'text=' + text + '&' + 'from=' + from + '&' + 'to=' + to + '&' + elk_session_var + '=' + elk_session_id, sp_on_format_received);
 
 	return false;
 }
 
 /**
- * Callback function for XML format ... updates the editor as needed.
+ * Callback function for XML format ... updates the editor text as needed.
  *
  * @param XMLDoc
  * @returns {boolean}
@@ -661,12 +659,56 @@ function sp_on_format_received(XMLDoc)
 	let xml = XMLDoc.getElementsByTagName('elk')[0],
 		val = xml.getElementsByTagName('format')[0].firstChild;
 
-	val = val !== null ? val.nodeValue : '';
+	val = val === null ? '' : val.nodeValue;
 
 	// Put the response in the editor wizzy and then toggle back to source
-	editor.sourceMode(false);
-	editor.val(val, true);
-	editor.sourceMode(true);
+	let $id = document.getElementById(post_box_name),
+		instance = sceditor.instance($id);
+
+	instance.sourceMode(false);
+	instance.val(val, true);
+	instance.sourceMode(true);
 
 	return false;
+}
+
+/**
+ * Prepares and enhances article-related elements on the page by applying various visual and interactive features.
+ *
+ * This method includes functionalities such as enabling video previews, toggling spoiler content, managing quote blocks,
+ * and beautifying code blocks. It ensures a more interactive and user-friendly article browsing experience.
+ *
+ * @return {void} This function does not return a value.
+ */
+function sp_prep_articles()
+{
+	// Preview video links if the feature is available
+	if (typeof $.fn.linkifyvideo === 'function')
+	{
+		$().linkifyvideo(oEmbedtext);
+	}
+
+	// Spoilers, Sweetie
+	document.querySelectorAll('.spoilerheader').forEach(element => {
+		element.addEventListener('click', function() {
+			element.nextElementSibling.children[0].slideToggle(250);
+		});
+	});
+
+	// Show more quote blocks
+	if (typeof elk_quotefix === 'function')
+	{
+		elk_quotefix();
+	}
+
+	// Fix and Prettify code blocks
+	if (typeof elk_codefix === 'function')
+	{
+		elk_codefix();
+	}
+
+	if (typeof prettyPrint === 'function')
+	{
+		prettyPrint();
+	}
 }

@@ -4,9 +4,9 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
 
@@ -132,26 +132,15 @@ function template_articles()
 {
 	global $context, $txt;
 
-	echo
-					template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message'), '
+	template_control_richedit($context['post_box_name']);
+
+	echo '
 					<div class="submitbutton">
 						<input type="submit" name="submit" value="', $context['page_title'], '" accesskey="s" tabindex="', $context['tabindex']++, '" />
 						<input type="submit" name="preview" value="', $txt['sp_admin_articles_preview'], '" accesskey="p" tabindex="', $context['tabindex']++, '" />
 						<input type="hidden" name="article_id" value="', $context['article']['id'], '" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
-
-	// Spellcheck button?
-	if ($context['show_spellchecking'])
-	{
-		echo '
-						<input type="button" value="', $txt['spell_check'], '" onclick="spellCheckStart()" tabindex="', $context['tabindex']++, '" class="button_submit" />';
-	}
-
-	echo '
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					</div>';
-
-
-	addInlineJavascript('sp_editor_change_type("article_type");', true);
 }
 
 /**
@@ -189,16 +178,21 @@ function template_articles_edit_below()
  */
 function template_article_existing_attachments()
 {
-	global $context;
+	global $context, $modSettings, $txt;
 
 	foreach ($context['attachments']['current'] as $attachment)
 	{
 		$label = $attachment['name'];
 
+		if (!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']))
+		{
+			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1024) / 1024), 0));
+		}
+
 		echo '
 							<dd class="smalltext">
 								<label for="attachment_', $attachment['id'], '">
-									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-size="', $attachment['size'], '"/> ', $label, '
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-name="', $attachment['name'], '" data-size="', $attachment['size'], '"/> ', $label, '
 								</label>
 							</dd>';
 	}
@@ -276,7 +270,7 @@ function template_article_new_attachments()
 								', $txt['attach_restrictions'], ' ', implode(', ', $context['attachments']['restrictions']), '<br />';
 	}
 
-	if ($context['attachments']['num_allowed'] == 0)
+	if ($context['attachments']['num_allowed'] === 0)
 	{
 		echo '
 								', $txt['attach_limit_nag'], '<br />';

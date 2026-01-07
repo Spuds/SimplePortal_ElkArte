@@ -5,86 +5,43 @@
  * @package SimplePortal ElkArte
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.3
+ * @version 2.0.0
  *
  */
 -->
-<package-info xmlns="https://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
+<package-info xmlns="https://www.elkarte.net/site/package-info" xmlns:elk="https://www.elkarte.net/">
 	<id>[SiNaN]:SimplePortal</id>
 	<name>SimplePortal</name>
-	<version>1.0.3</version>
+	<version>2.0.0</version>
 	<type>addon</type>
-	<install for="1.1.7 - 1.1.99">
+	<install for="2.0.0 Beta 1 - 2.0.99">
 		<readme type="inline">This will install SimplePortal for Elkarte.</readme>
-		<modification>modification.xml</modification>
+
 		<require-file name="PortalStandalone.php" destination="BOARDDIR" />
-		<require-dir name="admin" destination="SOURCEDIR" />
-		<require-dir name="subs" destination="SOURCEDIR" />
-		<require-dir name="controllers" destination="SOURCEDIR" />
+
+		<require-dir name="SimplePortal" destination="ADDONSDIR" />
+		<require-dir name="Languages/SimplePortal" destination="LANGUAGEDIR" />
+		<require-dir name="Languages/SimplePortalAdmin" destination="LANGUAGEDIR" />
+		<require-dir name="Languages/SimplePortalHelp" destination="LANGUAGEDIR" />
+
 		<require-dir name="themes" destination="BOARDDIR" />
 		<require-dir name="sp_attach" destination="BOARDDIR" />
+
 		<database>database.php</database>
+
 		<code>settings.php</code>
+
 		<credits url="github.com/SimplePortal" license="BSD 3" copyright="Simple Portal Team">SimplePortal</credits>
 		<redirect url="$scripturl?action=admin;area=portalconfig" timeout="5000" parsebbc="true">redirect</redirect>
 	</install>
 
-	<uninstall for="1.1 - 1.1.99">
+	<uninstall for="2.0.0 Beta 1 - 2.0.99">
 		<readme type="inline">This will uninstall SimplePortal for Elkarte.</readme>
 		<code>remove.php</code>
-		<modification reverse="true">modification.xml</modification>
+
 		<remove-file name="BOARDDIR/PortalStandalone.php" />
-		<remove-file name="CONTROLLERDIR/PortalArticles.controller.php" />
-		<remove-file name="CONTROLLERDIR/PortalCategories.controller.php" />
-		<remove-file name="CONTROLLERDIR/PortalMain.controller.php" />
-		<remove-file name="CONTROLLERDIR/PortalPages.controller.php" />
-		<remove-file name="CONTROLLERDIR/PortalRefresh.controller.php" />
-		<remove-file name="CONTROLLERDIR/PortalShoutbox.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminArticles.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminBlocks.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminCategories.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminMain.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminMenus.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminPages.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminProfiles.controller.php" />
-		<remove-file name="ADMINDIR/PortalAdminShoutbox.controller.php" />
-		<remove-file name="ADMINDIR/ManageSPortalModule.controller.php" />
-		<remove-file name="SUBSDIR/Portal.subs.php" />
-		<remove-file name="SUBSDIR/PortalAdmin.subs.php" />
-		<remove-file name="SUBSDIR/PortalArticle.subs.php" />
-		<remove-file name="SUBSDIR/PortalShoutbox.subs.php" />
-		<remove-file name="SUBSDIR/Portal.integrate.php" />
-		<remove-file name="SUBSDIR/spblocks/AdminInfo.block.php" />
-		<remove-file name="SUBSDIR/spblocks/BoardStats.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Recent.block.php" />
-		<remove-file name="SUBSDIR/spblocks/TopPoster.block.php" />
-		<remove-file name="SUBSDIR/spblocks/WhosOnline.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Gallery.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Html.block.php" />
-		<remove-file name="SUBSDIR/spblocks/LatestMember.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Menu.block.php" />
-		<remove-file name="SUBSDIR/spblocks/News.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Php.block.php" />
-		<remove-file name="SUBSDIR/spblocks/QuickSearch.block.php" />
-		<remove-file name="SUBSDIR/spblocks/ShowPoll.block.php" />
-		<remove-file name="SUBSDIR/spblocks/ThemeSelect.block.php" />
-		<remove-file name="SUBSDIR/spblocks/TopBoards.block.php" />
-		<remove-file name="SUBSDIR/spblocks/TopStatsMember.block.php" />
-		<remove-file name="SUBSDIR/spblocks/AttachmentImage.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Articles.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Bbc.block.php" />
-		<remove-file name="SUBSDIR/spblocks/AttachmentRecent.block.php" />
-		<remove-file name="SUBSDIR/spblocks/CalendarInformation.block.php" />
-		<remove-file name="SUBSDIR/spblocks/TopTopics.block.php" />
-		<remove-file name="SUBSDIR/spblocks/RssFeed.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Staff.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Calendar.block.php" />
-		<remove-file name="SUBSDIR/spblocks/BoardNews.block.php" />
-		<remove-file name="SUBSDIR/spblocks/UserInfo.block.php" />
-		<remove-file name="SUBSDIR/spblocks/Shoutbox.block.php" />
-		<remove-file name="SUBSDIR/spblocks/SPAbstractBlock.class.php" />
 		<remove-file name="THEMEDIR/Portal.template.php" />
 		<remove-file name="THEMEDIR/PortalArticles.template.php" />
 		<remove-file name="THEMEDIR/PortalPages.template.php" />
@@ -98,27 +55,14 @@
 		<remove-file name="THEMEDIR/PortalAdminProfiles.template.php" />
 		<remove-file name="THEMEDIR/PortalAdminCategories.template.php" />
 		<remove-file name="THEMEDIR/PortalAdminMenus.template.php" />
-		<remove-file name="THEMEDIR/css/portal.css" />
-		<remove-file name="THEMEDIR/css/portal_rtl.css" />
-		<remove-file name="THEMEDIR/scripts/portal.js" />
-		<remove-file name="LANGUAGEDIR/italian/SPortal.italian.php" />
-		<remove-file name="LANGUAGEDIR/english/SPortal.english.php" />
-		<remove-file name="LANGUAGEDIR/english/SPortalAdmin.english.php" />
-		<remove-file name="LANGUAGEDIR/english/SPortalHelp.english.php" />
-		<remove-file name="LANGUAGEDIR/french/SPortal.french.php" />
-		<remove-file name="LANGUAGEDIR/french/SPortalAdmin.french.php" />
-		<remove-file name="LANGUAGEDIR/french/SPortalHelp.french.php" />
-		<remove-file name="LANGUAGEDIR/german/SPortal.german.php" />
-		<remove-file name="LANGUAGEDIR/german/SPortalAdmin.german.php" />
-		<remove-file name="LANGUAGEDIR/german/SPortalHelp.german.php" />
-		<remove-dir name="IMAGESDIR/sp" />
-		<remove-file name="IMAGESDIR/admin/configuration.png" />
-		<remove-file name="IMAGESDIR/admin/articles.png" />
-		<remove-file name="IMAGESDIR/admin/blocks.png" />
-		<remove-file name="IMAGESDIR/admin/categories.png" />
-		<remove-file name="IMAGESDIR/admin/feature_pt.png" />
-		<remove-file name="IMAGESDIR/admin/pages.png" />
-		<remove-file name="IMAGESDIR/admin/profiles.png" />
-		<remove-file name="IMAGESDIR/admin/shoutbox.png" />
+
+		<remove-dir name="ADDONSDIR/SimplePortal" />
+		<remove-dir name="THEMEDIR/css/SimplePortal" />
+		<remove-dir name="THEMEDIR/scripts/SimplePortal" />
+		<remove-dir name="IMAGESDIR/SimplePortal" />
+		<remove-dir name="LANGUAGEDIR/SimplePortal" />
+		<remove-dir name="LANGUAGEDIR/SimplePortalAdmin" />
+		<remove-dir name="LANGUAGEDIR/SimplePortalHelp" />
+
 	</uninstall>
 </package-info>

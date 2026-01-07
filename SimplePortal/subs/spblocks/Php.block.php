@@ -4,11 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
 
 /**
  * Generic PHP Block, creates a PHP block to do whatever you can imagine :D
@@ -18,18 +19,18 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Php_Block extends SP_Abstract_Block
+class PhpBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'content' => 'textarea',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -53,7 +54,7 @@ class Php_Block extends SP_Abstract_Block
 			$this->data['content'] = substr($this->data['content'], 5);
 		}
 
-		if (substr($this->data['content'], -2) == '?>')
+		if (substr($this->data['content'], -2) === '?>')
 		{
 			$this->data['content'] = substr($this->data['content'], 0, -2);
 		}
@@ -66,7 +67,7 @@ class Php_Block extends SP_Abstract_Block
 	 */
 	public static function permissionsRequired()
 	{
-		return array('admin_forum');
+		return ['admin_forum'];
 	}
 }
 

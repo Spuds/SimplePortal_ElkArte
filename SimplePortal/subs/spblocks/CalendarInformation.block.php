@@ -4,11 +4,12 @@
  * @package SimplePortal
  *
  * @author SimplePortal Team
- * @copyright 2015-2023 SimplePortal Team
+ * @copyright 2015-2026 SimplePortal Team
  * @license BSD 3-clause
- * @version 1.0.0
+ * @version 2.0.0
  */
 
+use ElkArte\Database\QueryInterface;
 
 /**
  * Calendar Info Block, Displays basic calendar ... birthdays, events and holidays.
@@ -21,21 +22,21 @@
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
  */
-class Calendar_Information_Block extends SP_Abstract_Block
+class CalendarInformationBlock extends SPAbstractBlock
 {
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param Database|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
-		$this->block_parameters = array(
+		$this->block_parameters = [
 			'events' => 'check',
 			'future' => 'int',
 			'birthdays' => 'check',
 			'holidays' => 'check',
-		);
+		];
 
 		parent::__construct($db);
 	}
@@ -70,12 +71,12 @@ class Calendar_Information_Block extends SP_Abstract_Block
 
 		$now = forum_time();
 		$today_date = date("Y-m-d", $now);
-		$this->data['calendar'] = array(
-			'todayEvents' => array(),
-			'futureEvents' => array(),
-			'todayBirthdays' => array(),
-			'todayHolidays' => array()
-		);
+		$this->data['calendar'] = [
+			'todayEvents' => [],
+			'futureEvents' => [],
+			'todayBirthdays' => [],
+			'todayHolidays' => []
+		];
 
 		// Load calendar events
 		if ($show_event)
@@ -94,7 +95,7 @@ class Calendar_Information_Block extends SP_Abstract_Block
 			$events = sp_loadCalendarData('getEvents', $today_date, $event_future_date);
 			ksort($events);
 
-			$displayed = array();
+			$displayed = [];
 			foreach ($events as $day => $day_events)
 			{
 				foreach ($day_events as $event_key => $event)

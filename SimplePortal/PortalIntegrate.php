@@ -107,7 +107,7 @@ class PortalIntegrate
 	{
 		global $scripturl, $modSettings, $txt;
 
-		// Generally we don't want to render inside these tags ...
+		// Generally, we don't want to render inside these tags ...
 		$disallow = [
 			'quote' => 1,
 			'code' => 1,
@@ -207,7 +207,7 @@ class PortalIntegrate
 				Codes::ATTR_AUTOLINK => false,
 				Codes::ATTR_LENGTH => 8,
 			],
-			// Just an align ?
+			// Just an align?
 			[
 				Codes::ATTR_TAG => 'spattach',
 				Codes::ATTR_TYPE => Codes::TYPE_UNPARSED_CONTENT,
@@ -344,7 +344,7 @@ class PortalIntegrate
 			$article = $context['article']['id'] ?? 0;
 
 			// Not a preview, then sanitize the attach id
-			if (strpos($data, 'post_tmp_') === false)
+			if (!str_contains($data, 'post_tmp_'))
 			{
 				$data = (int) $data;
 			}
@@ -360,7 +360,7 @@ class PortalIntegrate
 	 * Integration hook integrate_setup_allow
 	 *
 	 * Called from Theme.php setupMenuContext(), used to determine if the admin button is visible for a given
-	 * member as its needed to access certain sub menus
+	 * member as It's needed to access certain submenus
 	 */
 	public static function sp_integrate_setup_allow()
 	{
@@ -389,7 +389,7 @@ class PortalIntegrate
 	}
 
 	/**
-	 * Admin Menu Hook, integrate_admin_areas, called from Menu.php via generic hook
+	 * Admin Menu Hook, integrate_admin_areas, called from Menu.php via generic hook,
 	 * adds the admin menu
 	 *
 	 * @param Menu $admin_areas
@@ -486,23 +486,21 @@ class PortalIntegrate
 						'add' => [$txt['sp_admin_shoutbox_add']],
 					],
 				],
-				/* Shhh its a secret for now, not done yet ;)
-				'portalmenus' => array(
+				'portalmenus' => [
 					'label' => $txt['sp_admin_menus_title'],
-					'file' => 'PortalAdminMenus.controller.php',
 					'controller' => 'ManagePortalMenus',
 					'function' => 'action_index',
-					'icon' => 'menus.png',
-					'permission' => array('sp_admin', 'sp_manage_menus'),
-					'subsections' => array(
-						'listmainitem' => array($txt['sp_admin_menus_main_item_list']),
-						'addmainitem' => array($txt['sp_admin_menus_main_item_add']),
-						'listcustommenu' => array($txt['sp_admin_menus_custom_menu_list']),
-						'addcustommenu' => array($txt['sp_admin_menus_custom_menu_add']),
-						'addcustomitem' => array($txt['sp_admin_menus_custom_item_add'], 'enabled' => !empty($_REQUEST['sa']) && $_REQUEST['sa'] === 'listcustomitem'),
-					),
-				),
-				*/
+					'namespace' => 'Addons\SimplePortal\AdminController\\',
+					'class' => 'i-admin i-menu',
+					'permission' => ['sp_admin', 'sp_manage_menus'],
+					'subsections' => [
+						'listmainitem' => [$txt['sp_admin_menus_main_item_list']],
+						'addmainitem' => [$txt['sp_admin_menus_main_item_add']],
+						'listcustommenu' => [$txt['sp_admin_menus_custom_menu_list']],
+						'addcustommenu' => [$txt['sp_admin_menus_custom_menu_add']],
+						'addcustomitem' => [$txt['sp_admin_menus_custom_item_add'], 'enabled' => !empty($_REQUEST['sa']) && $_REQUEST['sa'] === 'listcustomitem'],
+					],
+				],
 				'portalprofiles' => [
 					'label' => $txt['sp_admin_profiles_title'],
 					'controller' => 'ManagePortalProfile',
@@ -556,7 +554,7 @@ class PortalIntegrate
 	 *
 	 * @param array $actions
 	 *
-	 * @return string|array
+	 * @return string
 	 */
 	public static function sp_integrate_whos_online($actions)
 	{
@@ -579,7 +577,7 @@ class PortalIntegrate
 			$txt['whoall_portal'] = sprintf($txt['sp_who_index'], $scripturl);
 		}
 
-		// If its a portal action, lets check it out.
+		// If it's a portal action, let's check it out.
 		if (isset($actions['page']))
 		{
 			$data = self::sp_whos_online_page($actions['page']);
@@ -773,7 +771,7 @@ class PortalIntegrate
 
 	/**
 	 * Integration hook integrate_buffer, called from ob_exit via call_integration_buffer
-	 * Used to modify the output buffer before its sent, here we add in our copyright
+	 * Used to modify the output buffer before it's sent, here we add in our copyright
 	 *
 	 * @param string $tourniquet
 	 *
@@ -798,7 +796,7 @@ class PortalIntegrate
 
 		$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . Util::strftime('%Y', time()) . '</a>');
 
-		if (strpos($tourniquet, $fix) !== false)
+		if (str_contains($tourniquet, $fix))
 		{
 			return $tourniquet;
 		}
@@ -814,7 +812,7 @@ class PortalIntegrate
 		$tourniquet = str_replace($finds, $replaces, $tourniquet);
 
 		// Can't find it for some reason, so we add it at the end
-		if (strpos($tourniquet, $fix) === false)
+		if (!str_contains($tourniquet, $fix))
 		{
 			$fix = '<div style="text-align: center; width: 100%; font-size: x-small; margin-bottom: 5px;">' . $fix . '</div></body></html>';
 			$tourniquet = preg_replace('~</body>\s*</html>~', $fix, $tourniquet);
@@ -872,6 +870,89 @@ class PortalIntegrate
 				'action_hook' => true,
 			],
 		], 'after');
+
+		// Any custom main menu items from our menu module?
+		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
+
+		if (empty($context['SPortal']['permissions']))
+		{
+			sportal_load_permissions();
+		}
+
+		$items = sportal_get_menu_items(null, 'id_item', 0);
+		if (!empty($items))
+		{
+			foreach ($items as $item)
+			{
+				if (!in_array($item['id_profile'], $context['SPortal']['permissions']['profiles']))
+				{
+					continue;
+				}
+
+				$sub_buttons = [];
+				if (preg_match('~\$scripturl\?menu=(\d+)$~', $item['url'], $match))
+				{
+					$sub_buttons = self::sp_load_menu_items((int) $match[1]);
+				}
+
+				$button = [
+					'title' => $item['title'],
+					'data-icon' => 'i-spgroup',
+					'href' => str_replace('$scripturl', $scripturl, $item['url']),
+					'show' => true,
+					'target' => $item['target'] ? '_blank' : '',
+					'sub_buttons' => $sub_buttons,
+				];
+
+				$placement = !empty($item['placement']) ? $item['placement'] : 'after';
+				$after = !empty($item['placement_after']) ? $item['placement_after'] : 'forum';
+
+				// ElkArte's elk_array_insert takes care of 'before' and 'after'
+				$buttons = elk_array_insert($buttons, $after, [$item['namespace'] => $button], $placement);
+			}
+		}
+	}
+
+	/**
+	 * Helper function to load menu items for a custom menu
+	 *
+	 * @param int $menu_id
+	 * @return array
+	 */
+	public static function sp_load_menu_items($menu_id)
+	{
+		global $scripturl, $context;
+
+		if (empty($context['SPortal']['permissions']))
+		{
+			sportal_load_permissions();
+		}
+
+		$items = sportal_get_menu_items(null, 'id_item', $menu_id);
+		$sub_buttons = [];
+		foreach ($items as $item)
+		{
+			if (!in_array($item['id_profile'], $context['SPortal']['permissions']['profiles']))
+			{
+				continue;
+			}
+
+			$nested_sub_buttons = [];
+			if (preg_match('~\$scripturl\?menu=(\d+)$~', $item['url'], $match))
+			{
+				$nested_sub_buttons = self::sp_load_menu_items((int) $match[1]);
+			}
+
+			$sub_buttons[$item['namespace']] = [
+				'title' => $item['title'],
+				'href' => str_replace('$scripturl', $scripturl, $item['url']),
+				'show' => true,
+				'target' => $item['target'] ? '_blank' : '',
+				'sub_buttons' => $nested_sub_buttons,
+			];
+		}
+
+		return $sub_buttons;
 	}
 
 	/**
@@ -900,20 +981,6 @@ class PortalIntegrate
 				$setLocation = $context['portal_url'];
 			}
 		}
-		// @todo If we are using Search engine friendly URLs then lets do the same for page links
-		elseif (!empty($modSettings['queryless_urls'])
-			&& (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed']))
-			&& (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1))
-		{
-			if (defined('SID') && SID !== '')
-			{
-				$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:page)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
-			}
-			else
-			{
-				$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:page)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
-			}
-		}
 	}
 
 	/**
@@ -929,7 +996,7 @@ class PortalIntegrate
 			$context['robot_no_index'] = true;
 		}
 
-		// Set the board index canonical URL correctly when portal mode is set to front page
+		// Set the board index canonical URL correctly when portal mode is set to the front page
 		if (!empty($modSettings['sp_portal_mode']) && (int) $modSettings['sp_portal_mode'] === 1 && empty($context['disable_sp']))
 		{
 			$context['canonical_url'] = $scripturl . '?action=forum';
@@ -959,7 +1026,7 @@ class PortalIntegrate
 	}
 
 	/**
-	 * Add to the xml array our sortable actions for block arrangement.
+	 * Add to the XML array our sortable actions for block arrangement.
 	 * integrate_sa_xmlhttp
 	 *
 	 * @param array $subActions
@@ -1002,7 +1069,7 @@ class PortalIntegrate
 	 */
 	public static function sp_integrate_pre_parsebbc(&$message)
 	{
-		if (strpos($message, '[cutoff]') !== false)
+		if (str_contains($message, '[cutoff]'))
 		{
 			$message = str_replace('[cutoff]', '', $message);
 		}

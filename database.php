@@ -130,7 +130,7 @@ function addDefaultStyles(&$has_style_profiles)
 }
 
 /**
- * Adds guest only, member only and everyone permission profiles
+ * Adds guest-only, member only and everyone permission profiles
  */
 function addDefaultPermissions()
 {
@@ -177,6 +177,11 @@ function updateTableStructures()
 	{
 		$db_table->change_column('{db_prefix}sp_pages', 'body', array('type' => 'mediumtext'));
 	}
+
+	// Add new columns to the menu table
+	$db_table->add_column('{db_prefix}sp_menu_items', array('name' => 'placement', 'type' => 'varchar', 'size' => 10, 'default' => ''));
+	$db_table->add_column('{db_prefix}sp_menu_items', array('name' => 'placement_after', 'type' => 'varchar', 'size' => 255, 'default' => ''));
+	$db_table->add_column('{db_prefix}sp_menu_items', array('name' => 'id_profile', 'type' => 'int', 'size' => 10, 'default' => 1));
 }
 
 /**
@@ -776,6 +781,9 @@ function defineTables()
 				array('name' => 'title', 'type' => 'tinytext'),
 				array('name' => 'href', 'type' => 'tinytext'),
 				array('name' => 'target', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
+				array('name' => 'placement', 'type' => 'varchar', 'size' => 10, 'default' => ''),
+				array('name' => 'placement_after', 'type' => 'varchar', 'size' => 255, 'default' => ''),
+				array('name' => 'id_profile', 'type' => 'int', 'size' => 10, 'default' => 1),
 			),
 			'indexes' => array(
 				array('type' => 'primary', 'columns' => array('id_item')),
@@ -881,7 +889,7 @@ function defineTables()
 
 	$db_table = db_table();
 
-	// Create the tables, if they don't already exist
+	// Create the tables if they don't already exist
 	foreach ($sp_tables as $sp_table => $data)
 	{
 		$db_table->create_table('{db_prefix}' . $sp_table, $data['columns'], $data['indexes'], array(), 'ignore');

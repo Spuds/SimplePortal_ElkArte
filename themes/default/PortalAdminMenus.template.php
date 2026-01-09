@@ -68,15 +68,17 @@ function template_menus_custom_item_edit()
 					</dt>
 					<dd>
 						<select name="link_type" id="item_link_type" onchange="sp_update_link();">
-							<option value="custom">', $txt['sp_admin_menus_link_type_custom'], '</option>';
+							<option value="custom"', !empty($context['item']['link_type']) && $context['item']['link_type'] === 'custom' ? ' selected="selected"' : '', '>', $txt['sp_admin_menus_link_type_custom'], '</option>';
 
 	foreach ($context['items'] as $type => $items)
 	{
 		if (empty($items))
+		{
 			continue;
+		}
 
 		echo '
-							<option value="', $type, '">', $txt['sp_admin_menus_link_type_' . $type], '</option>';
+							<option value="', $type, '"', !empty($context['item']['link_type']) && $context['item']['link_type'] === $type ? ' selected="selected"' : '', '>', $txt['sp_admin_menus_link_type_' . $type], '</option>';
 	}
 
 	echo '
@@ -104,6 +106,47 @@ function template_menus_custom_item_edit()
 							<option value="1"', $context['item']['target'] == 1 ? ' selected="selected"' : '', '>', $txt['sp_admin_menus_link_target_1'], '</option>
 						</select>
 					</dd>
+					<dt>
+						<label for="id_profile">', $txt['sp_admin_menus_col_permissions'], ':</label>
+					</dt>
+					<dd>
+						<select name="id_profile" id="id_profile">';
+
+	foreach ($context['profiles'] as $profile)
+	{
+		echo '
+							<option value="', $profile['id'], '"', $profile['id'] == $context['item']['id_profile'] ? ' selected="selected"' : '', '>', $profile['label'], '</option>';
+	}
+
+	echo '
+						</select>
+					</dd>';
+
+	if ($context['menu']['id'] === 0)
+	{
+		echo '
+					<dt>
+						<label for="item_placement">', $txt['sp_admin_menus_col_placement'], ':</label>
+					</dt>
+					<dd>
+						<select name="placement" id="item_placement">
+							<option value="after"', $context['item']['placement'] === 'after' ? ' selected="selected"' : '', '>', $txt['sp_admin_menus_placement_after'], '</option>
+							<option value="before"', $context['item']['placement'] === 'before' ? ' selected="selected"' : '', '>', $txt['sp_admin_menus_placement_before'], '</option>
+						</select>
+						<select name="placement_after" id="item_placement_after">';
+
+		foreach ($context['main_menu_buttons'] as $key => $title)
+		{
+			echo '
+							<option value="', $key, '"', $context['item']['placement_after'] === $key ? ' selected="selected"' : '', '>', $title, '</option>';
+		}
+
+		echo '
+						</select>
+					</dd>';
+	}
+
+	echo '
 				</dl>
 				<div class="submitbutton">
 					<input type="submit" name="submit" class="button_submit" value="', $context['page_title'], '" />
@@ -116,13 +159,15 @@ function template_menus_custom_item_edit()
 	<script>
 		var sp_link_items = {';
 
-	$sets = array();
+	$sets = [];
 	foreach ($context['items'] as $type => $items)
 	{
 		if (empty($items))
+		{
 			continue;
+		}
 
-		$set = array();
+		$set = [];
 		foreach ($items as $id => $title)
 		{
 			$set[] = JavaScriptEscape($id) . ': ' . JavaScriptEscape($title);
@@ -139,7 +184,7 @@ function template_menus_custom_item_edit()
 			', $sets), '
 		};
 
-		function sp_update_link()
+		function sp_update_link(selected_item)
 		{
 			var type_select = document.getElementById("item_link_type"),
 				item_select = document.getElementById("item_link_item"),
@@ -149,10 +194,18 @@ function template_menus_custom_item_edit()
 				item_select.options[0] = null;
 
 			for (var key in sp_link_items[new_value])
-				item_select.options[item_select.length] = new Option(sp_link_items[new_value][key], key);
+			{
+				var option = new Option(sp_link_items[new_value][key], key);
+				if (typeof selected_item !== "undefined" && key == selected_item)
+					option.selected = true;
+
+				item_select.options[item_select.length] = option;
+			}
 
 			document.getElementById("item_link_dt").style.display = document.getElementById("item_link_dd").style.display = new_value == "custom" ? "none" : "block";
 			document.getElementById("item_url_dt").style.display = document.getElementById("item_url_dd").style.display = new_value != "custom" ? "none" : "block";
 		}
+
+		sp_update_link(', !empty($context['item']['link_item']) ? JavaScriptEscape($context['item']['link_item']) : '', ');
 	</script>';
 }

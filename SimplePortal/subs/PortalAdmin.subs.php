@@ -75,7 +75,7 @@ function getFunctionInfo($function = null)
 		];
 	}
 
-	// Show the block list in alpha order
+	// Show the blocklist in alpha order
 	if ($function === null)
 	{
 		usort($return, static function ($a, $b) {
@@ -217,7 +217,7 @@ function sp_changeState($type = null, $id = null)
 			'id' => $id,
 		]
 	);
-	list ($state) = $request->fetch_row();
+	[$state] = $request->fetch_row();
 	$request->free_result();
 
 	return $state;
@@ -258,7 +258,7 @@ function sp_general_load_themes()
  *
  * @param int[]|string $selectedGroups - all groups who should be shown as selected, if you like to check all than
  *     insert an 'all' You can also Give the function a string with '2,3,4'
- * @param string $show - 'normal' => will show all groups, and add a guest and regular member (Standard)
+ * @param string $show - 'normal' => will show all groups and add a guest and regular member (Standard)
  *                       'post' => will load only post groups
  *                       'master' => will load only not postbased groups
  * @param string $contextName - where the data should be stored in $context
@@ -275,7 +275,7 @@ function sp_loadMemberGroups($selectedGroups = [], $show = 'normal', $contextNam
 	// Some additional Language stings are needed
 	Txt::load('ManageBoards');
 
-	// Make sure its empty
+	// Make sure it's empty
 	if (!empty($subContext))
 	{
 		$context[$subContext][$contextName] = [];
@@ -319,7 +319,7 @@ function sp_loadMemberGroups($selectedGroups = [], $show = 'normal', $contextNam
 		$selectedGroups = [];
 	}
 
-	// Okay let us checkup the show function
+	// Okay, let us check up the show function
 	$show_option = [
 		'normal' => 'id_group != 3',
 		'moderator' => 'id_group != 1 AND id_group != 3',
@@ -432,7 +432,7 @@ function sp_count_categories()
 		SELECT COUNT(*)
 		FROM {db_prefix}sp_categories'
 	);
-	list ($total_categories) = $request->fetch_row();
+	[$total_categories] = $request->fetch_row();
 	$request->free_result();
 
 	return $total_categories;
@@ -508,7 +508,7 @@ function sp_check_duplicate_category($id, $namespace = '')
 			'current' => (int) $id,
 		]
 	);
-	list ($has_duplicate) = $request->fetch_row();
+	[$has_duplicate] = $request->fetch_row();
 	$request->free_result();
 
 	return $has_duplicate;
@@ -517,7 +517,7 @@ function sp_check_duplicate_category($id, $namespace = '')
 /**
  * Update an existing category or add a new one to the database
  *
- * If adding a new one, will return the id of the new category
+ * If adding a new one, it will return the id of the new category
  *
  * @param array $data field name to value for use in query
  * @param bool $is_new
@@ -636,7 +636,7 @@ function sp_count_articles()
 		    COUNT(*)
 		FROM {db_prefix}sp_articles'
 	);
-	list ($total_articles) = $request->fetch_row();
+	[$total_articles] = $request->fetch_row();
 	$request->free_result();
 
 	return $total_articles;
@@ -755,7 +755,7 @@ function sp_delete_articles($article_ids = [])
 /**
  * Validates that an articles id is not duplicated in a given namespace
  *
- * return true if it is a duplicate or false if its unique
+ * Return true if it is a duplicate or false if it's unique
  *
  * @param int $article_id
  * @param string $namespace
@@ -779,7 +779,7 @@ function sp_duplicate_articles($article_id, $namespace)
 			'current' => $article_id,
 		]
 	);
-	list ($has_duplicate) = $result->fetch_row();
+	[$has_duplicate] = $result->fetch_row();
 	$result->free_result();
 
 	return $has_duplicate;
@@ -788,8 +788,8 @@ function sp_duplicate_articles($article_id, $namespace)
 /**
  * Saves or updates an articles information
  *
- * - expects to have $context populated from sportal_get_articles()
- * - add items as a new article is is_new is true otherwise updates and existing one
+ * - Expects to have $context populated from sportal_get_articles()
+ * - Add items as a new article is is_new is true otherwise updates and existing one
  *
  * @param array $article_info array of fields details to save/update
  * @param bool $is_new true for new insertion, false to update
@@ -821,7 +821,7 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		// New will set this
 		unset($article_info['id']);
 
-		// If new we set these one time fields
+		// If new, we set these one-time fields
 		$fields = array_merge($fields, [
 			'id_member' => 'int',
 			'member_name' => 'string',
@@ -853,7 +853,7 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		{
 			foreach ($currentAttachments[$article_info['id']] as $attachment)
 			{
-				// Replace ila attach tags with the new valid attachment id and [spattach] tag
+				// Replace ila attached tags with the new valid attachment id and [spattach] tag
 				$article_info['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['id_attach'] . '\[\/attach\]~', '[spattach$1]' . $attachment['id_attach'] . '[/spattach]', $article_info['body']);
 			}
 		}
@@ -918,7 +918,7 @@ function sp_count_pages()
 		    COUNT(*)
 		FROM {db_prefix}sp_pages'
 	);
-	list ($total_pages) = $request->fetch_row();
+	[$total_pages] = $request->fetch_row();
 	$request->free_result();
 
 	return $total_pages;
@@ -997,7 +997,7 @@ function sp_delete_pages($page_ids = [])
 /**
  * Saves or updates a page
  *
- * - Add items as a new page is is_new is true otherwise updates and existing one
+ * - Add items as a new page is is_new is true otherwise updates an existing one
  *
  * @param array $page_info array of fields details to save/update
  * @param bool $is_new true for new insertion, false to update
@@ -1075,7 +1075,7 @@ function sp_check_duplicate_pages($namespace, $page_id)
 			'current' => (int) $page_id,
 		]
 	);
-	list ($has_duplicate) = $result->fetch_row();
+	[$has_duplicate] = $result->fetch_row();
 	$result->free_result();
 
 	return $has_duplicate;
@@ -1095,7 +1095,7 @@ function sp_count_shoutbox()
 		    COUNT(*)
 		FROM {db_prefix}sp_shoutboxes'
 	);
-	list ($total_shoutbox) = $request->fetch_row();
+	[$total_shoutbox] = $request->fetch_row();
 	$request->free_result();
 
 	return $total_shoutbox;
@@ -1201,7 +1201,7 @@ function sp_check_duplicate_shoutbox($name, $shoutbox_id)
 			'current' => (int) $shoutbox_id,
 		]
 	);
-	list ($has_duplicate) = $result->fetch_row();
+	[$has_duplicate] = $result->fetch_row();
 	$result->free_result();
 
 	return $has_duplicate;
@@ -1271,7 +1271,7 @@ function sp_edit_shoutbox($shoutbox_info, $is_new = false)
 
 /**
  * Gets a members ID from their userid or display name.
- * Used to prune a shouts from a box
+ * Used to prune a shout from a box
  *
  * @param string $member
  *
@@ -1293,7 +1293,7 @@ function sp_shoutbox_prune_member($member)
 			'limit' => 1,
 		]
 	);
-	list ($member_id) = $request->fetch_row();
+	[$member_id] = $request->fetch_row();
 	$request->free_result();
 
 	return (int) $member_id;
@@ -1333,7 +1333,7 @@ function sp_prune_shoutbox($shoutbox_id, $where, $parameters, $all = false)
 				'limit' => 1,
 			]
 		);
-		list ($total_shouts) = $request->fetch_row();
+		[$total_shouts] = $request->fetch_row();
 		$request->free_result();
 	}
 
@@ -1367,7 +1367,7 @@ function sp_count_profiles($type = 1)
 			'type' => $type,
 		]
 	);
-	list ($total_profiles) = $request->fetch_row();
+	[$total_profiles] = $request->fetch_row();
 	$request->free_result();
 
 	return $total_profiles;
@@ -1390,7 +1390,7 @@ function sp_load_profiles($start, $items_per_page, $sort, $type = 1)
 
 	$db = database();
 
-	// First load up all the permission profiles names in the system
+	// First, load up all the permission profiles names in the system
 	$profiles = [];
 	$db->query('', '
 		SELECT
@@ -1547,7 +1547,7 @@ function sp_update_block_visibility($id, $data)
 /**
  * Fetches the rows from a specified column and returns the values
  *
- * - If a current block ID is not specified the next available row number in
+ * - If a current block ID is not specified, the next available row number in
  * the specified column is returned
  * - If a block id is specified, its row number + 1 is returned
  *
@@ -1571,7 +1571,7 @@ function sp_block_nextrow($block_column, $block_id = 0)
 			'current_id' => $block_id,
 		]
 	);
-	list ($row) = $request->fetch_row();
+	[$row] = $request->fetch_row();
 	$request->free_result();
 
 	return $row + 1;
@@ -1695,7 +1695,7 @@ function sp_block_get_position($block_id)
 			'block_id' => $block_id,
 		]
 	);
-	list ($current_side, $current_row) = $request->fetch_row();
+	[$current_side, $current_row] = $request->fetch_row();
 	$request->free_result();
 
 	return [(int) $current_side, (int) $current_row];
@@ -1729,7 +1729,7 @@ function sp_block_move_col($block_id, $target_side)
 /**
  * Adds the portal block to the new row position
  *
- * - Opens up space in the column by shift all rows below the insertion point down one
+ * - Opens up space in the column by shifting all rows below the insertion point down one
  * - Adds the block ID to the specified column and row
  *
  * @param int $block_id
@@ -1798,7 +1798,7 @@ function sp_block_delete($block_id)
 }
 
 /**
- * Function to add or update a profile, style, permissions or display
+ * Function to add or update a profile, style, permissions, or display
  *
  * @param array $profile_info The data to insert/update
  * @param bool $is_new if to update or insert
@@ -1870,7 +1870,7 @@ function sp_delete_profile($profile_id)
 }
 
 /**
- * Loads boards and pages for template selection
+ * Loads boards, pages, categories, articles, and menus for template selection
  *
  * - Returns the results in $context for the template
  *
@@ -1883,7 +1883,7 @@ function sp_block_template_helpers()
 	$helpers = [];
 
 	// Get a list of board names for use in the template
-	$helpers['boards'] = [];
+	$helpers['board'] = [];
 	$db->query('', '
 		SELECT
 			id_board, name
@@ -1894,11 +1894,11 @@ function sp_block_template_helpers()
 			'empty' => '',
 		]
 	)->fetch_callback(function ($row) use (&$helpers) {
-		$helpers['boards']['b' . $row['id_board']] = $row['name'];
+		$helpers['board']['b' . $row['id_board']] = $row['name'];
 	});
 
 	// Get all the pages loaded in the system for template use
-	$helpers['pages'] = [];
+	$helpers['page'] = [];
 	$db->query('', '
 		SELECT
 			id_page, title
@@ -1906,11 +1906,11 @@ function sp_block_template_helpers()
 		ORDER BY title DESC',
 		[]
 	)->fetch_callback(function ($row) use (&$helpers) {
-		$helpers['pages']['p' . $row['id_page']] = $row['title'];
+		$helpers['page']['p' . $row['id_page']] = $row['title'];
 	});
 
 	// Same for categories
-	$helpers['categories'] = [];
+	$helpers['category'] = [];
 	$db->query('', '
 		SELECT
 			id_category, name
@@ -1918,11 +1918,11 @@ function sp_block_template_helpers()
 		ORDER BY name DESC',
 		[]
 	)->fetch_callback(function ($row) use (&$helpers) {
-		$helpers['categories']['c' . $row['id_category']] = $row['name'];
+		$helpers['category']['c' . $row['id_category']] = $row['name'];
 	});
 
-	// And finish up with articles
-	$helpers['articles'] = [];
+	// Same for articles
+	$helpers['article'] = [];
 	$db->query('', '
 		SELECT
 			id_article, title
@@ -1930,7 +1930,19 @@ function sp_block_template_helpers()
 		ORDER BY title DESC',
 		[]
 	)->fetch_callback(function ($row) use (&$helpers) {
-		$helpers['articles']['a' . $row['id_article']] = $row['title'];
+		$helpers['article']['a' . $row['id_article']] = $row['title'];
+	});
+
+	// And finally, custom menus
+	$helpers['menu'] = [];
+	$db->query('', '
+		SELECT
+			id_menu, name
+		FROM {db_prefix}sp_custom_menus
+		ORDER BY name DESC',
+		[]
+	)->fetch_callback(function ($row) use (&$helpers) {
+		$helpers['menu']['m' . $row['id_menu']] = $row['name'];
 	});
 
 	return $helpers;
@@ -1983,7 +1995,7 @@ function sp_remove_menu_items($remove_ids)
 }
 
 /**
- * Determine the menu count, used for create List
+ * Determine the menu count used for create List
  *
  * @return int
  */
@@ -1996,14 +2008,14 @@ function sp_menu_count()
 		    COUNT(*)
 		FROM {db_prefix}sp_custom_menus'
 	);
-	list ($total_menus) = $request->fetch_row();
+	[$total_menus] = $request->fetch_row();
 	$request->free_result();
 
 	return $total_menus;
 }
 
 /**
- * Return menu & items, helper function for createlist
+ * Return menu and items, helper function for createlist
  *
  * @param int $start
  * @param int $items_per_page
@@ -2117,7 +2129,7 @@ function sp_menu_check_duplicate_items($id, $namespace)
 			'limit' => 1,
 		]
 	);
-	list ($has_duplicate) = $result->fetch_row();
+	[$has_duplicate] = $result->fetch_row();
 	$result->free_result();
 
 	return $has_duplicate;
@@ -2138,10 +2150,13 @@ function sp_add_menu_item($item_info, $is_new)
 	// Our database fields
 	$fields = [
 		'id_menu' => 'int',
+		'id_profile' => 'int',
 		'namespace' => 'string',
 		'title' => 'string',
 		'href' => 'string',
 		'target' => 'int',
+		'placement' => 'string',
+		'placement_after' => 'string',
 	];
 
 	// Adding a new item
@@ -2180,7 +2195,7 @@ function sp_add_menu_item($item_info, $is_new)
 }
 
 /**
- * Determine the menu count, used for create List
+ * Determine the menu count used for create List
  *
  * @param int $menu_id
  * @return int
@@ -2190,14 +2205,15 @@ function sp_menu_item_count($menu_id)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT COUNT(*)
+		SELECT 
+			COUNT(*)
 		FROM {db_prefix}sp_menu_items
 		WHERE id_menu = {int:menu}',
 		[
 			'menu' => $menu_id,
 		]
 	);
-	list ($total_menus) = $request->fetch_row();
+	[$total_menus] = $request->fetch_row();
 	$request->free_result();
 
 	return $total_menus;
@@ -2222,7 +2238,7 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 	$items = [];
 	$db->query('', '
 		SELECT
-			id_item, title, namespace, target
+			id_item, title, namespace, target, id_profile
 		FROM {db_prefix}sp_menu_items
 		WHERE id_menu = {int:menu}
 		ORDER BY {raw:sort}
@@ -2240,6 +2256,7 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 			'title' => $row['title'],
 			'namespace' => $row['namespace'],
 			'target' => $txt['sp_admin_menus_link_target_' . $row['target']],
+			'id_profile' => $row['id_profile'],
 		];
 	});
 
@@ -2249,7 +2266,7 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 /**
  * SCEditor spplugin Plugin.
  * Used to set editor initial state and the setup so type conversion can
- * happen. Just call the plugin with initial and new states.
+ * happen. Call the plugin with initial and new states.
  *
  * @param string $type
  */
@@ -2281,4 +2298,30 @@ function addConversionJS($type)
 			};
 		};
 	');
+}
+
+function sp_fetch_actions()
+{
+	global $txt;
+
+	return [
+		'portal' => $txt['sp-portal'],
+		'forum' => $txt['sp-forum'],
+		'recent' => $txt['recent_posts'],
+		'unread' => $txt['unread_topics_visit'],
+		'unreadreplies' => $txt['unread_replies'],
+		'profile' => $txt['profile'],
+		'pm' => $txt['pm_short'],
+		'calendar' => $txt['calendar'],
+		'admin' => $txt['admin'],
+		'login' => $txt['login'],
+		'register' => $txt['register'],
+		'post' => $txt['post'],
+		'stats' => $txt['forum_stats'],
+		'search' => $txt['search'],
+		'mlist' => $txt['members_list'],
+		'moderate' => $txt['moderate'],
+		'help' => $txt['help'],
+		'who' => $txt['who_title'],
+	];
 }

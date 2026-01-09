@@ -13,12 +13,13 @@ namespace Addons\SimplePortal\AdminController;
 
 use ElkArte\AbstractController;
 use ElkArte\Action;
+use ElkArte\Exceptions\Exception;
+use ElkArte\Helper\DataValidator;
+use ElkArte\Helper\Util;
 
 /**
  * SimplePortal Menus Administration controller class.
  * This class handles the adding/editing of menus
- *
- * @todo not complete, do not use
  */
 class ManagePortalMenus extends AbstractController
 {
@@ -40,58 +41,87 @@ class ManagePortalMenus extends AbstractController
 		theme()->getTemplates()->load('PortalAdminMenus');
 
 		$subActions = [
-			'listmainitem' => [$this, 'action_sportal_admin_menus_main_item_list'],
-			'addmainitem' => [$this, 'action_sportal_admin_menus_main_item_edit'],
-			'editmainitem' => [$this, 'action_sportal_admin_menus_main_item_edit'],
-			'deletemainitem' => [$this, 'action_sportal_admin_menus_main_item_delete'],
+			'listmainitem' => [$this, 'action_main_item_list'],
+			'addmainitem' => [$this, 'action_main_item_edit'],
+			'editmainitem' => [$this, 'action_main_item_edit'],
+			'deletemainitem' => [$this, 'action_main_item_delete'],
 
-			'listcustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_list'],
-			'addcustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_edit'],
-			'editcustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_edit'],
-			'deletecustommenu' => [$this, 'action_sportal_admin_menus_custom_menu_delete'],
+			'listcustommenu' => [$this, 'action_custom_menu_list'],
+			'addcustommenu' => [$this, 'action_custom_menu_edit'],
+			'editcustommenu' => [$this, 'action_custom_menu_edit'],
+			'deletecustommenu' => [$this, 'action_custom_menu_delete'],
 
-			'listcustomitem' => [$this, 'action_sportal_admin_menus_custom_item_list'],
-			'addcustomitem' => [$this, 'action_sportal_admin_menus_custom_item_edit'],
-			'editcustomitem' => [$this, 'action_sportal_admin_menus_custom_item_edit'],
-			'deletecustomitem' => [$this, 'action_sportal_admin_menus_custom_item_delete'],
+			'listcustomitem' => [$this, 'action_custom_item_list'],
+			'addcustomitem' => [$this, 'action_custom_item_edit'],
+			'editcustomitem' => [$this, 'action_custom_item_edit'],
+			'deletecustomitem' => [$this, 'action_custom_item_delete'],
 		];
 
 		// Start up the controller, provide a hook since we can
 		$action = new Action('portal_menus');
 
 		// Set up the tabs
-		$context[$context['admin_menu_name']]['tab_data'] = [
+		$tabs = [
+			'listmainitem' => [],
+			'addmainitem' => [],
+			'listcustommenu' => [],
+			'addcustommenu' => [],
+			'addcustomitem' => [],
+		];
+
+		// Default to list the main menu items
+		$subAction = $action->initialize($subActions, 'listmainitem');
+		$context['sub_action'] = $subAction;
+
+		if ($context['sub_action'] === 'listcustomitem' && !empty($_REQUEST['menu_id']))
+		{
+			$tabs['addcustomitem'] = [
+				'add_params' => ';menu_id=' . $_REQUEST['menu_id']
+			];
+		}
+
+		$context[$context['admin_menu_name']]['object']->prepareTabData([
 			'title' => $txt['sp_admin_menus_title'],
 			'help' => 'sp_MenusArea',
 			'description' => $txt['sp_admin_menus_desc'],
-			'tabs' => [
-				//	'listmainitem' => array(),
-				//	'addmainitem' => array(),
-				'listcustommenu' => [],
-				'addcustommenu' => [],
-			],
-		];
-
-		// Default to list the categories
-		$subAction = $action->initialize($subActions, 'listcustommenu');
-		$context['sub_action'] = $subAction;
-
-		// Extra tab in the right cases
-		if ($context['sub_action'] === 'listcustomitem' && !empty($_REQUEST['menu_id']))
-		{
-			$context[$context['admin_menu_name']]['tab_data']['tabs']['addcustomitem'] = [
-				'add_params' => ';menu_id=' . $_REQUEST['menu_id'],
-			];
-		}
+			'tabs' => $tabs,
+		]);
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
 	}
 
 	/**
+	 * List the items in the main forum menu
+	 */
+	public function action_main_item_list()
+	{
+		$_REQUEST['menu_id'] = 0;
+		$this->action_custom_item_list();
+	}
+
+	/**
+	 * Edit or add a main forum menu item
+	 */
+	public function action_main_item_edit()
+	{
+		$_REQUEST['menu_id'] = 0;
+		$this->action_custom_item_edit();
+	}
+
+	/**
+	 * Delete a main forum menu item
+	 */
+	public function action_main_item_delete()
+	{
+		$_REQUEST['menu_id'] = 0;
+		$this->action_custom_item_delete();
+	}
+
+	/**
 	 * List the custom menus in the system
 	 */
-	public function action_sportal_admin_menus_custom_menu_list()
+	public function action_custom_menu_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -158,6 +188,7 @@ class ManagePortalMenus extends AbstractController
 							'format' => '
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=addcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('add') . '</a>
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('items') . '</a>
+						 		<br />
 						 		<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>
 								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustommenu;menu_id=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp_admin_menus_menu_delete_confirm'] . '\');">' . sp_embed_image('delete') . '</a>',
 							'params' => [
@@ -184,7 +215,6 @@ class ManagePortalMenus extends AbstractController
 		$context['default_list'] = 'portal_menus';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -198,7 +228,7 @@ class ManagePortalMenus extends AbstractController
 	}
 
 	/**
-	 * Returns an array of menus, passthru really
+	 * Returns an array of menus
 	 * Callback for createList()
 	 *
 	 * @param int $start
@@ -215,21 +245,21 @@ class ManagePortalMenus extends AbstractController
 	/**
 	 * Create or edit a menu
 	 */
-	public function action_sportal_admin_menus_custom_menu_edit()
+	public function action_custom_menu_edit()
 	{
 		global $context, $txt;
 
 		// New menu or existing menu
 		$is_new = empty($_REQUEST['menu_id']);
 
-		// Saving the edit/add
+		// Saving the edit?
 		if (!empty($_POST['submit']))
 		{
 			checkSession();
 
 			if (!isset($_POST['name']) || Util::htmltrim(Util::htmlspecialchars($_POST['name'], ENT_QUOTES)) === '')
 			{
-				throw new Elk_Exception('sp_error_menu_name_empty', false);
+				throw new Exception('sp_error_menu_name_empty', false);
 			}
 
 			$menu_info = [
@@ -237,7 +267,7 @@ class ManagePortalMenus extends AbstractController
 				'name' => Util::htmlspecialchars($_POST['name'], ENT_QUOTES),
 			];
 
-			$menu_info['id'] = sp_add_menu($menu_info, $is_new);
+			sp_add_menu($menu_info, $is_new);
 
 			redirectexit('action=admin;area=portalmenus;sa=listcustommenu');
 		}
@@ -264,7 +294,7 @@ class ManagePortalMenus extends AbstractController
 	/**
 	 * Delete a custom menu and its items
 	 */
-	public function action_sportal_admin_menus_custom_menu_delete()
+	public function action_custom_menu_delete()
 	{
 		checkSession('get');
 
@@ -279,7 +309,7 @@ class ManagePortalMenus extends AbstractController
 	/**
 	 * List the items contained in a custom menu
 	 */
-	public function action_sportal_admin_menus_custom_item_list()
+	public function action_custom_item_list()
 	{
 		global $context, $scripturl, $txt, $modSettings;
 
@@ -297,12 +327,10 @@ class ManagePortalMenus extends AbstractController
 			sp_remove_menu_items($remove);
 		}
 
-		$menu_id = !empty($_REQUEST['menu_id']) ? (int) $_REQUEST['menu_id'] : 0;
-		$context['menu'] = sportal_get_custom_menus($menu_id);
-
+		$menu_id = $this->getMenuContext();
 		if (empty($context['menu']))
 		{
-			throw new Elk_Exception('error_sp_menu_not_found', false);
+			throw new Exception('error_sp_menu_not_found', false);
 		}
 
 		// Build the list option array to display the custom items in this custom menu
@@ -311,7 +339,7 @@ class ManagePortalMenus extends AbstractController
 			'title' => $txt['sp_admin_menus_custom_item_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['sp_error_no_custom_menus'],
-			'base_href' => $scripturl . '?action=admin;area=portalmenus;sa=listcustomitem;',
+			'base_href' => $scripturl . '?action=admin;area=portalmenus;sa=' . ($menu_id === 0 ? 'listmainitem' : 'listcustomitem') . ';',
 			'default_sort_col' => 'title',
 			'get_items' => [
 				'function' => [$this, 'list_sp_menu_item'],
@@ -370,8 +398,8 @@ class ManagePortalMenus extends AbstractController
 					'data' => [
 						'sprintf' => [
 							'format' => '
-								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=editcustomitem;menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('modify') . '</a>
-								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=deletecustomitem;menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp_admin_menus_item_delete_confirm'] . '\');">' . sp_embed_image('delete') . '</a>',
+								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=' . ($menu_id === 0 ? 'editmainitem' : 'editcustomitem') . ';menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '">' . sp_embed_image('edit') . '</a>
+								<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=' . ($menu_id === 0 ? 'deletemainitem' : 'deletecustomitem') . ';menu_id=%1$s;item_id=%2$s;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['sp_admin_menus_item_delete_confirm'] . '\');">' . sp_embed_image('delete') . '</a>',
 							'params' => [
 								'menu' => true,
 								'id' => true,
@@ -416,7 +444,6 @@ class ManagePortalMenus extends AbstractController
 		$context['default_list'] = 'portal_items';
 
 		// Create the list.
-		require_once(SUBSDIR . '/GenericList.class.php');
 		createList($listOptions);
 	}
 
@@ -434,7 +461,7 @@ class ManagePortalMenus extends AbstractController
 	}
 
 	/**
-	 * Returns an array of menus, passthru really
+	 * Returns an array of menus
 	 * Callback for createList()
 	 *
 	 * @param int $start
@@ -452,17 +479,15 @@ class ManagePortalMenus extends AbstractController
 	/**
 	 * Add or edit menu items
 	 */
-	public function action_sportal_admin_menus_custom_item_edit()
+	public function action_custom_item_edit()
 	{
 		global $context, $txt;
 
-		$menu_id = !empty($_REQUEST['menu_id']) ? (int) $_REQUEST['menu_id'] : 0;
-		$context['menu'] = sportal_get_custom_menus($menu_id);
-
 		// No menu, no further
+		$menu_id = $this->getMenuContext();
 		if (empty($context['menu']))
 		{
-			throw new Elk_Exception('error_sp_menu_not_found', false);
+			throw new Exception('error_sp_menu_not_found', false);
 		}
 
 		// Need to know if we are adding or editing
@@ -473,15 +498,15 @@ class ManagePortalMenus extends AbstractController
 		{
 			checkSession();
 
-			// Use our standard validation functions in a few spots
-			require_once(SUBSDIR . '/DataValidator.class.php');
-			$validator = new Data_Validator();
+			// Use our standard validation functions
+			$validator = new DataValidator();
 
 			// Clean and Review the post data for compliance
 			$validator->sanitation_rules([
 				'title' => 'Util::htmltrim|Util::htmlspecialchars',
 				'namespace' => 'Util::htmltrim|Util::htmlspecialchars',
 				'item_id' => 'intval',
+				'id_profile' => 'intval',
 				'url' => 'Util::htmlspecialchars',
 				'target' => 'intval',
 			]);
@@ -498,10 +523,10 @@ class ManagePortalMenus extends AbstractController
 			// If you messed this up, back you go
 			if (!$validator->validate($_POST))
 			{
-				// @todo, should set  ErrorContext::context and display in template instead
+				// @todo, should set ErrorContext::context and display in template instead
 				foreach ($validator->validation_errors() as $id => $error)
 				{
-					throw new Elk_Exception($error, false);
+					throw new Exception($error, false);
 				}
 			}
 
@@ -509,22 +534,25 @@ class ManagePortalMenus extends AbstractController
 			$has_duplicate = sp_menu_check_duplicate_items($validator->item_id, $validator->namespace);
 			if (!empty($has_duplicate))
 			{
-				throw new Elk_Exception('sp_error_item_namespace_duplicate', false);
+				throw new Exception('sp_error_item_namespace_duplicate', false);
 			}
 
 			// Can't have a simple numeric namespace
 			if (preg_replace('~\d+~', '', $validator->namespace) === '')
 			{
-				throw new Elk_Exception('sp_error_item_namespace_numeric', false);
+				throw new Exception('sp_error_item_namespace_numeric', false);
 			}
 
 			$item_info = [
 				'id' => $validator->item_id,
 				'id_menu' => $context['menu']['id'],
+				'id_profile' => $validator->id_profile,
 				'namespace' => $validator->namespace,
 				'title' => $validator->title,
 				'href' => $validator->url,
 				'target' => $validator->target,
+				'placement' => !empty($_POST['placement']) ? Util::htmlspecialchars($_POST['placement']) : '',
+				'placement_after' => !empty($_POST['placement_after']) ? Util::htmlspecialchars($_POST['placement_after']) : '',
 			];
 
 			// Adjust the url for the link type
@@ -532,13 +560,20 @@ class ManagePortalMenus extends AbstractController
 			$link_item = !empty($_POST['link_item']) ? $_POST['link_item'] : '';
 			if ($link_type !== 'custom')
 			{
-				if (preg_match('~^\d+|[A-Za-z0-9_\-]+$~', $link_item, $match))
+				if (preg_match('~^(?:([abcpm])?(\d+)|([A-Za-z0-9_\-]+))$~', $link_item, $match))
 				{
-					$link_item_id = $match[0];
+					if (!empty($match[2]))
+					{
+						$link_item_id = $match[2];
+					}
+					else
+					{
+						$link_item_id = $match[3] ?? $match[0];
+					}
 				}
 				else
 				{
-					throw new Elk_Exception('sp_error_item_link_item_invalid', false);
+					throw new Exception('sp_error_item_link_item_invalid', false);
 				}
 
 				switch ($link_type)
@@ -547,6 +582,7 @@ class ManagePortalMenus extends AbstractController
 					case 'page':
 					case 'category':
 					case 'article':
+					case 'menu':
 						$item_info['href'] = '$scripturl?' . $link_type . '=' . $link_item_id;
 						break;
 					case 'board':
@@ -558,7 +594,8 @@ class ManagePortalMenus extends AbstractController
 			// Add or update the item
 			sp_add_menu_item($item_info, $is_new);
 
-			redirectexit('action=admin;area=portalmenus;sa=listcustomitem;menu_id=' . $context['menu']['id']);
+			$sa = $context['menu']['id'] === 0 ? 'listmainitem' : 'listcustomitem';
+			redirectexit('action=admin;area=portalmenus;sa=' . $sa . ';menu_id=' . $context['menu']['id']);
 		}
 
 		// Prepare the items for the template
@@ -570,38 +607,61 @@ class ManagePortalMenus extends AbstractController
 				'title' => $txt['sp_menus_default_menu_item_name'],
 				'url' => '',
 				'target' => 0,
+				'id_profile' => 1,
+				'placement' => '',
+				'placement_after' => 'forum',
 			];
 		}
-		// Not new so fetch what we know about the item
+		// Not new, so fetch what we know about the item
 		else
 		{
 			$_REQUEST['item_id'] = (int) $_REQUEST['item_id'];
 			$context['item'] = sportal_get_menu_items($_REQUEST['item_id']);
+
+ 		// Reverse engineer the URL to get the link type and item
+			$context['item']['link_type'] = 'custom';
+			$context['item']['link_item'] = '';
+			$context['item']['id_profile'] = 0;
+			if (preg_match('~\$scripturl\?([a-z]+)=([A-Za-z0-9_\-]+)(?:\.0)?$~', $context['item']['url'], $match))
+			{
+				$context['item']['link_type'] = $match[1];
+				$context['item']['link_item'] = $match[2];
+
+				// If it's board/page/category/article/menu, we need the prefix back for the JS
+				$prefixes = ['board' => 'b', 'page' => 'p', 'category' => 'c', 'article' => 'a', 'menu' => 'm'];
+				if (isset($prefixes[$context['item']['link_type']]))
+				{
+					$context['item']['link_item'] = $prefixes[$context['item']['link_type']] . $context['item']['link_item'];
+				}
+			}
 		}
 
-		// Menu items
-		$context['items']['action'] = [
-			'portal' => $txt['sp-portal'],
-			'forum' => $txt['sp-forum'],
-			'recent' => $txt['recent_posts'],
-			'unread' => $txt['unread_topics_visit'],
-			'unreadreplies' => $txt['unread_replies'],
-			'profile' => $txt['profile'],
-			'pm' => $txt['pm_short'],
-			'calendar' => $txt['calendar'],
-			'admin' => $txt['admin'],
-			'login' => $txt['login'],
-			'register' => $txt['register'],
-			'post' => $txt['post'],
-			'stats' => $txt['forum_stats'],
-			'search' => $txt['search'],
-			'mlist' => $txt['members_list'],
-			'moderate' => $txt['moderate'],
-			'help' => $txt['help'],
-			'who' => $txt['who_title'],
-		];
-
+		// Menu action items
+		$context['items']['action'] = sp_fetch_actions();
 		$context['items'] = array_merge($context['items'], sp_block_template_helpers());
+
+		// Permission profiles
+		$context['profiles'] = sportal_get_profiles(null, 1);
+
+		// Get the main menu buttons for placement selection
+		if ($context['menu']['id'] === 0)
+		{
+			if (empty($context['menu_buttons']))
+			{
+				theme()->setupThemeContext();
+			}
+
+			$context['main_menu_buttons'] = [];
+			foreach ($context['menu_buttons'] as $key => $button)
+			{
+				// Don't place it after itself, or the profile button, or a button that is not shown
+				if ($button['show'] === true && $key !== 'profile' && $key !== $context['item']['namespace'])
+				{
+					$context['main_menu_buttons'][$key] = preg_replace('~<span class="pm_indicator"[^>]*>.*?</span>~i', '', $button['title']);
+				}
+			}
+		}
+
 		$context['page_title'] = $is_new ? $txt['sp_admin_menus_custom_item_add'] : $txt['sp_admin_menus_custom_item_edit'];
 		$context['sub_template'] = 'menus_custom_item_edit';
 	}
@@ -609,7 +669,7 @@ class ManagePortalMenus extends AbstractController
 	/**
 	 * Remove an item from a menu
 	 */
-	public function action_sportal_admin_menus_custom_item_delete()
+	public function action_custom_item_delete()
 	{
 		checkSession('get');
 
@@ -617,7 +677,31 @@ class ManagePortalMenus extends AbstractController
 		$item_id = !empty($_REQUEST['item_id']) ? (int) $_REQUEST['item_id'] : 0;
 
 		sp_remove_menu_items($item_id);
+		$sa = $menu_id === 0 ? 'listmainitem' : 'listcustomitem';
 
-		redirectexit('action=admin;area=portalmenus;sa=listcustomitem;menu_id=' . $menu_id);
+		redirectexit('action=admin;area=portalmenus;sa=' . $sa . ';menu_id=' . $menu_id);
+	}
+
+	/**
+	 * Get the context for the menu
+	 */
+	public function getMenuContext()
+	{
+		global $context, $txt;
+
+		$menu_id = isset($_REQUEST['menu_id']) ? (int) $_REQUEST['menu_id'] : 0;
+		if ($menu_id === 0)
+		{
+			$context['menu'] = [
+				'id' => 0,
+				'name' => $txt['sp_admin_menus_main_item_list'],
+			];
+		}
+		else
+		{
+			$context['menu'] = sportal_get_custom_menus($menu_id);
+		}
+
+		return $menu_id;
 	}
 }

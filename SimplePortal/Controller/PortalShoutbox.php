@@ -44,7 +44,7 @@ class PortalShoutbox extends AbstractController
 	}
 
 	/**
-	 * Override default method, just say no for xml
+	 * Override default method, just say no for XML
 	 */
 	public function trackStats($action = '')
 	{
@@ -115,7 +115,7 @@ class PortalShoutbox extends AbstractController
 
 				$_REQUEST['shout'] = Util::htmlspecialchars(trim($_REQUEST['shout']));
 				$preparse = PreparseCode::instance(User::$info['name']);
-				$preparse->preparsecode($_REQUEST['shout'], false);
+				$preparse->preparsecode($_REQUEST['shout']);
 				sportal_create_shout($context['SPortal']['shoutbox'], $_REQUEST['shout']);
 			}
 			else
@@ -156,7 +156,7 @@ class PortalShoutbox extends AbstractController
 			// Get all the shouts for this box
 			$context['SPortal']['shouts'] = sportal_get_shouts($shoutbox_id, $shout_parameters);
 
-			// Return a clean xml response
+			// Return a clean XML response
 			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
 			$context['sub_template'] = 'shoutbox_xml';

@@ -96,7 +96,7 @@ class PortalCategories extends AbstractController
 		// Load the articles in this category
 		$context['articles'] = sportal_get_articles(null, true, true, 'spa.id_article DESC', $context['category']['id'], $per_page, $start);
 
-		// Get the first "image/attachment" when in blog view
+		// Get the first "image/attachment" when in the blog view
 		$context['articles'] = setBlogAttachments(getBlogAttachments($context['articles']));
 
 		foreach ($context['articles'] as $article)
@@ -110,7 +110,7 @@ class PortalCategories extends AbstractController
 			$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
 
 			// We have to wait until we cut to see if we need the attachment or not
-			if (strpos($context['articles'][$article['id']]['preview'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article=') !== false)
+			if (str_contains($context['articles'][$article['id']]['preview'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article='))
 			{
 				$context['articles'][$article['id']]['attachments'] = [];
 			}

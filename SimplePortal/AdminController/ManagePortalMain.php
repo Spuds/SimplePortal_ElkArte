@@ -20,6 +20,7 @@ use ElkArte\Converters\Html2Md;
 use ElkArte\Languages\Txt;
 use ElkArte\MembersList;
 use ElkArte\SettingsForm\SettingsForm;
+use Michelf\MarkdownExtra;
 
 /**
  * SimplePortal Configuration controller class.
@@ -174,7 +175,7 @@ class ManagePortalMain extends AbstractController
 				if (!empty($_POST[$pos . 'width']))
 				{
 					$suffix = 'px';
-					if (strpos($_POST[$pos . 'width'], '%') !== false)
+					if (str_contains($_POST[$pos . 'width'], '%'))
 					{
 						$suffix = '%';
 					}
@@ -499,8 +500,11 @@ class ManagePortalMain extends AbstractController
 		if ($format_parameters['from'] === 'markdown')
 		{
 			// MD to HTML
-			require_once(EXTDIR . '/markdown/markdown.php');
-			$format_parameters['text'] = Markdown($format_parameters['text']);
+			//require_once(EXTDIR . '/markdown/markdown.php');
+
+			$parser = new MarkdownExtra();
+			$parser->hashtag_protection = true;
+			$format_parameters['text'] = $parser->transform($format_parameters['text']);
 
 			// HTML to BBC
 			$parser = new Html2BBC($format_parameters['text']);
@@ -545,8 +549,10 @@ class ManagePortalMain extends AbstractController
 		// From MD to HTML
 		if ($format_parameters['from'] === 'markdown')
 		{
-			require_once(EXTDIR . '/markdown/markdown.php');
-			$format_parameters['text'] = htmlspecialchars(Markdown($format_parameters['text']));
+			$parser = new MarkdownExtra();
+			$parser->hashtag_protection = true;
+			$format_parameters['text'] = htmlspecialchars($parser->transform($format_parameters['text']));
+
 			return;
 		}
 
@@ -561,7 +567,7 @@ class ManagePortalMain extends AbstractController
 		// BBC to HTML
 		if ($format_parameters['from'] === 'bbc')
 		{
-			PreparseCode::instance('')->preparsecode($format_parameters['text'], false);
+			PreparseCode::instance('')->preparsecode($format_parameters['text']);
 			$format_parameters['text'] = ParserWrapper::instance()->parseMessage($format_parameters['text'] , true);
 
 			$format_parameters['text'] = strtr($format_parameters['text'], ['&nbsp;' => ' ', '<br />' => "\n<br />"]);
@@ -581,7 +587,7 @@ class ManagePortalMain extends AbstractController
 		// From BBC to MD, should have a direct way, but ...
 		if ($format_parameters['from'] === 'bbc')
 		{
-			PreparseCode::instance('')->preparsecode($format_parameters['text'], false);
+			PreparseCode::instance('')->preparsecode($format_parameters['text']);
 			$format_parameters['text'] = ParserWrapper::instance()->parseMessage($format_parameters['text'] , true);
 
 			// Convert this to markdown

@@ -284,7 +284,7 @@ class ManagePortalProfile extends AbstractController
 				throw new Exception('sp_error_profile_name_empty', false);
 			}
 
-			list($groups_allowed, $groups_denied) = $this->_group_permissions();
+			[$groups_allowed, $groups_denied] = $this->_group_permissions();
 
 			// Add the data to place in the fields
 			$profile_info = [
@@ -713,7 +713,7 @@ class ManagePortalProfile extends AbstractController
 			}
 
 			// Get the form values
-			list($selections, $query, $mobile) = $this->_profile_visibility();
+			[$selections, $query, $mobile] = $this->_profile_visibility();
 
 			// Add the data to place in the fields
 			$profile_info = [
@@ -741,7 +741,7 @@ class ManagePortalProfile extends AbstractController
 				'mobile_view' => false,
 			];
 		}
-		// Not a new visibility profile so fetch the existing one to display
+		// Not a new visibility profile, so fetch the existing one to display
 		else
 		{
 			$profile_id = (int) $_GET['profile_id'];
@@ -752,26 +752,7 @@ class ManagePortalProfile extends AbstractController
 		$context[$context['admin_menu_name']]['current_subsection'] = 'listvisibility';
 
 		// All the places we can add portal visibility
-		$context['profile']['actions'] = [
-			'portal' => $txt['sp-portal'],
-			'forum' => $txt['sp-forum'],
-			'recent' => $txt['recent_posts'],
-			'unread' => $txt['unread_topics_visit'],
-			'unreadreplies' => $txt['unread_replies'],
-			'profile' => $txt['profile'],
-			'pm' => $txt['pm_short'],
-			'calendar' => $txt['calendar'],
-			'admin' => $txt['admin'],
-			'login' => $txt['login'],
-			'register' => $txt['register'],
-			'post' => $txt['post'],
-			'stats' => $txt['forum_stats'],
-			'search' => $txt['search'],
-			'mlist' => $txt['members_list'],
-			'moderate' => $txt['moderate'],
-			'help' => $txt['help'],
-			'who' => $txt['who_title'],
-		];
+		$context['profile']['actions'] = sp_fetch_actions();
 
 		// Load board, cat, page and article values for the template
 		$context['profile'] = array_merge($context['profile'], sp_block_template_helpers());

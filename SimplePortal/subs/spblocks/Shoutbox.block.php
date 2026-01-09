@@ -108,7 +108,7 @@ class ShoutboxBlock extends SPAbstractBlock
 
 		$this->data = sportal_get_shoutbox($parameters['shoutbox'], true, true);
 
-		// To add a shoutbox you must have one or more defined for use
+		// To add a shoutbox, you must have one or more defined for use
 		if (empty($this->data))
 		{
 			$this->data['error_msg'] = $txt['error_sp_shoutbox_not_exist'];
@@ -132,8 +132,8 @@ class ShoutboxBlock extends SPAbstractBlock
 				require_once(SUBSDIR . '/Post.subs.php');
 
 				$_POST['new_shout'] = Util::htmlspecialchars(trim($_POST['new_shout']));
-				$preparse = PreparseCode::instance();
-				$preparse->preparsecode($_POST['new_shout'], false);
+				$preparse = PreparseCode::instance('');
+				$preparse->preparsecode($_POST['new_shout']);
 
 				if (!empty($_POST['new_shout']))
 				{

@@ -63,7 +63,7 @@ class TopPosterBlock extends SPAbstractBlock
 			// Today
 			if ($type === 1)
 			{
-				list($year, $month, $day) = explode('-', date('Y-m-d'));
+				[$year, $month, $day] = explode('-', date('Y-m-d'));
 				$start_time = mktime(0, 0, 0, $month, $day, $year);
 			}
 			// This week

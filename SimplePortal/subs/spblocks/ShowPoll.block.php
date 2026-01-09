@@ -89,7 +89,7 @@ class ShowPollBlock extends SPAbstractBlock
 					'type' => $type == 1 ? 'p.id_poll DESC' : 'RAND()',
 				]
 			);
-			list ($topic) = $request->fetch_row();
+			[$topic] = $request->fetch_row();
 			$request->free_result();
 		}
 

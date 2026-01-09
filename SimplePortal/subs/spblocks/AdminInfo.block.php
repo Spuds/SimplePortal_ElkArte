@@ -49,7 +49,7 @@ class AdminInfoBlock extends SPAbstractBlock
 			if (User::$info->is_admin)
 			{
 				$errorLog = new Log(database());
-				$this->data['admin']['errors'] = $errorLog->numErrors([]);
+				$this->data['admin']['errors'] = $errorLog->numErrors();
 
 				$activation_numbers = countInactiveMembers();
 				$this->data['admin']['awaiting_activation'] = 0;

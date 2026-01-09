@@ -55,7 +55,7 @@ class PortalArticles extends AbstractController
 			'rmattach' => [$this, 'action_sportal_rmattach'],
 		];
 
-		// Setup the action handler
+		// Set up the action handler
 		$action = new Action();
 		$subAction = $action->initialize($subActions, 'article');
 
@@ -110,7 +110,7 @@ class PortalArticles extends AbstractController
 	/**
 	 * Display a chosen article, called from frontpage hook
 	 *
-	 * - Update the stats, like #views etc
+	 * - Update the stats, like #views etc.
 	 *
 	 * @return void
 	 * @throws Exception
@@ -137,7 +137,7 @@ class PortalArticles extends AbstractController
 		$context['article']['body'] = censor($context['article']['body']);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
 
-		// Fetch attachments, if there are any
+		// Fetch attachments if there are any
 		if (!empty($modSettings['attachmentEnable']) && !empty($context['article']['has_attachments']))
 		{
 			loadJavascriptFile('topic.js');
@@ -174,7 +174,7 @@ class PortalArticles extends AbstractController
 			// Prep the body / comment
 			$body = Util::htmlspecialchars(trim($_POST['body']));
 			$preparse = PreparseCode::instance('');
-			$preparse->preparsecode($body, false);
+			$preparse->preparsecode($body);
 
 			// Update or add a new comment
 			$parser = ParserWrapper::instance();
@@ -182,8 +182,8 @@ class PortalArticles extends AbstractController
 			{
 				if (!empty($_POST['comment']))
 				{
-					list ($comment_id, $author_id,) = sportal_fetch_article_comment((int) $_POST['comment']);
-					if (empty($comment_id) || (!$context['article']['can_moderate'] && User::$info['id'] != $author_id))
+					[$comment_id, $author_id,] = sportal_fetch_article_comment((int) $_POST['comment']);
+					if (empty($comment_id) || (!$context['article']['can_moderate'] && User::$info['id'] !== (int) $author_id))
 					{
 						throw new Exception('error_sp_cannot_comment_modify', false);
 					}
@@ -206,8 +206,8 @@ class PortalArticles extends AbstractController
 		{
 			checkSession('get');
 
-			list ($comment_id, $author_id, $body) = sportal_fetch_article_comment((int) $_GET['modify']);
-			if (empty($comment_id) || (!$context['article']['can_moderate'] && User::$info['id'] != $author_id))
+			[$comment_id, $author_id, $body] = sportal_fetch_article_comment((int) $_GET['modify']);
+			if (empty($comment_id) || (!$context['article']['can_moderate'] && User::$info['id'] != (int) $author_id))
 			{
 				throw new Exception('error_sp_cannot_comment_modify', false);
 			}
@@ -300,7 +300,7 @@ class PortalArticles extends AbstractController
 		}
 
 		// Temporary attachment, special case...
-		if (strpos($_GET['attach'], 'post_tmp_' . User::$info['id'] . '_') !== false)
+		if (str_contains($_GET['attach'], 'post_tmp_' . User::$info['id'] . '_'))
 		{
 			$modSettings['automanage_attachments'] = 0;
 			$modSettings['attachmentUploadDir'] = [1 => $modSettings['sp_articles_attachment_dir']];
@@ -325,7 +325,7 @@ class PortalArticles extends AbstractController
 			throw new Exception('no_access', false);
 		}
 
-		list ($real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $width, $height) = $attachment;
+		[$real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $width, $height] = $attachment;
 		$filename = $modSettings['sp_articles_attachment_dir'] . '/' . $id_attach . '_' . $file_hash . '.elk';
 
 		// No file, generate a bland its missing image
@@ -341,7 +341,7 @@ class PortalArticles extends AbstractController
 		$do_cache = (!isset($_GET['image']) && getValidMimeImageType($file_ext) !== '') === false;
 
 		// Make sure the mime type warrants an inline display.
-		if (isset($_GET['image']) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
+		if (isset($_GET['image']) && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
 		{
 			unset($_GET['image']);
 			$mime_type = '';
@@ -360,7 +360,7 @@ class PortalArticles extends AbstractController
 	}
 
 	/**
-	 * Sends the requested file to the user. If the file is compressible e.g.
+	 * Sends the requested file to the user. If the file is compressible e.g.,
 	 * has a mine type of text/??? May compress the file before sending.
 	 *
 	 * @param string $filename
@@ -401,7 +401,7 @@ class PortalArticles extends AbstractController
 	}
 
 	/**
-	 * If the mime type benefits from compression e.g. text/xyz and gzencode is
+	 * If the mime type benefits from compression e.g., text/xyz and gzencode is
 	 * available and the user agent accepts gzip, then return true, else false
 	 *
 	 * @param string $mime_type
@@ -417,9 +417,9 @@ class PortalArticles extends AbstractController
 			return false;
 		}
 
-		// Not compressible, or not supported / requested by client
+		// Not compressible or not supported / requested by a client
 		if (!preg_match('~^(?:text/|application/(?:json|xml|rss\+xml)$)~i', $mime_type)
-			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || strpos($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip') === false))
+			|| (!isset($_SERVER['HTTP_ACCEPT_ENCODING']) || !str_contains($_SERVER['HTTP_ACCEPT_ENCODING'], 'gzip')))
 		{
 			return false;
 		}
@@ -435,7 +435,7 @@ class PortalArticles extends AbstractController
 	 * @param string $mime_type The mime-type of the file
 	 * @param string $disposition The value of the Content-Disposition header
 	 * @param string $real_filename The original name of the file
-	 * @param bool $do_cache If send the a max-age header or not
+	 * @param bool $do_cache If to send a max-age header or not
 	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
 	public function send_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache, $check_filename = true)
@@ -443,7 +443,6 @@ class PortalArticles extends AbstractController
 		global $txt;
 
 		$headers = Headers::instance();
-		$protocol = detectServer()->getProtocol();
 
 		// No point in a nicer message, because this is supposed to be an attachment anyway...
 		if ($check_filename && !FileFunctions::instance()->fileExists($filename))
@@ -476,7 +475,7 @@ class PortalArticles extends AbstractController
 		}
 
 		// Check whether the ETag was sent back, and cache based on that...
-		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
+		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && str_contains($_SERVER['HTTP_IF_NONE_MATCH'], $eTag))
 		{
 			@ob_end_clean();
 
@@ -498,7 +497,7 @@ class PortalArticles extends AbstractController
 		// Different browsers like different standards...
 		$headers->setAttachmentFileParams($mime_type, $real_filename, $disposition);
 
-		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
+		// If this has an "image extension" - but isn't an image - then ensure it isn't cached cause of silly IE.
 		if ($do_cache)
 		{
 			$headers
@@ -522,7 +521,7 @@ class PortalArticles extends AbstractController
 	{
 		global $context, $txt, $modSettings;
 
-		// Prepare the template so we can respond with json
+		// Prepare the template so we can respond with JSON
 		setJsonTemplate();
 
 		// Make sure the session is valid

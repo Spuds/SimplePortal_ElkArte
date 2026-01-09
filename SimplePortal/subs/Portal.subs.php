@@ -80,10 +80,10 @@ function sportal_init($standalone = false)
 		return;
 	}
 
-	// Not running standalone then we need to load in some template information
+	// Not running standalone, then we need to load in some template information
 	if (!$standalone)
 	{
-		// Load the portal css and the default css if it's not loaded.
+		// Load the portal CSS and the default CSS if it's not loaded.
 		loadCSSFile('SimplePortal/portal.css', ['stale' => SPORTAL_STALE]);
 
 		// rtl CSS as well?
@@ -110,7 +110,7 @@ function sportal_init($standalone = false)
 		}
 	}
 
-	// Portal isn't enabled, or mobile, or debug, or maintenance, or .... then bow out now
+	// Portal isn't enabled, or mobile, or debug, or maintenance, or ... then bow out now
 	if (!sp_is_active())
 	{
 		if ($standalone)
@@ -127,12 +127,12 @@ function sportal_init($standalone = false)
 		return;
 	}
 
-	// Not standalone means we need to load some portal specific information in to context
+	// Not standalone means we need to load some portal-specific information in to context
 	if (!$standalone)
 	{
 		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.php');
 
-		// Not running via ssi then we need to get SSI for its functions
+		// Not running via SSI, then we need to get SSI for its functions
 		if (ELK !== 'SSI')
 		{
 			require_once(BOARDDIR . '/SSI.php');
@@ -182,7 +182,7 @@ function sportal_init($standalone = false)
 		{
 			foreach ($context['linktree'] as $key => $tree)
 			{
-				if (strpos($tree['url'], '#c') !== false && strpos($tree['url'], 'action=forum#c') === false)
+				if (str_contains($tree['url'], '#c') && !str_contains($tree['url'], 'action=forum#c'))
 				{
 					$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
 				}
@@ -231,11 +231,11 @@ function sportal_init_headers()
 	$safe_scripturl = $scripturl;
 	$current_request = empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] : $_SERVER['HTTP_HOST'];
 
-	if (strpos($scripturl, 'www.') !== false && strpos($current_request, 'www.') === false)
+	if (str_contains($scripturl, 'www.') && !str_contains($current_request, 'www.'))
 	{
 		$safe_scripturl = str_replace('://www.', '://', $scripturl);
 	}
-	elseif (strpos($scripturl, 'www.') === false && strpos($current_request, 'www.') !== false)
+	elseif (!str_contains($scripturl, 'www.') && str_contains($current_request, 'www.'))
 	{
 		$safe_scripturl = str_replace('://', '://www.', $scripturl);
 	}
@@ -243,10 +243,10 @@ function sportal_init_headers()
 	// The shoutbox may fail to function in certain cases without using a safe scripturl
 	theme()->addJavascriptVar(['sp_script_url' => '\'' . $safe_scripturl . '\'']);
 
-	// Load up some javascript!
+	// Load up some JavaScript!
 	loadJavascriptFile('SimplePortal/portal.js', ['stale' => SPORTAL_STALE, 'defer' => true]);
 
-	// Load in any optional javascript
+	// Load in any optional JavaScript
 	$javascript = '';
 
 	// JavaScript to allow D&D ordering of the front page blocks, not for guests
@@ -391,7 +391,7 @@ function sportal_load_blocks()
 					continue;
 				}
 
-				// For each custom arranged block
+				// For each custom-arranged block
 				foreach ($column as $item)
 				{
 					if (empty($blocks[$item]))
@@ -405,6 +405,11 @@ function sportal_load_blocks()
 					// For each moved block, instantiate it and run setup
 					$blocks[$item]['instance'] = sp_instantiate_block($blocks[$item]['type'], $blocks[$item]['id']);
 					$blocks[$item]['instance']->setup($blocks[$item]['parameters'], $blocks[$item]['id']);
+
+					if (!isset($context['SPortal']['blocks'][$id]))
+					{
+						$context['SPortal']['blocks'][$id] = [];
+					}
 					$context['SPortal']['blocks'][$id][] = $blocks[$item];
 
 					// Don't do this again
@@ -435,6 +440,12 @@ function sportal_load_blocks()
 		$block['instance']->setup($block['parameters'], $block['id']);
 
 		$context['SPortal']['sides'][$block['column']]['last'] = $block['id'];
+
+		if (!isset($context['SPortal']['blocks'][$block['column']]))
+		{
+			$context['SPortal']['blocks'][$block['column']] = [];
+		}
+
 		$context['SPortal']['blocks'][$block['column']][] = $block;
 	}
 
@@ -676,7 +687,7 @@ function sportal_process_visibility($query)
 		'profile' => ['trackip', 'viewprofile'],
 	];
 
-	// Still, we might not be in portal!
+	// Still, we might not be in the portal!
 	if (!empty($_GET) && empty($context['standalone']))
 	{
 		foreach ($_GET as $key => $value)
@@ -697,7 +708,7 @@ function sportal_process_visibility($query)
 		}
 	}
 
-	// Set the action to a common one, e.g. reminder => login
+	// Set the action to a common one, e.g., reminder => login
 	foreach ($exceptions as $key => $exception)
 	{
 		if (in_array($action, $exception))
@@ -757,7 +768,7 @@ function sportal_process_visibility($query)
 		// Is this a weird action?
 		if ($value[0] === '~')
 		{
-			if (strpos($value, '|') !== false)
+			if (str_contains($value, '|'))
 			{
 				list ($name, $item) = explode('|', substr($value, 1));
 			}
@@ -781,7 +792,7 @@ function sportal_process_visibility($query)
 			// We still may have weird things...
 			if ($value[1] === '~')
 			{
-				if (strpos($value, '|') !== false)
+				if (str_contains($value, '|'))
 				{
 					list ($name, $item) = explode('|', substr($value, 2));
 				}
@@ -891,7 +902,7 @@ function sportal_process_visibility($query)
 }
 
 /**
- * Determines if the block should be shown for this area, action, etc
+ * Determines if the block should be shown for this area, action, etc.
  *
  * @param int $visibility_id
  *
@@ -910,7 +921,7 @@ function sportal_check_visibility($visibility_id)
 	// See if we can show this block, here, now, for this ...
 	if ($visibility_id === '0' && !isset($visibilities[$visibility_id]))
 	{
-		// No id, assume its off
+		// No id, assume it's off
 		return false;
 	}
 
@@ -933,7 +944,7 @@ function sportal_check_visibility($visibility_id)
 /**
  * This is a simple function that loads calendar data for the portal as infrequently as possible
  *
- * @param string $type type of data to load, events, birthdays, etc
+ * @param string $type type of data to load, events, birthdays, etc.
  * @param string $low_date don't load data before this date
  * @param string|boolean $high_date don't load data after this date, false for no limit
  *
@@ -975,7 +986,7 @@ function sp_loadColors($users = [])
 
 	$db = database();
 
-	// This is for later, if you like to disable colors ;)
+	// This is for later if you like to disable colors ;)
 	if (!empty($modSettings['sp_disableColor']))
 	{
 		return false;
@@ -1140,7 +1151,7 @@ function sp_embed_image($name, $alt = '', $width = null, $height = null, $title 
 	}
 
 	// Build the image tag, with a default fallback
-	if (file_exists($settings['sp_images_url'] . '/' . $name . '.png'))
+	if (isset($settings['sp_images_url']) && file_exists($settings['sp_images_url'] . '/' . $name . '.png'))
 	{
 		$file_name = $settings['sp_images_url'] . '/' . $name . '.png';
 	}
@@ -1543,7 +1554,7 @@ function sportal_get_pages($page_id = null, $active = false, $allowed = false, $
  * Shortens the length of a string.
  *
  * What it does:
- * - If the string is pure html or bcc (parsed) it will properly shorten it to that many
+ * - If the string is pure HTML or BBC (parsed), it will properly shorten it to that many
  * characters, accounting as best it can for presentational tags etc.
  * - Will use [cutoff] tag if present as primary and passed length second
  * - If no shortening is defined (cutoff or length), it returns the full parsed string
@@ -1572,7 +1583,7 @@ function sportal_parse_cutoff_content(&$body, $type, $length = 0, $link_id = nul
 				$body = str_replace('[cutoff]', '&#91;cutoff]', $body);
 				$body = sportal_parse_content($body, $type, 'return');
 
-				// With the bbc_parse done, determine character or marker length of plain text
+				// With the bbc_parse done, determine the character or marker length of plain text
 				$cutoff = Util::strpos(strip_tags($body), '&#91;cutoff]');
 				$cutoff = empty($cutoff) ? $length : $cutoff;
 
@@ -1607,17 +1618,17 @@ function sportal_parse_cutoff_content(&$body, $type, $length = 0, $link_id = nul
 }
 
 /**
- * Prepare body text to be of type, html, bbc, php, etc
+ * Prepare body text to be of type, HTML, BBC, PHP, etc.
  *
  * @param string $body the string of text to treat as $type
- * @param string $type one of html, bbc, php
+ * @param string $type one of HTML, BBC, PHP
  * @param string $output_method if echo echoes the results, otherwise returns the string
  *
  * @return string|bool
  */
 function sportal_parse_content($body, $type, $output_method = 'echo')
 {
-	if (in_array($type, ['bbc', 'html', 'markdown']) && strpos($body, '[cutoff]') !== false)
+	if (in_array($type, ['bbc', 'html', 'markdown']) && str_contains($body, '[cutoff]'))
 	{
 		$body = str_replace('[cutoff]', '', $body);
 	}
@@ -1655,11 +1666,11 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			global $txt;
 
 			$body = trim(un_htmlspecialchars($body));
-			if (strpos($body, '<?php') === 0)
+			if (str_starts_with($body, '<?php'))
 			{
 				$body = substr($body, 5);
 			}
-			if (substr($body, -2) === '?>')
+			if (str_ends_with($body, '?>'))
 			{
 				$body = substr($body, 0, -2);
 			}
@@ -1719,7 +1730,7 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
 		$parameters
 	)->fetch_callback( function ($row) use (&$return) {
 		$return[$row['id_menu']] = [
-			'id' => $row['id_menu'],
+			'id' => (int) $row['id_menu'],
 			'name' => $row['name'],
 		];
 	});
@@ -1732,10 +1743,11 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
  *
  * @param int|null $item_id
  * @param string $sort
+ * @param int|null $menu_id
  *
  * @return array|mixed
  */
-function sportal_get_menu_items($item_id = null, $sort = 'id_item')
+function sportal_get_menu_items($item_id = null, $sort = 'id_item', $menu_id = null)
 {
 	$db = database();
 
@@ -1748,10 +1760,16 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
 		$parameters['item_id'] = (int) $item_id;
 	}
 
+	if (isset($menu_id))
+	{
+		$query[] = 'id_menu = {int:menu_id}';
+		$parameters['menu_id'] = (int) $menu_id;
+	}
+
 	$return = [];
 	$db->query('', '
 		SELECT
-			id_item, id_menu, namespace, title, href, target
+			id_item, id_menu, id_profile, namespace, title, href, target, placement, placement_after
 		FROM {db_prefix}sp_menu_items' . (!empty($query) ? '
 			WHERE ' . implode(' AND ', $query) : '') . '
 		ORDER BY {raw:sort}',
@@ -1760,10 +1778,13 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item')
 		$return[$row['id_item']] = [
 			'id' => $row['id_item'],
 			'id_menu' => $row['id_menu'],
+			'id_profile' => $row['id_profile'],
 			'namespace' => $row['namespace'],
 			'title' => $row['title'],
 			'url' => $row['href'],
 			'target' => $row['target'],
+			'placement' => $row['placement'],
+			'placement_after' => $row['placement_after'],
 		];
 	});
 

@@ -69,13 +69,13 @@ class PortalMain extends AbstractController implements FrontpageInterface
 			'rmattach' => ['controller' => '\Addons\SimplePortal\Controller\PortalArticles', 'function' => 'action_index'],
 		];
 
-		// We like action, so lets get ready for some
+		// We like action, so let's get ready for some
 		$action = new Action('');
 
-		// Get the subAction, or just go to action_sportal_index
+		// Get the subAction or just go to action_sportal_index
 		$subAction = $action->initialize($subActions, 'index');
 
-		// Finally go to where we want to go
+		// Finally, go to where we want to go
 		$action->dispatch($subAction);
 	}
 
@@ -96,7 +96,7 @@ class PortalMain extends AbstractController implements FrontpageInterface
 	 * Used to change the default action with a new one.
 	 *
 	 * Called statically from the Dispatcher to the controller listed in $modSettings['front_page']
-	 * Can be used to call add_integration_function() for added functions (non permanent)
+	 * Can be used to call add_integration_function() for added functions (non-permanent)
 	 *
 	 * @param string[] $default_action
 	 */
@@ -113,7 +113,7 @@ class PortalMain extends AbstractController implements FrontpageInterface
 			$function = null;
 			$namespace = '\Addons\SimplePortal\Controller\\';
 
-			if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && $modSettings['sp_portal_mode'] == 1)
+			if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']) && (int) $modSettings['sp_portal_mode'] === 1)
 			{
 				// View the portal front page
 				$controller = $namespace . 'PortalMain';
@@ -230,7 +230,7 @@ class PortalMain extends AbstractController implements FrontpageInterface
 				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 				$context['articles'][$article['id']]['time'] = $article['date'];
 
-				// Fetch attachments, if there are any
+				// Fetch attachments if there are any
 				if (!empty($modSettings['attachmentEnable']) && !empty($article['has_attachments']))
 				{
 					$context['articles'][$article['id']]['attachment'] = sportal_load_attachment_context($article['id']);
@@ -264,7 +264,7 @@ class PortalMain extends AbstractController implements FrontpageInterface
 	}
 
 	/**
-	 * Displays the credit page outside the admin area,
+	 * Displays the credit page outside the admin area.
 	 *
 	 * - Forwards to ManagePortalMain controller to display credits outside the admin area
 	 */
@@ -333,17 +333,17 @@ class PortalMain extends AbstractController implements FrontpageInterface
 					'sp_footer' => 6
 				];
 
-				// What block was drag and dropped? e.g. block_2,4
-				list ($block_moved,) = explode(',', $_POST['moved']);
+				// What block was drag and dropped? e.g., block_2,4
+				[$block_moved,] = explode(',', $_POST['moved']);
 				$block_moved = (int) str_replace('block_', '', $block_moved);
 
-				// Where is it going
+				// Where is it going?
 				$target_column = $column_numbers[$_POST['received']];
 
 				// The block ids arrive in 1-n view order ... block,column
 				foreach ($_POST['block'] as $id)
 				{
-					list ($block, $column) = explode(',', $id);
+					[$block, $column] = explode(',', $id);
 
 					// Update the moved blocks column
 					if ($block == $block_moved)
@@ -355,7 +355,7 @@ class PortalMain extends AbstractController implements FrontpageInterface
 				}
 			}
 
-			// Update the option so its remembered
+			// Update the option so it's remembered
 			require_once(SUBSDIR . '/Themes.subs.php');
 			updateThemeOptions([$settings['theme_id'], User::$info['id'], 'sp_block_layout', serialize($block_tree)]);
 

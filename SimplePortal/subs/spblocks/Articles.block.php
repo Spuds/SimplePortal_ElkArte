@@ -167,7 +167,7 @@ class ArticlesBlock extends SPAbstractBlock
 			}
 
 			// Check if we need the blog attachment, no if we rendered any ILA/[sp attach] tags
-			if (strpos($article['body'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article=') !== false)
+			if (str_contains($article['body'], '<img src="' . $scripturl . '?action=portal;sa=spattach;article='))
 			{
 				$article['attachments'] = [];
 			}

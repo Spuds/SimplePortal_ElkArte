@@ -292,7 +292,7 @@ class ManagePortalPages extends AbstractController
 			// Fix up bbc errors before we go to the preview
 			if ($context['SPortal']['page']['type'] === 'bbc')
 			{
-				PreparseCode::instance('')->preparsecode($context['SPortal']['page']['body'], false);
+				PreparseCode::instance('')->preparsecode($context['SPortal']['page']['body']);
 			}
 
 			theme()->getTemplates()->load('PortalPages');
@@ -511,7 +511,7 @@ class ManagePortalPages extends AbstractController
 
 		if ($page_info['type'] === 'bbc')
 		{
-			PreparseCode::instance('')->preparsecode($page_info['body'], false);
+			PreparseCode::instance('')->preparsecode($page_info['body']);
 		}
 
 		// Save away

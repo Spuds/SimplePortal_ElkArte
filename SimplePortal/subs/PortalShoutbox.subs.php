@@ -195,7 +195,7 @@ function sportal_get_shouts($shoutbox, $parameters)
 		$shouts[$shout['id']]['text'] = preg_replace('~<a([^>]+>)([^<]+)</a>~', '<a$1' . $txt['sp_link'] . '</a>', $shouts[$shout['id']]['text']);
 		$shouts[$shout['id']]['text'] = censor($shouts[$shout['id']]['text']);
 
-		// Ignored user, hide the shout with option to show it
+		// Ignored user, hide the shout with an option to show it
 		if (!empty($modSettings['enable_buddylist']) && in_array($shout['author']['id'], $context['user']['ignoreusers']))
 		{
 			$shouts[$shout['id']]['text'] = '<a href="#toggle" id="ignored_shout_link_' . $shout['id'] . '" onclick="sp_show_ignored_shout(' . $shout['id'] . '); return false;">[' . $txt['sp_shoutbox_show_ignored'] . ']</a><span id="ignored_shout_' . $shout['id'] . '" style="display: none;">' . $shouts[$shout['id']]['text'] . '</span>';
@@ -258,7 +258,7 @@ function sportal_create_shout($shoutbox, $shout)
 		return false;
 	}
 
-	// What, its not like we can shout to nothing
+	// What, it's not like we can shout to nothing
 	if (empty($shoutbox))
 	{
 		return false;
@@ -345,7 +345,7 @@ function sportal_delete_shout($shoutbox_id, $shouts, $prune = false)
  * Use true to increment by 1
  *
  * @param int $shoutbox_id
- * @param int|bool $num_shouts if true increase the count by 1
+ * @param int|bool $num_shouts if true, increase the count by 1
  *
  * @return null
  */

@@ -49,12 +49,12 @@ class PhpBlock extends SPAbstractBlock
 		$this->data['content'] = trim(un_htmlspecialchars($this->data['content']));
 
 		// Strip leading / trailing php wrapper
-		if (strpos($this->data['content'], '<?php') === 0)
+		if (str_starts_with($this->data['content'], '<?php'))
 		{
 			$this->data['content'] = substr($this->data['content'], 5);
 		}
 
-		if (substr($this->data['content'], -2) === '?>')
+		if (str_ends_with($this->data['content'], '?>'))
 		{
 			$this->data['content'] = substr($this->data['content'], 0, -2);
 		}

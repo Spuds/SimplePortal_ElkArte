@@ -35,7 +35,7 @@ class PortalRefresh extends AbstractController
 		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
 		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.class.php');
 
-		// Not running via SSI then we need to get SSI for many block functions
+		// Not running via SSI, then we need to get SSI for many block functions
 		if (ELK !== 'SSI')
 		{
 			require_once(BOARDDIR . '/SSI.php');
@@ -49,7 +49,7 @@ class PortalRefresh extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Where do you want to go today? Well this should never be called
+		// Where do you want to go today? Well, this should never be called
 		obExit(false);
 	}
 
@@ -85,7 +85,7 @@ class PortalRefresh extends AbstractController
 	 */
 	private function _process()
 	{
-		// Details about the block to refresh, check that its enabled, and permissions
+		// Details about the block to refresh, check that it's enabled, and permissions
 		$block_details = getBlockInfo(null, $this->_block_id, true, false, true);
 		$block_details = array_shift($block_details);
 
@@ -105,7 +105,7 @@ class PortalRefresh extends AbstractController
 	{
 		global $context, $modSettings, $settings, $maintenance;
 
-		// Not for guests etc
+		// Not for guests etc.
 		if (User::$info->is_guest || (int) User::$info->id === 0 || User::$info->possibly_robot)
 		{
 			$this->_request = false;
@@ -136,7 +136,7 @@ class PortalRefresh extends AbstractController
 		// You should have a valid session with the request as well
 		checkSession();
 
-		// Then lets see if they can refresh this block
+		// Then let's see if they can refresh this block
 		$this->_block_id = (int) $_POST['block'];
 	}
 }

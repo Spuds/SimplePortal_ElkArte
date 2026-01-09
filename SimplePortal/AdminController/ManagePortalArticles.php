@@ -513,7 +513,7 @@ class ManagePortalArticles extends AbstractController
 
 		if ($article_info['type'] === 'bbc')
 		{
-			PreparseCode::instance('')->preparsecode($article_info['body'], false);
+			PreparseCode::instance('')->preparsecode($article_info['body']);
 		}
 
 		// Bind attachments to the article if existing, create any needed thumbnails,
@@ -551,13 +551,13 @@ class ManagePortalArticles extends AbstractController
 			$keep_temp = [];
 			$keep_ids = [];
 			$tmp_attachments = new TemporaryAttachmentsList();
-			$prefix = $tmp_attachments->getTplName($this->user->id, '');
+			$prefix = $tmp_attachments->getTplName($this->user->id);
 
 			foreach ($_POST['attach_del'] as $public_id)
 			{
 				$attachID = $tmp_attachments->getIdFromPublic($public_id);
 
-				if (strpos($attachID, (string) $prefix) !== false)
+				if (str_contains($attachID, (string) $prefix))
 				{
 					$keep_temp[] = $attachID;
 				}
@@ -576,7 +576,7 @@ class ManagePortalArticles extends AbstractController
 					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name'])
 							&& in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files']))
 						|| in_array($attachID, $keep_temp)
-						|| strpos($attachID, 'post_tmp_' . User::$info['id']) === false
+						|| !str_contains($attachID, 'post_tmp_' . User::$info['id'])
 					)
 					{
 						continue;
@@ -605,7 +605,7 @@ class ManagePortalArticles extends AbstractController
 			|| ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments'));
 		if ($context['attachments']['can']['post'])
 		{
-			list($context['attachments']['quantity'], $context['attachments']['total_size']) = attachmentsSizeForArticle($this->_is_aid);
+			[$context['attachments']['quantity'], $context['attachments']['total_size']] = attachmentsSizeForArticle($this->_is_aid);
 
 			// A little razzle-dazzle to point the system to the article attachment directory
 			$attachmentUploadDirSave = $modSettings['attachmentUploadDir'];
@@ -635,7 +635,7 @@ class ManagePortalArticles extends AbstractController
 		{
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . User::$info['id']) === false)
+				if ($attachID !== 'initial_error' && !str_contains($attachID, 'post_tmp_' . User::$info['id']))
 				{
 					continue;
 				}
@@ -774,7 +774,7 @@ class ManagePortalArticles extends AbstractController
 			$current = sportal_get_articles($this->_is_aid);
 			$author = $current['author'];
 			$date = standardTime($current['date']);
-			list($views, $comments) = sportal_get_article_views_comments($this->_is_aid);
+			[$views, $comments] = sportal_get_article_views_comments($this->_is_aid);
 		}
 		// New ones we set defaults
 		else
@@ -803,7 +803,7 @@ class ManagePortalArticles extends AbstractController
 
 		if ($article['type'] === 'bbc')
 		{
-			PreparseCode::instance()->preparsecode($article['body'], false);
+			PreparseCode::instance()->preparsecode($article['body']);
 		}
 
 		return $article;
@@ -909,13 +909,13 @@ class ManagePortalArticles extends AbstractController
 		// New attachments to add
 		elseif ($tmp_attachments->hasAttachments())
 		{
-			$prefix = $tmp_attachments->getTplName($this->user->id, '');
+			$prefix = $tmp_attachments->getTplName($this->user->id);
 
 			/** @var TemporaryAttachment $attachment */
 			foreach ($tmp_attachments as $attachID => $attachment)
 			{
 				// Initial errors (such as missing directory), we can recover
-				if ($attachID !== 'initial_error' && strpos($attachID, (string) $prefix) === false)
+				if ($attachID !== 'initial_error' && !str_contains($attachID, (string) $prefix))
 				{
 					continue;
 				}
@@ -1005,7 +1005,7 @@ class ManagePortalArticles extends AbstractController
 					// Show some numbers.
 					if ($type === 'attachmentNumPerPostLimit')
 					{
-						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], '<span id="' . $type . '">' . ($modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']) . '</span>');
+						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], '<span id="' . $type . '">' . ($modSettings['attachmentNumPerPostLimit'] - $context['attachments']['quantity']) . '</span>');
 					}
 
 					if ($type === 'attachmentPostLimit')

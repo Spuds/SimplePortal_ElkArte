@@ -131,7 +131,7 @@ class BoardNewsBlock extends SPAbstractBlock
 			$start = !empty($_REQUEST['news' . $id]) ? (int) $_REQUEST['news' . $id] : 0;
 
 			$clean_url = str_replace('%', '%%', preg_replace('~news' . $id . '=[^;]+;?~', '', $_SERVER['REQUEST_URL']));
-			$current_url = $clean_url . (strpos($clean_url, '?') !== false ? (in_array(substr($clean_url, -1), [';', '?']) ? '' : ';') : '?');
+			$current_url = $clean_url . (str_contains($clean_url, '?') ? (in_array(substr($clean_url, -1), [';', '?']) ? '' : ';') : '?');
 		}
 
 		// Load the actual post-details for the topics
@@ -194,7 +194,7 @@ class BoardNewsBlock extends SPAbstractBlock
 
 			// If ILA is enable and what we rendered has ILA tags, assume they don't need any further attachment help
 			if (!empty($this->_modSettings['attachment_inline_enabled'])
-				&& strpos($row['body'], '<img src="' . $scripturl . '?action=dlattach;attach=') !== false)
+				&& str_contains($row['body'], '<img src="' . $scripturl . '?action=dlattach;attach='))
 			{
 				$attach = [];
 			}

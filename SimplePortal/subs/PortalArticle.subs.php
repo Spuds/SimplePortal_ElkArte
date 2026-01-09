@@ -11,7 +11,6 @@
 
 use BBC\ParserWrapper;
 use ElkArte\Graphics\Image;
-use ElkArte\Helper\FileFunctions;
 use ElkArte\User;
 
 /**
@@ -519,7 +518,7 @@ function sportal_modify_article_comment($comment_id, $body)
 }
 
 /**
- * Removes an comment from an article
+ * Removes a comment from an article
  *
  * @param int $comment_id comment it
  *
@@ -720,7 +719,7 @@ function attachmentsSizeForArticle($id_article, $include_count = true)
  * What it does:
  * - Adds any additional or missing parameters to $attachmentOptions.
  * - Renames the temporary file.
- * - Creates a thumbnail if the file is an image and the option enabled.
+ * - Creates a thumbnail if the file is an image and the option is enabled.
  *
  * @param array $attachmentOptions associative array of options
  * @return bool
@@ -736,14 +735,14 @@ function createArticleAttachment(&$attachmentOptions)
 
 	$image = new Image($attachmentOptions['tmp_name']);
 
-	// If this is an image we need to set a few additional parameters.
+	// If this is an image, we need to set a few additional parameters.
 	$is_image = $image->isImageLoaded();
 	$size = $is_image ? $image->getImageDimensions() : [0, 0, 0];
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 	$attachmentOptions['width'] = max(0, $attachmentOptions['width']);
 	$attachmentOptions['height'] = max(0, $attachmentOptions['height']);
 
-	// If it's an image get the mime type right.
+	// If it's an image, get the mime type right.
 	if ($is_image)
 	{
 		$attachmentOptions['mime_type'] = getValidMimeImageType($size[2]);
@@ -761,7 +760,7 @@ function createArticleAttachment(&$attachmentOptions)
 		$attachmentOptions['file_hash'] = getAttachmentFilename($attachmentOptions['name'], 0, null, true);
 	}
 
-	// Assuming no-one set the extension let's take a look at it.
+	// Assuming no-one set the extension, let's take a look at it.
 	if (empty($attachmentOptions['fileext']))
 	{
 		$attachmentOptions['fileext'] = strtolower(strrpos($attachmentOptions['name'], '.') !== false ? substr($attachmentOptions['name'], strrpos($attachmentOptions['name'], '.') + 1) : '');
@@ -798,7 +797,7 @@ function createArticleAttachment(&$attachmentOptions)
 		return false;
 	}
 
-	// Now that we have the attach id, let's rename this and finish up.
+	// Now that we have the attached id, let's rename this and finish up.
 	$attachmentOptions['destination'] = $attachmentOptions['id_folder'] . '/' . $attachmentOptions['id'] . '_' . $attachmentOptions['file_hash'] . '.elk';
 	if (rename($attachmentOptions['tmp_name'], $attachmentOptions['destination']) && $is_image)
 	{
@@ -1122,7 +1121,7 @@ function sportal_get_attachment_thumb_from_article($article, $attach)
 			'article' => $article,
 		]
 	)->fetch_callback(function($row) use (&$attachmentData) {
-		// If there is a hash then the thumbnail exists
+		// If there is a hash, then the thumbnail exists
 		if (!empty($row['file_hash']))
 		{
 			$attachmentData = [
@@ -1189,7 +1188,7 @@ function isArticleAttachmentImage($id_attach)
 		]
 	)->fetch_callback(function($row) use (&$attachmentData) {
 		$attachmentData = $row;
-		$attachmentData['is_image'] = strpos($attachmentData['mime_type'], 'image') === 0;
+		$attachmentData['is_image'] = str_starts_with($attachmentData['mime_type'], 'image');
 		$attachmentData['size'] = byte_format($attachmentData['size']);
 	});
 
@@ -1197,7 +1196,7 @@ function isArticleAttachmentImage($id_attach)
 }
 
 /**
- * Get attachment count for a article or group of articles
+ * Get attachment count for an article or group of articles
  *
  * @param int|int[] $articles the article id
  * @return array
@@ -1277,7 +1276,7 @@ function getBlogAttachments($articles)
 /**
  * Load the blog level attachment details
  *
- * - If the article was found to have attachments (via getBlogAttachments) then
+ * - If the article was found to have attachments (via getBlogAttachments), then
  * it will load that attachment data for use in a template
  * - If the message did not have attachments, it is then searched for the first
  * bbc IMG tag, and that image is used.

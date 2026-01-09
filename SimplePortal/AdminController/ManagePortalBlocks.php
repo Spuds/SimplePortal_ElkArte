@@ -355,7 +355,7 @@ class ManagePortalBlocks extends AbstractController
 				'instance' => $block,
 			];
 
-			if (strpos($modSettings['leftwidth'], '%') !== false || strpos($modSettings['leftwidth'], 'px') !== false)
+			if (str_contains($modSettings['leftwidth'], '%') || str_contains($modSettings['leftwidth'], 'px'))
 			{
 				$context['widths'][1] = $modSettings['leftwidth'];
 			}
@@ -364,7 +364,7 @@ class ManagePortalBlocks extends AbstractController
 				$context['widths'][1] = $modSettings['leftwidth'] . 'px';
 			}
 
-			if (strpos($modSettings['rightwidth'], '%') !== false || strpos($modSettings['rightwidth'], 'px') !== false)
+			if (str_contains($modSettings['rightwidth'], '%') || str_contains($modSettings['rightwidth'], 'px'))
 			{
 				$context['widths'][4] = $modSettings['rightwidth'];
 			}
@@ -373,12 +373,12 @@ class ManagePortalBlocks extends AbstractController
 				$context['widths'][4] = $modSettings['rightwidth'] . 'px';
 			}
 
-			if (strpos($context['widths'][1], '%') !== false)
+			if (str_contains($context['widths'][1], '%'))
 			{
 				$context['widths'][2] = $context['widths'][3] = 100 - ((int) $context['widths'][1] + (int) $context['widths'][4]) . '%';
 				$context['widths'][5] = $context['widths'][6] = '100%';
 			}
-			elseif (strpos($context['widths'][1], 'px') !== false)
+			elseif (str_contains($context['widths'][1], 'px'))
 			{
 				$context['widths'][2] = $context['widths'][3] = 960 - ((int) $context['widths'][1] + (int) $context['widths'][4]) . 'px';
 				$context['widths'][5] = $context['widths'][6] = '960px';
@@ -479,7 +479,7 @@ class ManagePortalBlocks extends AbstractController
 						$form_message = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : '';
 
 						// But if it's in HTML world, turn them into htmlspecialchar's so they can be edited!
-						if (strpos($form_message, '[html]') !== false)
+						if (str_contains($form_message, '[html]'))
 						{
 							$parts = preg_split('~(\[/code\]|\[code(?:=[^\]]+)?\])~i', $form_message, -1, PREG_SPLIT_DELIM_CAPTURE);
 							for ($i = 0, $n = count($parts); $i < $n; $i++)
@@ -726,7 +726,7 @@ class ManagePortalBlocks extends AbstractController
 
 			// Prepare the message a bit for some additional testing.
 			$value = Util::htmlspecialchars($value, ENT_QUOTES);
-			PreparseCode::instance()->preparsecode($value, false);
+			PreparseCode::instance()->preparsecode($value);
 
 			// Store now the correct and fixed value ;)
 			$_POST['parameters'][$name] = $value;
@@ -779,7 +779,7 @@ class ManagePortalBlocks extends AbstractController
 
 				$target_side = (int) str_replace('side_', '', $_POST['received']);
 				$block_id = (int) str_replace('block_', '', $_POST['moved']);
-				list ($current_side,) = sp_block_get_position($block_id);
+				[$current_side,] = sp_block_get_position($block_id);
 
 				// The block ids arrive in 1-n view order ...
 				$blocks = array_map('intval',$_POST['block']);
@@ -794,12 +794,12 @@ class ManagePortalBlocks extends AbstractController
 					// Find the details about the blocks above and below our moved one
 					if ($moved_key !== 0)
 					{
-						list ($check_above_side, $check_above_row) = sp_block_get_position($blocks[$moved_key - 1]);
+						[$check_above_side, $check_above_row] = sp_block_get_position($blocks[$moved_key - 1]);
 					}
 
 					if ($moved_key + 1 < count($blocks))
 					{
-						list ($check_below_side, $check_below_row) = sp_block_get_position($blocks[$moved_key + 1]);
+						[$check_below_side, $check_below_row] = sp_block_get_position($blocks[$moved_key + 1]);
 					}
 
 					// The block above is in the same side, so we place it after that block
@@ -924,7 +924,7 @@ class ManagePortalBlocks extends AbstractController
 		}
 
 		// Get the blocks current position in the portal
-		list ($current_side, $current_row) = sp_block_get_position($block_id);
+		[$current_side, $current_row] = sp_block_get_position($block_id);
 
 		// Is a move needed, new row, new column?
 		if ($current_side !== $target_side || $current_row + 1 !== $target_row)
@@ -996,7 +996,8 @@ class ManagePortalBlocks extends AbstractController
 	{
 		global $context;
 
-		checkSession(isset($_REQUEST['xml']) ? '' : 'get');
+		$api = $this->getApi();
+		checkSession($api === 'xml' ? '' : 'get');
 
 		$id = (int) $_REQUEST['block_id'];
 		$state = sp_changeState('block', $id);
@@ -1004,7 +1005,7 @@ class ManagePortalBlocks extends AbstractController
 		$list = !empty($_GET['redirect']) && isset($sides[$_GET['redirect']]) ? $sides[$_GET['redirect']] : 'list';
 
 		// Doing this the ajax way?
-		if (isset($_REQUEST['xml']))
+		if ($api === 'xml')
 		{
 			$context['item_id'] = $id;
 			$context['status'] = !empty($state) ? 'active' : 'deactive';

@@ -9,11 +9,12 @@
  * @version 2.0.0
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
 
 /**
- * Top stats block, shows the top x members who has achieved top position of various stats
- * Designed to be flexible so adding additional member stats is easy
+ * Top stats block, shows the top x members who have achieved top position of various stats
+ * Designed to be flexible, so adding additional member stats is easy
  *
  * @param array $parameters
  *        'limit' => number of top posters to show
@@ -61,24 +62,38 @@ class TopStatsMemberBlock extends SPAbstractBlock
 		$this->setupSystemArray();
 	}
 
+	/**
+	 * Configures the system array used for the top statistics block.
+	 *
+	 * - Initializes a predefined array that specifies different statistics and
+	 *   their associated configurations, such as data fields, sorting, output formats,
+	 *   and additional processing logic.
+	 * - Supports multiple statistics types, such as posts, karma, and likes, with
+	 *   each type tailored for different functionalities and outputs.
+	 *
+	 * @return void
+	 */
 	private function setupSystemArray()
 	{
 		global $txt;
 
-		/*
-		* The system setup array, the order depends on the $txt array of the select name
-		*
-		* 'mod_id' - Only used as information
-		* 'field' - The members field that should be loaded.  Please don't forget to add mem. before the field names
-		* 'order' - What is the field name i need to be sort after
-		* 'where' - Here you can add additional where statements
-		* 'output_text' - What should be displayed after the avatar and nickname
-		*	 - For example if your field is karmaGood 'output_text' => $txt['karma'] . '%karmaGood%';
-		* 'output_function' - With this you can add to the $row of the query some information.
-		* 'reverse' - On true it change the reverse cause, if not set it will be false :)
-		* 'enabled' - true = mod exists or is possible to use :D
-		* 'error_msg' => $txt['my_error_msg']; You can insert here what kind of error message should appear if the modification not exists =D
-		*/
+		/**
+		 * Configuration for the Top Stats system.
+		 *
+		 * Each array key corresponds to a 'type' index defined in the constructor.
+		 *
+		 * @type string $name Internal identifier for the stat.
+		 * @type string $field DB fields to select (must use 'mem.' prefix for member columns).
+		 * @type string $order The DB column name or expression used for sorting.
+		 * @type string $where (Optional) Additional DB WHERE clause constraints.
+		 * @type string $output_text The display string. Placeholders wrapped in % (e.g., %posts%)
+		 * are replaced by the corresponding database field value.
+		 * @type callable $output_function (Optional) Anonymous function to process $row by reference
+		 * before output. Useful for formatting dates or calculations.
+		 * @type bool $reverse If true, the default sorting direction is inverted.
+		 * @type bool $enabled Whether this stat type is available for use (e.g., check mod settings).
+		 * @type string $error_msg The language string to display if 'enabled' is false.
+		 */
 		$this->sp_topStatsSystem = [
 			'0' => [
 				'name' => 'Total time logged in',
@@ -88,23 +103,23 @@ class TopStatsMemberBlock extends SPAbstractBlock
 					global $txt;
 
 					// Figure out the days, hours and minutes.
-					$timeDays = floor($row["total_time_logged_in"] / 86400);
-					$timeHours = floor(($row["total_time_logged_in"] % 86400) / 3600);
+					$timeDays = floor($row['total_time_logged_in'] / 86400);
+					$timeHours = floor(($row['total_time_logged_in'] % 86400) / 3600);
 
 					// Figure out which things to show... (days, hours, minutes, etc.)
-					$timelogged = "";
+					$timelogged = '';
 					if ($timeDays > 0)
 					{
-						$timelogged .= $timeDays . $txt["totalTimeLogged5"];
+						$timelogged .= $timeDays . $txt['totalTimeLogged5'];
 					}
 
 					if ($timeHours > 0)
 					{
-						$timelogged .= $timeHours . $txt["totalTimeLogged6"];
+						$timelogged .= $timeHours . $txt['totalTimeLogged6'];
 					}
 
-					$timelogged .= floor(($row["total_time_logged_in"] % 3600) / 60) . $txt["totalTimeLogged7"];
-					$row["timelogged"] = $timelogged;
+					$timelogged .= floor(($row['total_time_logged_in'] % 3600) / 60) . $txt['totalTimeLogged7'];
+					$row['timelogged'] = $timelogged;
 				},
 				'output_text' => ' %timelogged%',
 				'reverse_sort_asc' => false,
@@ -122,7 +137,7 @@ class TopStatsMemberBlock extends SPAbstractBlock
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'mem.karma_good',
 				'output_function' => function(&$row) {
-					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
+					$row['karma_total'] = $row['karma_good'] - $row['karma_bad'];
 				},
 				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
@@ -133,7 +148,7 @@ class TopStatsMemberBlock extends SPAbstractBlock
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'mem.karma_bad',
 				'output_function' => function(&$row) {
-					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
+					$row['karma_total'] = $row['karma_good'] - $row['karma_bad'];
 				},
 				'output_text' => (!empty($this->_modSettings['karmaLabel']) ? $this->_modSettings['karmaLabel'] : '') . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' +%karma_good%\-%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
@@ -144,7 +159,7 @@ class TopStatsMemberBlock extends SPAbstractBlock
 				'field' => 'mem.karma_good, mem.karma_bad',
 				'order' => 'FLOOR(1000000+karma_good-karma_bad)',
 				'output_function' => function(&$row) {
-					$row["karma_total"] = $row["karma_good"] - $row["karma_bad"];
+					$row['karma_total'] = $row['karma_good'] - $row['karma_bad'];
 				},
 				'output_text' => $this->_modSettings['karmaLabel'] . ($this->_modSettings['karmaMode'] == 1 ? ' %karma_total%' : ' &plusmn;%karma_good%\%karma_bad%'),
 				'enabled' => !empty($this->_modSettings['karmaMode']),
@@ -199,7 +214,7 @@ class TopStatsMemberBlock extends SPAbstractBlock
 		$this->data['enable_label'] = !empty($parameters['enable_label']);
 		$this->data['list_label'] = !empty($parameters['list_label']) ? $parameters['list_label'] : '';
 
-		// Setup current block type
+		// Set up the current block type
 		$current_system = $this->sp_topStatsSystem[$type];
 
 		// Possible to output?
@@ -221,18 +236,13 @@ class TopStatsMemberBlock extends SPAbstractBlock
 		$where = [];
 
 		// If this is already cached, use it
-		$chache_id = 'sp_chache_' . $id . '_topStatsMember';
-		if (empty($this->_modSettings['sp_disableChache']) && !empty($this->_modSettings[$chache_id]))
+		$cache_id = 'sp_cache_' . $id . '_topStatsMember';
+		$cache_data = Cache::instance()->get($cache_id, 300);
+		if (empty($this->_modSettings['sp_disableCache']) && $cache_data !== null)
 		{
-			$data = explode(';', $this->_modSettings[$chache_id]);
-
-			if ($data[0] == $type && $data[1] == $limit && !empty($data[2]) == $sort_asc && $data[3] > time() - 300) // 5 Minute cache
+			if ($cache_data[0] == $type && $cache_data[1] == $limit && !empty($cache_data[2]) == $sort_asc)
 			{
-				$where[] = 'mem.id_member IN (' . $data[4] . ')';
-			}
-			else
-			{
-				unset($this->_modSettings[$chache_id]);
+				$where[] = 'mem.id_member IN (' . $cache_data[4] . ')';
 			}
 		}
 
@@ -240,7 +250,7 @@ class TopStatsMemberBlock extends SPAbstractBlock
 		if (!empty($last_active_limit))
 		{
 			$timeLimit = time() - $last_active_limit;
-			$where[] = "last_login > $timeLimit";
+			$where[] = 'last_login > ' . $timeLimit;
 		}
 
 		if (!empty($current_system['where']))
@@ -255,10 +265,10 @@ class TopStatsMemberBlock extends SPAbstractBlock
 		}
 		else
 		{
-			$where = "";
+			$where = '';
 		}
 
-		// Finally make the query with the parameters we built
+		// Finally, make the query with the parameters we built
 		$this->data['members'] = [];
 		$count = 1;
 		$cache_member_ids = [];
@@ -288,7 +298,7 @@ class TopStatsMemberBlock extends SPAbstractBlock
 
 			$this->color_ids[$row['id_member']] = $row['id_member'];
 
-			// Setup the row
+			// Set up the row
 			$output = '';
 
 			// Prepare some data of the row?
@@ -321,15 +331,16 @@ class TopStatsMemberBlock extends SPAbstractBlock
 		})->bindTo($this));
 
 		// Update the cache, at least around 100 members are needed for a good working version
-		if (empty($this->_modSettings['sp_disableChache']) && isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 0 && !empty($cache_member_ids) && count($cache_member_ids) > $limit && empty($this->_modSettings[$chache_id]))
+		if (empty($this->_modSettings['sp_disableCache']) && isset($context['common_stats']['total_members']) && $context['common_stats']['total_members'] > 0 && !empty($cache_member_ids) && count($cache_member_ids) > $limit && $cache_data === null)
 		{
 			$toCache = [$type, $limit, ($sort_asc ? 1 : 0), time(), implode(',', $cache_member_ids)];
-			updateSettings([$chache_id => implode(';', $toCache)]);
-		}
-		// One time error, if this happens the cache needs an update
-		elseif (!empty($this->_modSettings[$chache_id]))
-		{
-			updateSettings([$chache_id => '0;0;0;1000;0']);
+			Cache::instance()->put($cache_id, $toCache, 300);
+
+			// Clean up the old modSettings cache if it exists
+			if (!empty($this->_modSettings[$cache_id]))
+			{
+				updateSettings([$cache_id => null]);
+			}
 		}
 
 		// Color the id's

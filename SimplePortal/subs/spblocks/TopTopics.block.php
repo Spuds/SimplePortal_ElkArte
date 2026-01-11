@@ -16,9 +16,9 @@ use ElkArte\Database\QueryInterface;
  *
  * @param array $parameters
  *        'limit' => number of posts to show
- *        'type' => 0 replies or 1 views
+ *        'type' => 0 for replies or 1 for views
  * @param int $id - not used in this block
- * @param bool $return_parameters if true returns the configuration options for the block
+ * @param bool $return_parameters if true, returns the configuration options for the block
  */
 class TopTopicsBlock extends SPAbstractBlock
 {

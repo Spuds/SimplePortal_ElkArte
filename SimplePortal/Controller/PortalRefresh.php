@@ -12,6 +12,7 @@
 namespace Addons\SimplePortal\Controller;
 
 use ElkArte\AbstractController;
+use ElkArte\Action;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
 
@@ -33,7 +34,7 @@ class PortalRefresh extends AbstractController
 	{
 		Txt::load('SimplePortal');
 		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
-		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.class.php');
+		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.php');
 
 		// Not running via SSI, then we need to get SSI for many block functions
 		if (ELK !== 'SSI')
@@ -49,7 +50,23 @@ class PortalRefresh extends AbstractController
 	 */
 	public function action_index()
 	{
-		// Where do you want to go today? Well, this should never be called
+		// Add subaction array to act accordingly
+		$subActions = [
+			'whos' => [$this, 'action_whos_api'],
+			'recent' => [$this, 'action_recent_api'],
+			'boardstats' => [$this, 'action_boardstats_api'],
+		];
+
+		// Set up the action handler
+		$action = new Action();
+		$subAction = $action->initialize($subActions);
+
+		if (!empty($subAction) && $this->getApi())
+		{
+			// Call the action
+			$action->dispatch($subAction);
+		}
+
 		obExit(false);
 	}
 

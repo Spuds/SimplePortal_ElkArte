@@ -99,7 +99,7 @@ function template_shoutbox_embed($shoutbox)
 		foreach ($shoutbox['smileys']['normal'] as $smiley)
 		{
 			echo '
-				<a href="javascript:void(0);" onclick="replaceText(\' ', $smiley['code'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;"><img src="', $settings['smileys_url'], '/', $smiley['filename'], '" alt="', $smiley['description'], '" title="', $smiley['description'], '" /></a>';
+				<a href="javascript:void(0);" onclick="replaceText(\' ', $smiley['code'], '\', document.getElementById(\'new_shout_', $shoutbox['id'], '\')); return false;"><img src="', $smiley['url'], '" alt="', $smiley['code'], '" title="', $smiley['description'], '" /></a>';
 		}
 
 		if (!empty($shoutbox['smileys']['popup']))
@@ -209,17 +209,12 @@ function template_shoutbox_embed($shoutbox)
 		var interval_id_', $shoutbox['id'], ' = setInterval("sp_auto_refresh_', $shoutbox['id'], '()", ', $shoutbox['refresh'], ' * 1000);
 		function sp_auto_refresh_', $shoutbox['id'], '()
 		{
-			if (window.XMLHttpRequest)
-			{
-				sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], ');
-				last_refresh_', $shoutbox['id'], ' += ', $shoutbox['refresh'], ';
-			}
-			else
-				clearInterval(interval_id_', $shoutbox['id'], ');
+			sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], ');
+			last_refresh_', $shoutbox['id'], ' += ', $shoutbox['refresh'], ';
 		}';
 	}
 
-	// Setup the data for the popup smileys.
+	// Set up the data for the popup smileys.
 	if (!empty($shoutbox['smileys']['popup']))
 	{
 		echo '

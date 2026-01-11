@@ -152,13 +152,8 @@ function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
  */
 function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
 {
-	if (window.XMLHttpRequest)
-	{
-		shoutbox_indicator(shoutbox_id, true);
-
-		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;api=xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
-	}
-
+	shoutbox_indicator(shoutbox_id, true);
+	sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;api=xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 	return false;
 }
 
@@ -170,13 +165,8 @@ function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
  */
 function sp_refresh_shout(shoutbox_id, last_refresh)
 {
-	if (window.XMLHttpRequest)
-	{
-		shoutbox_indicator(shoutbox_id, true);
-
-		getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';api=xml', onShoutReceived);
-	}
-
+	shoutbox_indicator(shoutbox_id, true);
+	getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';api=xml', onShoutReceived);
 	return false;
 }
 

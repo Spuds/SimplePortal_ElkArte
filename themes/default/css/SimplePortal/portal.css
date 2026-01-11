@@ -548,8 +548,8 @@ body {
 }
 
 .shoutbox_list_compact li img, .shoutbox_list_all li img {
-	max-height: 50px;
-	max-width: 50px;
+	max-height: 2rem;
+	max-width: 2rem;
 }
 
 .shoutbox_time {

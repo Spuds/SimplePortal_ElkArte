@@ -117,7 +117,7 @@ class ShoutboxBlock extends SPAbstractBlock
 			return;
 		}
 
-		// Going to add to the shoutbox \
+		// Going to add to the shoutbox
 		if (!empty($_POST['new_shout'])
 			&& !empty($_POST['submit_shout'])
 			&& !empty($_POST['shoutbox_id'])
@@ -173,7 +173,7 @@ class ShoutboxBlock extends SPAbstractBlock
 			$settings['smileys_url'] = $context['smiley_path'];
 
 			// No Smileys, then just some defaults
-			if (empty($this->_modSettings['smiley_enable']))
+			if (empty($context['smiley_enabled']))
 			{
 				$this->data['smileys']['normal'] = $this->_smileys();
 			}
@@ -209,6 +209,7 @@ class ShoutboxBlock extends SPAbstractBlock
 				{
 					$this->data['smileys'][$location][$i]['code'] = addslashes($iValue['code']);
 					$this->data['smileys'][$location][$i]['js_description'] = addslashes($iValue['description']);
+					$this->data['smileys'][$location][$i]['url'] = (isset($iValue['emoji']) ? $context['emoji_path'] : $context['smiley_path']) . $iValue['filename'];
 				}
 
 				if (!empty($this->data['smileys'][$location]))
@@ -259,22 +260,22 @@ class ShoutboxBlock extends SPAbstractBlock
 		global $txt;
 
 		return [
-			['code' => ':)', 'filename' => 'smiley.gif', 'description' => $txt['icon_smiley']],
-			['code' => ';)', 'filename' => 'wink.gif', 'description' => $txt['icon_wink']],
-			['code' => ':D', 'filename' => 'cheesy.gif', 'description' => $txt['icon_cheesy']],
-			['code' => ';D', 'filename' => 'grin.gif', 'description' => $txt['icon_grin']],
-			['code' => '>:(', 'filename' => 'angry.gif', 'description' => $txt['icon_angry']],
-			['code' => ':(', 'filename' => 'sad.gif', 'description' => $txt['icon_sad']],
-			['code' => ':o', 'filename' => 'shocked.gif', 'description' => $txt['icon_shocked']],
-			['code' => '8)', 'filename' => 'cool.gif', 'description' => $txt['icon_cool']],
-			['code' => '???', 'filename' => 'huh.gif', 'description' => $txt['icon_huh']],
-			['code' => '::)', 'filename' => 'rolleyes.gif', 'description' => $txt['icon_rolleyes']],
-			['code' => ':P', 'filename' => 'tongue.gif', 'description' => $txt['icon_tongue']],
-			['code' => ':-[', 'filename' => 'embarrassed.gif', 'description' => $txt['icon_embarrassed']],
-			['code' => ':-X', 'filename' => 'lipsrsealed.gif', 'description' => $txt['icon_lips']],
-			['code' => ':-\\', 'filename' => 'undecided.gif', 'description' => $txt['icon_undecided']],
-			['code' => ':-*', 'filename' => 'kiss.gif', 'description' => $txt['icon_kiss']],
-			['code' => ':\'(', 'filename' => 'cry.gif', 'description' => $txt['icon_cry']]
+			['code' => ':)', 'filename' => 'smiley.svg', 'description' => $txt['icon_smiley']],
+			['code' => ';)', 'filename' => 'wink.svg', 'description' => $txt['icon_wink']],
+			['code' => ':D', 'filename' => 'cheesy.svg', 'description' => $txt['icon_cheesy']],
+			['code' => ';D', 'filename' => 'grin.svg', 'description' => $txt['icon_grin']],
+			['code' => '>:(', 'filename' => 'angry.svg', 'description' => $txt['icon_angry']],
+			['code' => ':(', 'filename' => 'sad.svg', 'description' => $txt['icon_sad']],
+			['code' => ':o', 'filename' => 'shocked.svg', 'description' => $txt['icon_shocked']],
+			['code' => '8)', 'filename' => 'cool.svg', 'description' => $txt['icon_cool']],
+			['code' => '???', 'filename' => 'huh.svg', 'description' => $txt['icon_huh']],
+			['code' => '::)', 'filename' => 'rolleyes.svg', 'description' => $txt['icon_rolleyes']],
+			['code' => ':P', 'filename' => 'tongue.svg', 'description' => $txt['icon_tongue']],
+			['code' => ':-[', 'filename' => 'embarrassed.svg', 'description' => $txt['icon_embarrassed']],
+			['code' => ':-X', 'filename' => 'lipsrsealed.svg', 'description' => $txt['icon_lips']],
+			['code' => ':-\\', 'filename' => 'undecided.svg', 'description' => $txt['icon_undecided']],
+			['code' => ':-*', 'filename' => 'kiss.svg', 'description' => $txt['icon_kiss']],
+			['code' => ':\'(', 'filename' => 'cry.svg', 'description' => $txt['icon_cry']]
 		];
 	}
 }

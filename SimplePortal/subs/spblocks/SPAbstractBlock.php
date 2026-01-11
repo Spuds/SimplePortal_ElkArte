@@ -132,29 +132,34 @@ abstract class SPAbstractBlock
 	 */
 	public function auto_refresh()
 	{
-		// Lets be reasonable on the refresh, lets not beat on the server
+		// Be reasonable on the refresh, do not beat on the server
 		$refresh = (max((int) $this->refresh['refresh_value'], 30)) * 1000;
 
 		theme()->addInlineJavascript('
-			$(document).ready(function()
-			{
-				let $block = $("#sp_block_' . (int) $this->refresh['id'] . '"),
-					$container = $block.find("' . $this->refresh['class'] . '"),
-					spRefreshParams = {"block" : ' . (int) $this->refresh['id'] . '};
+			document.addEventListener("DOMContentLoaded", () => {
+				let block = document.getElementById("sp_block_' . (int) $this->refresh['id'] . '"),
+					container = block ? block.querySelector("' . $this->refresh['class'] . '") : null;
 
-				spRefreshParams[elk_session_var] = elk_session_id;
-
-				setInterval(function()
+				if (container === null)
 				{
-					$.ajax({
-						type: "POST",
-						url: elk_prepareScriptUrl(sp_script_url) + "action=PortalRefresh;sa=' . $this->refresh['sa'] . ';api",
-						data: spRefreshParams,
+					return;
+				}
+
+				let spRefreshParams = new URLSearchParams({"block": ' . (int) $this->refresh['id'] . ', [elk_session_var]: elk_session_id});
+
+				setInterval(() => {
+					fetch(elk_prepareScriptUrl(sp_script_url) + "action=portalrefresh;sa=' . $this->refresh['sa'] . ';api=html", {
+						method: "POST",
+						body: spRefreshParams,
+						headers: {
+							"X-Requested-With": "XMLHttpRequest"
+						}
 					})
-					.done(function(result, textStatus) {
-						if (textStatus === "success" && result !== "")
+					.then(response => response.ok ? response.text() : "")
+					.then(result => {
+						if (result !== "")
 						{
-							$container.html(result);
+							container.innerHTML = result;
 						}
 					});
 				}, ' . $refresh . ');

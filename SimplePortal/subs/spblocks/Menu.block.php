@@ -9,6 +9,8 @@
  * @version 2.0.0
  */
 
+use Addons\SimplePortal\PortalIntegrate;
+
 /**
  * Menu Block, creates a sidebar menu block based on the system main menu
  *
@@ -78,7 +80,7 @@ class MenuBlock extends SPAbstractBlock
 		else
 		{
 			require_once(ADDONSDIR . '/SimplePortal/PortalIntegrate.php');
-			$this->data['menu_buttons'] = \Addons\SimplePortal\PortalIntegrate::sp_load_menu_items($menu_id);
+			$this->data['menu_buttons'] = PortalIntegrate::sp_load_menu_items($menu_id);
 		}
 
 		$this->setTemplate('template_sp_menu');
@@ -130,15 +132,4 @@ function template_sp_menu($data)
 
 	echo '
 		</ul>';
-
-	// Superfish the menu
-	$javascript = "
-	$(document).ready(function() {
-		if (use_click_menu)
-			$('#sp_menu').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}, speedOut: 0, activeClass: 'sfhover'});
-		else
-			$('#sp_menu').superfish({delay : 300, speed: 175, hoverClass: 'sfhover'});
-	});";
-
-	theme()->addInlineJavascript($javascript, true);
 }

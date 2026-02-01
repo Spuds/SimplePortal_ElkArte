@@ -54,7 +54,7 @@ class LatestMemberBlock extends SPAbstractBlock
 		$limit = !empty($parameters['limit']) ? (int) $parameters['limit'] : 5;
 		$rows = recentMembers($limit);
 
-		// Get them ready the template
+		// Get them ready for the template
 		$this->data['members'] = [];
 
 		foreach ($rows as $row)

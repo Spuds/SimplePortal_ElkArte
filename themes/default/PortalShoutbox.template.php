@@ -78,7 +78,7 @@ function template_shoutbox_embed($shoutbox)
 	<form method="post">
 		<div class="shoutbox_container">
 			<div class="shoutbox_info">
-				<div id="shoutbox_load_', $shoutbox['id'], '" style="float: right; display: none;"><i class="fa fa-spinner fa-spin"></i></div>
+				<div id="shoutbox_load_', $shoutbox['id'], '" style="float: right; display: none;"><i class="icon i-puff"></i></div>
 				<a ', sp_embed_class('refresh'), ' href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '" onclick="sp_refresh_shout(', $shoutbox['id'], ', last_refresh_', $shoutbox['id'], '); return false;"></a>
 				<a ', sp_embed_class('history'), ' href="', $scripturl, '?action=shoutbox;shoutbox_id=', $shoutbox['id'], '"></a>';
 
@@ -105,7 +105,7 @@ function template_shoutbox_embed($shoutbox)
 		if (!empty($shoutbox['smileys']['popup']))
 		{
 			echo '
-				<a onclick="sp_showMoreSmileys(\'', $shoutbox['id'], '\', \'', $txt['more_smileys_title'], '\', \'', $txt['more_smileys_pick'], '\', \'', $txt['more_smileys_close_window'], '\', \'', $settings['theme_url'], '\', \'', $context['smiley_path'], '\'); return false;" href="javascript:void(0);">[', $txt['more_smileys'], ']</a>';
+					<a onclick="sp_showMoreSmileys(\'', $shoutbox['id'], '\', \'', $txt['more_smileys_title'], '\', \'', $txt['more_smileys_pick'], '\', \'', $txt['more_smileys_close_window'], '\', \'', $settings['theme_url'], '\', \'', $context['smiley_path'], '\'); return false;" href="javascript:void(0);">[', $txt['more_smileys'], ']</a>';
 		}
 
 		// BBC box

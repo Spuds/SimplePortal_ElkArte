@@ -421,7 +421,7 @@ class ManagePortalMain extends AbstractController
 		}
 		else
 		{
-			loadJavascriptFile('SimplePortal/portal.js', ['stale' => SPORTAL_STALE, 'defer' => true]);
+			loadJavascriptFile('SimplePortal/portal.js', ['stale' => SPORTAL_STALE, 'defer' => false]);
 
 			$context['in_admin'] = true;
 			$context['sp_version'] = SPORTAL_VERSION;

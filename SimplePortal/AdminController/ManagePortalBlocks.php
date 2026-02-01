@@ -467,7 +467,7 @@ class ManagePortalBlocks extends AbstractController
 				// Prepare the Text content for BBC, only the first bbc will be correct detected!
 				elseif ($type === 'bbc')
 				{
-					// ELK onlys supports one bbc correctly, multiple bbc do not work at the moment
+					// ELK only supports one bbc correctly, multiple bbc do not work at the moment
 					if (!$firstBBCFound)
 					{
 						$firstBBCFound = true;

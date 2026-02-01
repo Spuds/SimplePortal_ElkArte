@@ -14,13 +14,12 @@
  *
  * @param {string} id
  */
-function sp_collapseBlock(id)
+function sp_collapseBlock (id)
 {
-	$("#sp_block_" + id).slideToggle(300).promise().done(function ()
-	{
+	$('#sp_block_' + id).slideToggle(300).promise().done(function() {
 		let mode = false;
 
-		if ($("#sp_block_" + id).is(":visible"))
+		if ($('#sp_block_' + id).is(':visible'))
 		{
 			mode = true;
 		}
@@ -28,15 +27,15 @@ function sp_collapseBlock(id)
 		// Save the choice, one way for guest, or theme options for members
 		if (elk_member_id === 0)
 		{
-			document.cookie = "sp_block_" + id + "=" + (mode ? 0 : 1);
+			document.cookie = 'sp_block_' + id + '=' + (mode ? 0 : 1);
 		}
 		else
 		{
-			elk_setThemeOption("sp_block_" + id, mode ? 0 : 1, null, null);
+			elk_setThemeOption('sp_block_' + id, mode ? 0 : 1, null, null);
 		}
 
 		// Swap the class to change the icon
-		$("#sp_collapse_" + id).attr("class", mode ? "chevricon i-chevron-up" : "chevricon i-chevron-down");
+		$('#sp_collapse_' + id).attr('class', mode ? 'chevricon i-chevron-up' : 'chevricon i-chevron-down');
 	});
 }
 
@@ -45,19 +44,19 @@ function sp_collapseBlock(id)
  *
  * @param {string} id
  */
-function sp_collapseSide(id)
+function sp_collapseSide (id)
 {
 	let sp_sides = [];
 
-	sp_sides[1] = "sp_left";
-	sp_sides[4] = "sp_right";
+	sp_sides[1] = 'sp_left';
+	sp_sides[4] = 'sp_right';
 
-	let mode = document.getElementById(sp_sides[id]).style.display === "" ? 0 : 1;
+	let mode = document.getElementById(sp_sides[id]).style.display === '' ? 0 : 1;
 
 	// Guests use a cookie, members a theme option to remember the choice
 	if (elk_member_id === 0)
 	{
-		document.cookie = sp_sides[id] + "=" + (mode ? 0 : 1);
+		document.cookie = sp_sides[id] + '=' + (mode ? 0 : 1);
 	}
 	else
 	{
@@ -65,7 +64,7 @@ function sp_collapseSide(id)
 	}
 
 	// Update the side expand/collapse image
-	document.getElementById("sp_collapse_side" + id).className = (mode ? "icon collapse" : "icon expand");
+	document.getElementById('sp_collapse_side' + id).className = (mode ? 'icon collapse' : 'icon expand');
 
 	// Hide the side with a touch of animation
 	$('#' + sp_sides[id]).toggle(400);
@@ -77,25 +76,25 @@ function sp_collapseSide(id)
  * @param {string} id
  * @param {boolean} has_image
  */
-function sp_collapse_object(id, has_image)
+function sp_collapse_object (id, has_image)
 {
-	let mode = document.getElementById("sp_object_" + id).style.display === '' ? 0 : 1;
+	let mode = document.getElementById('sp_object_' + id).style.display === '' ? 0 : 1;
 
-	$("#sp_object_" + id).toggle(300);
+	$('#sp_object_' + id).toggle(300);
 
-	if (typeof (has_image) === "undefined" || has_image === true)
+	if (typeof (has_image) === 'undefined' || has_image === true)
 	{
-		document.getElementById("sp_collapse_" + id).src = elk_images_url + (mode ? '/collapse.png' : '/expand.png');
+		document.getElementById('sp_collapse_' + id).src = elk_images_url + (mode ? '/collapse.png' : '/expand.png');
 	}
 }
 
-function sp_image_resize()
+function sp_image_resize ()
 {
-	let possible_images = document.getElementsByTagName("img");
+	let possible_images = document.getElementsByTagName('img');
 
 	for (var i = 0; i < possible_images.length; i++)
 	{
-		if (possible_images[i].className !== "bbc_img sp_article")
+		if (possible_images[i].className !== 'bbc_img sp_article')
 		{
 			continue;
 		}
@@ -115,7 +114,7 @@ function sp_image_resize()
 		}
 	}
 
-	if (typeof window_oldSPImageOnload !== "undefined" && window_oldSPImageOnload)
+	if (typeof window_oldSPImageOnload !== 'undefined' && window_oldSPImageOnload)
 	{
 		window_oldSPImageOnload();
 		window_oldSPImageOnload = null;
@@ -129,11 +128,11 @@ function sp_image_resize()
  * @param {string} sSessionVar
  * @param {string} sSessionId
  */
-function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
+function sp_submit_shout (shoutbox_id, sSessionVar, sSessionId)
 {
 	shoutbox_indicator(shoutbox_id, true);
 
-	let shout_body = document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, "&#38;#").php_urlencode();
+	let shout_body = document.getElementById('new_shout_' + shoutbox_id).value.replace(/&#/g, '&#38;#').php_urlencode();
 
 	sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;api=xml', 'shoutbox_id=' + shoutbox_id + '&shout=' + shout_body + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
 
@@ -150,11 +149,14 @@ function sp_submit_shout(shoutbox_id, sSessionVar, sSessionId)
  * @param {string} sSessionVar
  * @param {string} sSessionId
  */
-function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
+function sp_delete_shout (shoutbox_id, shout_id, sSessionVar, sSessionId)
 {
-	shoutbox_indicator(shoutbox_id, true);
-	sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;api=xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
-	return false;
+	if (window.XMLHttpRequest)
+	{
+		shoutbox_indicator(shoutbox_id, true);
+		sendXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;api=xml', 'shoutbox_id=' + shoutbox_id + '&delete=' + shout_id + '&' + sSessionVar + '=' + sSessionId, onShoutReceived);
+		return false;
+	}
 }
 
 /**
@@ -163,7 +165,7 @@ function sp_delete_shout(shoutbox_id, shout_id, sSessionVar, sSessionId)
  * @param {string} shoutbox_id
  * @param {int} last_refresh
  */
-function sp_refresh_shout(shoutbox_id, last_refresh)
+function sp_refresh_shout (shoutbox_id, last_refresh)
 {
 	shoutbox_indicator(shoutbox_id, true);
 	getXMLDocument(elk_prepareScriptUrl(sp_script_url) + 'action=shoutbox;shoutbox_id=' + shoutbox_id + ';time=' + last_refresh + ';api=xml', onShoutReceived);
@@ -175,30 +177,30 @@ function sp_refresh_shout(shoutbox_id, last_refresh)
  *
  * @param {object} XMLDoc
  */
-function onShoutReceived(XMLDoc)
+function onShoutReceived (XMLDoc)
 {
 	let shout, shouts, shoutbox_id, updated, error, warning, reverse, id, author, time,
 		timeclean, delete_link, content, is_me, new_body = '';
 
 	// All valid response will have these
-	shoutbox_id = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shoutbox")[0].childNodes[0].nodeValue;
-	updated = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("updated")[0].childNodes[0].nodeValue;
+	shoutbox_id = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('shoutbox')[0].childNodes[0].nodeValue;
+	updated = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('updated')[0].childNodes[0].nodeValue;
 
 	// Updated response will have the full shoutbox data
-	if (updated === "1")
+	if (updated === '1')
 	{
-		shouts = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shout");
-		error = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("error")[0].childNodes[0].nodeValue;
-		warning = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("warning")[0].childNodes[0].nodeValue;
-		reverse = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("reverse")[0].childNodes[0].nodeValue;
+		shouts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('shout');
+		error = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('error')[0].childNodes[0].nodeValue;
+		warning = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('warning')[0].childNodes[0].nodeValue;
+		reverse = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('reverse')[0].childNodes[0].nodeValue;
 
 		// SHow the "warning" box at the top of the shoutbox
-		if (warning !== "0")
+		if (warning !== '0')
 		{
 			new_body += '<li class="shoutbox_warning smalltext">' + warning + '</li>';
 		}
 
-		if (error !== "0")
+		if (error !== '0')
 		{
 			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body + '<li class="smalltext">' + error + '</li>';
 		}
@@ -207,23 +209,23 @@ function onShoutReceived(XMLDoc)
 			// Display all the shouts
 			for (var i = 0; i < shouts.length; i++)
 			{
-				shout = XMLDoc.getElementsByTagName("elk")[0].getElementsByTagName("shout")[i];
-				id = shout.getElementsByTagName("id")[0].childNodes[0].nodeValue;
-				author = shout.getElementsByTagName("author")[0].childNodes[0].nodeValue;
-				time = shout.getElementsByTagName("time")[0].childNodes[0].nodeValue;
-				timeclean = shout.getElementsByTagName("timeclean")[0].childNodes[0].nodeValue;
-				delete_link = shout.getElementsByTagName("delete")[0].childNodes[0].nodeValue;
-				content = shout.getElementsByTagName("content")[0].childNodes[0].nodeValue;
-				is_me = shout.getElementsByTagName("is_me")[0].childNodes[0].nodeValue;
+				shout = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('shout')[i];
+				id = shout.getElementsByTagName('id')[0].childNodes[0].nodeValue;
+				author = shout.getElementsByTagName('author')[0].childNodes[0].nodeValue;
+				time = shout.getElementsByTagName('time')[0].childNodes[0].nodeValue;
+				timeclean = shout.getElementsByTagName('timeclean')[0].childNodes[0].nodeValue;
+				delete_link = shout.getElementsByTagName('delete')[0].childNodes[0].nodeValue;
+				content = shout.getElementsByTagName('content')[0].childNodes[0].nodeValue;
+				is_me = shout.getElementsByTagName('is_me')[0].childNodes[0].nodeValue;
 
 				// Something you said
-				new_body += '<li>' + (is_me === "0" ? '<strong>' + author + ':</strong> ' : '') + content + '<br />' + (delete_link !== 0 ? ('<span class="shoutbox_delete">' + delete_link + '</span>') : '') + '<span class="smalltext shoutbox_time">' + time + '</span></li>';
+				new_body += '<li>' + (is_me === '0' ? '<strong>' + author + ':</strong> ' : '') + content + '<br />' + (delete_link !== 0 ? ('<span class="shoutbox_delete">' + delete_link + '</span>') : '') + '<span class="smalltext shoutbox_time">' + time + '</span></li>';
 			}
 
 			document.getElementById('shouts_' + shoutbox_id).innerHTML = new_body;
 
 			// Set the display direction
-			if (reverse !== "0")
+			if (reverse !== '0')
 			{
 				document.getElementById('shouts_' + shoutbox_id).scrollTop = document.getElementById('shouts_' + shoutbox_id).scrollHeight;
 			}
@@ -246,32 +248,32 @@ function onShoutReceived(XMLDoc)
  * @param {int} shoutbox_id id of the box to work on
  * @param {boolean} turn_on showing or hiding
  */
-function shoutbox_indicator(shoutbox_id, turn_on)
+function shoutbox_indicator (shoutbox_id, turn_on)
 {
 	document.getElementById('shoutbox_load_' + shoutbox_id).style.display = turn_on ? '' : 'none';
 }
 
-function sp_show_ignored_shout(shout_id)
+function sp_show_ignored_shout (shout_id)
 {
 	document.getElementById('ignored_shout_' + shout_id).style.display = '';
 	document.getElementById('ignored_shout_link_' + shout_id).style.display = 'none';
 }
 
-function sp_show_history_ignored_shout(shout_id)
+function sp_show_history_ignored_shout (shout_id)
 {
 	document.getElementById('history_ignored_shout_' + shout_id).style.display = '';
 	document.getElementById('history_ignored_shout_link_' + shout_id).style.display = 'none';
 }
 
-function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_theme_url, elk_smileys_url)
+function sp_showMoreSmileys (postbox, sTitleText, sPickText, sCloseText, elk_theme_url, elk_smileys_url)
 {
-	if (typeof (this.oSmileyPopupWindow) !== "undefined" && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
+	if (typeof (this.oSmileyPopupWindow) !== 'undefined' && 'closed' in this.oSmileyPopupWindow && !this.oSmileyPopupWindow.closed)
 	{
 		this.oSmileyPopupWindow.focus();
 		return;
 	}
 
-	if (typeof (sp_smileyRowsContent) === "undefined")
+	if (typeof (sp_smileyRowsContent) === 'undefined')
 	{
 		var sp_smileyRowsContent = '';
 
@@ -298,10 +300,10 @@ function sp_showMoreSmileys(postbox, sTitleText, sPickText, sCloseText, elk_them
  *
  * @param {type} obj
  */
-function sp_theme_select(obj)
+function sp_theme_select (obj)
 {
 	var id = obj.options[obj.selectedIndex].value;
-	document.getElementById("sp_ts_thumb").src = sp_ts_thumbs[id];
+	document.getElementById('sp_ts_thumb').src = sp_ts_thumbs[id];
 }
 
 /**
@@ -309,17 +311,17 @@ function sp_theme_select(obj)
  *
  * @param {type} id
  */
-function sp_collapseCalendar(id)
+function sp_collapseCalendar (id)
 {
-	let new_day = "sp_calendar_" + id;
+	let new_day = 'sp_calendar_' + id;
 
 	if (new_day === current_day)
 	{
 		return false;
 	}
 
-	document.getElementById(current_day).style.display = "none";
-	document.getElementById(new_day).style.display = "";
+	document.getElementById(current_day).style.display = 'none';
+	document.getElementById(new_day).style.display = '';
 	current_day = new_day;
 }
 
@@ -328,31 +330,31 @@ function sp_collapseCalendar(id)
  *
  * @param {type} id
  */
-function sp_collapseObject(id)
+function sp_collapseObject (id)
 {
-	var mode = document.getElementById("sp_object_" + id).style.display;
-	mode = (!(mode === "" || mode === "block"));
+	var mode = document.getElementById('sp_object_' + id).style.display;
+	mode = (!(mode === '' || mode === 'block'));
 
 	// Make it close smoothly
-	$("#sp_object_" + id).slideToggle(300);
+	$('#sp_object_' + id).slideToggle(300);
 
-	document.getElementById("sp_collapse_" + id).src = elk_images_url + (!mode ? "/selected_open.png" : "/selected.png");
+	document.getElementById('sp_collapse_' + id).src = elk_images_url + (!mode ? '/selected_open.png' : '/selected.png');
 }
 
 /**
  * Used to enable / disable the style options for body and title
  */
-function check_style_options()
+function check_style_options ()
 {
-	var noTitle = document.getElementById("no_title").checked,
-		noBody = document.getElementById("no_body").checked;
+	var noTitle = document.getElementById('no_title').checked,
+		noBody = document.getElementById('no_body').checked;
 
-	document.getElementById("title_default_class").disabled = noTitle;
-	document.getElementById("title_custom_class").disabled = noTitle;
-	document.getElementById("title_custom_style").disabled = noTitle;
-	document.getElementById("body_default_class").disabled = noBody;
-	document.getElementById("body_custom_class").disabled = noBody;
-	document.getElementById("body_custom_style").disabled = noBody;
+	document.getElementById('title_default_class').disabled = noTitle;
+	document.getElementById('title_custom_class').disabled = noTitle;
+	document.getElementById('title_custom_style').disabled = noTitle;
+	document.getElementById('body_default_class').disabled = noBody;
+	document.getElementById('body_custom_class').disabled = noBody;
+	document.getElementById('body_custom_style').disabled = noBody;
 }
 
 /**
@@ -363,7 +365,7 @@ function check_style_options()
  * @param {string} text2
  * @param {object} oTextHandle
  */
-function sp_surroundText(text1, text2, oTextHandle)
+function sp_surroundText (text1, text2, oTextHandle)
 {
 	// Can a text range be created, start off with Internet explorer < 9.
 	if ('caretPos' in oTextHandle && 'createTextRange' in oTextHandle)
@@ -422,26 +424,24 @@ function sp_surroundText(text1, text2, oTextHandle)
 /**
  * Updates the current version container with the current version found in the repository
  */
-function sp_currentVersion()
+function sp_currentVersion ()
 {
-	let oSPVersionContainer = document.getElementById("spCurrentVersion"),
-		oinstalledVersionContainer = document.getElementById("spYourVersion"),
+	let oSPVersionContainer = document.getElementById('spCurrentVersion'),
+		oinstalledVersionContainer = document.getElementById('spYourVersion'),
 		sCurrentVersion = oinstalledVersionContainer.innerHTML,
 		spIndex = new Elk_AdminIndex(),
 		spVersion = '???',
 		verCompare = new Elk_ViewVersions();
 
-	$.getJSON('https://api.github.com/repos/SimplePortal/SimplePortal_ElkArte/releases', {format: "json"},
-		function (data, textStatus, jqXHR)
-		{
+	$.getJSON('https://api.github.com/repos/SimplePortal/SimplePortal_ElkArte/releases', {format: 'json'},
+		function(data, textStatus, jqXHR) {
 			let mostRecent = {},
 				previous = {},
 				init_news = false;
 
 			spIndex.current = spIndex.normalizeVersion(sCurrentVersion);
 
-			$.each(data, function (idx, elem)
-			{
+			$.each(data, function(idx, elem) {
 				// No drafts, thank you
 				if (elem.draft)
 				{
@@ -484,7 +484,7 @@ function sp_currentVersion()
  * @param init_news
  * @param announcement
  */
-function sp_setAnnouncement(init_news, announcement)
+function sp_setAnnouncement (init_news, announcement)
 {
 	var oElem = document.getElementById('spAnnouncements'),
 		sMessages = init_news ? oElem.innerHTML : '',
@@ -518,7 +518,7 @@ function sp_setAnnouncement(init_news, announcement)
  * @param {string} type
  * @returns {boolean}
  */
-function sp_change_status(id, type)
+function sp_change_status (id, type)
 {
 	if (type === 'articles')
 	{
@@ -540,6 +540,11 @@ function sp_change_status(id, type)
 		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalblocks;sa=statechange;api=xml', 'block_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
 	}
 
+	if (type === 'menu_item')
+	{
+		sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalmenus;sa=statuscustomitem;api=xml', 'item_id=' + id + '&' + elk_session_var + '=' + elk_session_id, sp_on_status_received);
+	}
+
 	return false;
 }
 
@@ -549,7 +554,7 @@ function sp_change_status(id, type)
  * @param XMLDoc
  * @returns {boolean}
  */
-function sp_on_status_received(XMLDoc)
+function sp_on_status_received (XMLDoc)
 {
 	// If it is not valid then clean up
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk'))
@@ -580,20 +585,19 @@ function sp_on_status_received(XMLDoc)
  *
  * @param {string} element ID of element to attach change/focus events
  */
-function sp_editor_change_type(element)
+function sp_editor_change_type (element)
 {
-	$('#' + element).on('focus', function ()
-	{
+	$('#' + element).on('focus', function() {
 		// Store the current value on focus
 		initial_state = this.value;
-	}).change(function ()
-	{
-		// Handle the editor change of format
-		sceditor.plugins.portal(initial_state, this.value);
+	})
+		.change(function() {
+			// Handle the editor change of format
+			sceditor.plugins.portal(initial_state, this.value);
 
-		// Make sure the previous value is updated
-		initial_state = this.value;
-	});
+			// Make sure the previous value is updated
+			initial_state = this.value;
+		});
 }
 
 /**
@@ -602,7 +606,8 @@ function sp_editor_change_type(element)
  * @param {string} initial_state one of bbc, html, markdown, php
  * @param {string} new_state one of bbc, html, markdown, php
  */
-function sp_to_new(initial_state, new_state) {
+function sp_to_new (initial_state, new_state)
+{
 	let $id = document.getElementById(post_box_name),
 		instance = sceditor.instance($id);
 
@@ -613,7 +618,7 @@ function sp_to_new(initial_state, new_state) {
 	sp_change_format(val, initial_state, new_state);
 
 	// Only show the toolbar when in BBC mode
-	document.getElementById("editor_toolbar_container").style.display = (new_state === 'bbc' ? 'block' : 'none');
+	document.getElementById('editor_toolbar_container').style.display = (new_state === 'bbc' ? 'block' : 'none');
 }
 
 /**
@@ -624,9 +629,9 @@ function sp_to_new(initial_state, new_state) {
  * @param {string} to Going to bbc, html, php, markdown
  * @returns {boolean}
  */
-function sp_change_format(text, from, to)
+function sp_change_format (text, from, to)
 {
-	text = text.replace(/&#/g, "&#38;#").php_urlencode();
+	text = text.replace(/&#/g, '&#38;#').php_urlencode();
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=portalconfig;sa=formatchange;api=xml', 'text=' + text + '&' + 'from=' + from + '&' + 'to=' + to + '&' + elk_session_var + '=' + elk_session_id, sp_on_format_received);
 
 	return false;
@@ -638,7 +643,7 @@ function sp_change_format(text, from, to)
  * @param XMLDoc
  * @returns {boolean}
  */
-function sp_on_format_received(XMLDoc)
+function sp_on_format_received (XMLDoc)
 {
 	// If it is not valid then clean up
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('elk'))
@@ -670,7 +675,7 @@ function sp_on_format_received(XMLDoc)
  *
  * @return {void} This function does not return a value.
  */
-function sp_prep_articles()
+function sp_prep_articles ()
 {
 	// Preview video links if the feature is available
 	if (typeof $.fn.linkifyvideo === 'function')

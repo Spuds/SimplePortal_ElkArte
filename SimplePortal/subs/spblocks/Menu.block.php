@@ -9,13 +9,16 @@
  * @version 2.0.0
  */
 
+use Addons\SimplePortal\PortalIntegrate;
+use ElkArte\Database\QueryInterface;
+
 /**
  * Menu Block, creates a sidebar menu block based on the system main menu
  *
- * @param array $parameters -  not used in this block
+ * @param array $parameters - select list of menus to choose from
  * @param int $id - not used in this block
  * @param bool $return_parameters if true returns the configuration options for the block
- *@todo needs updating so it knows right vs left block for the flyout
+ * @todo needs updating so it knows right vs left block for the flyout
  *
  */
 class MenuBlock extends SPAbstractBlock
@@ -23,7 +26,7 @@ class MenuBlock extends SPAbstractBlock
 	/**
 	 * Constructor, used to define block parameters
 	 *
-	 * @param \ElkArte\Database\QueryInterface|null $db
+	 * @param QueryInterface|null $db
 	 */
 	public function __construct($db = null)
 	{
@@ -44,11 +47,13 @@ class MenuBlock extends SPAbstractBlock
 		require_once(ADDONSDIR . '/SimplePortal/subs/Portal.subs.php');
 		$menus = sportal_get_custom_menus();
 
-		$this->block_parameters['menu'][0] = $txt['sp_admin_menus_main_item_list'];
+		$menu_options = [$txt['sp_admin_menus_main_item_list']];
 		foreach ($menus as $menu)
 		{
-			$this->block_parameters['menu'][$menu['id']] = $menu['name'];
+			$menu_options[$menu['id']] = $menu['name'];
 		}
+
+		$this->block_parameters['menu'] = $menu_options;
 
 		return $this->block_parameters;
 	}
@@ -78,7 +83,7 @@ class MenuBlock extends SPAbstractBlock
 		else
 		{
 			require_once(ADDONSDIR . '/SimplePortal/PortalIntegrate.php');
-			$this->data['menu_buttons'] = \Addons\SimplePortal\PortalIntegrate::sp_load_menu_items($menu_id);
+			$this->data['menu_buttons'] = PortalIntegrate::sp_load_menu_items($menu_id);
 		}
 
 		$this->setTemplate('template_sp_menu');
@@ -130,15 +135,4 @@ function template_sp_menu($data)
 
 	echo '
 		</ul>';
-
-	// Superfish the menu
-	$javascript = "
-	$(document).ready(function() {
-		if (use_click_menu)
-			$('#sp_menu').superclick({speed: 150, animation: {opacity:'show', height:'toggle'}, speedOut: 0, activeClass: 'sfhover'});
-		else
-			$('#sp_menu').superfish({delay : 300, speed: 175, hoverClass: 'sfhover'});
-	});";
-
-	theme()->addInlineJavascript($javascript, true);
 }

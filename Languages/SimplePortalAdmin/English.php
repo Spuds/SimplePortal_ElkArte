@@ -226,6 +226,7 @@ $txt['sp_param_Articles_avatar'] = 'Author Avatar';
 $txt['sp_param_Articles_attachment'] = 'Display first attachment';
 $txt['sp_param_Articles_length'] = 'Maximum Characters';
 $txt['sp_param_Articles_view'] = 'Display';
+$txt['sp_param_Menu_menu'] = 'Menu to Display';
 $txt['sp_param_Shoutbox_shoutbox'] = 'Shoutbox to Display';
 $txt['sp_param_Gallery_limit'] = 'Items to Display';
 $txt['sp_param_Gallery_type'] = 'Display';

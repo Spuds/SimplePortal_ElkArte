@@ -386,6 +386,7 @@ class PortalIntegrate
 
 		$actions['portal'] = ['\Addons\SimplePortal\Controller\PortalMain', 'action_index'];
 		$actions['shoutbox'] = ['\Addons\SimplePortal\Controller\PortalShoutbox', 'action_index'];
+		$actions['portalrefresh'] = ['\Addons\SimplePortal\Controller\PortalRefresh', 'action_index'];
 	}
 
 	/**

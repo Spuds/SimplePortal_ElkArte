@@ -245,7 +245,7 @@ function sportal_init_headers()
 	theme()->addJavascriptVar(['sp_script_url' => '\'' . $safe_scripturl . '\'']);
 
 	// Load up some JavaScript!
-	loadJavascriptFile('SimplePortal/portal.js', ['stale' => SPORTAL_STALE, 'defer' => true]);
+	loadJavascriptFile('SimplePortal/portal.js', ['stale' => SPORTAL_STALE, 'defer' => false]);
 
 	// Load in any optional JavaScript
 	$javascript = '';

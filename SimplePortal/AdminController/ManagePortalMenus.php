@@ -499,7 +499,7 @@ class ManagePortalMenus extends AbstractController
 		global $context, $txt;
 
 		// No menu, no further
-		$menu_id = $this->getMenuContext();
+		$this->getMenuContext();
 		if (empty($context['menu']))
 		{
 			throw new Exception('error_sp_menu_not_found', false);
@@ -635,7 +635,7 @@ class ManagePortalMenus extends AbstractController
 			$_REQUEST['item_id'] = (int) $_REQUEST['item_id'];
 			$context['item'] = sportal_get_menu_items($_REQUEST['item_id']);
 
- 		// Reverse engineer the URL to get the link type and item
+ 		    // Reverse engineer the URL to get the link type and item
 			$context['item']['link_type'] = 'custom';
 			$context['item']['link_item'] = '';
 			$context['item']['id_profile'] = 0;

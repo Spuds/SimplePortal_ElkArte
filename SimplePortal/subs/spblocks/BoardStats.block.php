@@ -83,7 +83,7 @@ class BoardStatsBlock extends SPAbstractBlock
 		// Enabling auto refresh?
 		if (!empty($parameters['refresh_value']) && !User::$info->is_guest)
 		{
-			$this->refresh = ['sa' => 'boardstats', 'class' => '.sp_boardstats', 'id' => $id, 'refresh_value' => $parameters['refresh_value']];
+			$this->refresh = ['sa' => 'boardstats', 'class' => '.sp_board_stats', 'id' => $id, 'refresh_value' => $parameters['refresh_value']];
 			$this->auto_refresh();
 		}
 	}

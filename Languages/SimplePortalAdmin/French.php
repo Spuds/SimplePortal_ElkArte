@@ -474,10 +474,11 @@ $txt['sp_admin_menus_col_actions'] = 'Actions';
 
 $txt['sp_admin_menus_link_type_custom'] = 'Personnalisé';
 $txt['sp_admin_menus_link_type_action'] = 'Action';
-$txt['sp_admin_menus_link_type_boards'] = 'Section';
-$txt['sp_admin_menus_link_type_pages'] = 'Page';
-$txt['sp_admin_menus_link_type_categories'] = 'Categorie';
-$txt['sp_admin_menus_link_type_articles'] = 'Article';
+$txt['sp_admin_menus_link_type_board'] = 'Section';
+$txt['sp_admin_menus_link_type_page'] = 'Page';
+$txt['sp_admin_menus_link_type_category'] = 'Catégorie';
+$txt['sp_admin_menus_link_type_article'] = 'Article';
+$txt['sp_admin_menus_link_type_menu'] = 'Menu personnalisé';
 
 $txt['sp_admin_menus_link_target_0'] = 'Fenêtre actuelle';
 $txt['sp_admin_menus_link_target_1'] = 'Nouvelle fenetre';

@@ -413,7 +413,7 @@ $txt['sp_admin_menus_title'] = 'Menus';
 $txt['sp_admin_menus_remove'] = 'Remove Menus';
 $txt['sp_admin_items_remove'] = 'Remove Items';
 
-$txt['sp_admin_menus_main_item_list'] = 'Main Menu Items List';
+$txt['sp_admin_menus_main_item_list'] = 'Main Menu List';
 $txt['sp_admin_menus_main_item_add'] = 'Add Main Menu Item';
 $txt['sp_admin_menus_main_item_edit'] = 'Edit Main Menu Item';
 $txt['sp_admin_menus_custom_menu_list'] = 'Custom Menus List';
@@ -440,24 +440,32 @@ $txt['sp_error_no_custom_menus'] = 'There are no custom menus available.';
 $txt['sp_error_no_menu_items'] = 'There are no menu items available.';
 
 $txt['sp_admin_menus_col_name'] = 'Name';
-$txt['sp_admin_menus_col_namespace'] = 'Item ID';
+$txt['sp_admin_menus_col_namespace'] = 'Item Namespace';
 $txt['sp_admin_menus_col_title'] = 'Title';
 $txt['sp_admin_menus_col_items'] = 'Items';
 $txt['sp_admin_menus_col_link_type'] = 'Link Type';
 $txt['sp_admin_menus_col_link_item'] = 'Link Item';
 $txt['sp_admin_menus_col_url'] = 'URL';
 $txt['sp_admin_menus_col_target'] = 'Target';
+$txt['sp_admin_menus_col_status'] = 'Status';
+$txt['sp_admin_menus_col_enabled'] = 'Enabled';
+$txt['sp_admin_menus_col_permissions'] = 'Permissions';
+$txt['sp_admin_menus_col_placement'] = 'Placement';
 $txt['sp_admin_menus_col_actions'] = 'Actions';
 
 $txt['sp_admin_menus_link_type_custom'] = 'Custom';
 $txt['sp_admin_menus_link_type_action'] = 'Action';
-$txt['sp_admin_menus_link_type_boards'] = 'Board';
-$txt['sp_admin_menus_link_type_pages'] = 'Page';
-$txt['sp_admin_menus_link_type_categories'] = 'Category';
-$txt['sp_admin_menus_link_type_articles'] = 'Article';
+$txt['sp_admin_menus_link_type_board'] = 'Board';
+$txt['sp_admin_menus_link_type_page'] = 'Page';
+$txt['sp_admin_menus_link_type_category'] = 'Category';
+$txt['sp_admin_menus_link_type_article'] = 'Article';
+$txt['sp_admin_menus_link_type_menu'] = 'Custom Menu';
 
 $txt['sp_admin_menus_link_target_0'] = 'Current window';
 $txt['sp_admin_menus_link_target_1'] = 'New window';
+
+$txt['sp_admin_menus_placement_before'] = 'Before';
+$txt['sp_admin_menus_placement_after'] = 'After';
 
 $txt['sp_menus_default_custom_menu_name'] = 'Unnamed Menu';
 $txt['sp_menus_default_menu_item_name'] = 'Untitled Item';

@@ -105,7 +105,7 @@ function template_shoutbox_embed($shoutbox)
 		if (!empty($shoutbox['smileys']['popup']))
 		{
 			echo '
-					<a onclick="sp_showMoreSmileys(\'', $shoutbox['id'], '\', \'', $txt['more_smileys_title'], '\', \'', $txt['more_smileys_pick'], '\', \'', $txt['more_smileys_close_window'], '\', \'', $settings['theme_url'], '\', \'', $settings['smileys_url'], '\'); return false;" href="javascript:void(0);">[', $txt['more_smileys'], ']</a>';
+				<a onclick="sp_showMoreSmileys(\'', $shoutbox['id'], '\', \'', $txt['more_smileys_title'], '\', \'', $txt['more_smileys_pick'], '\', \'', $txt['more_smileys_close_window'], '\', \'', $settings['theme_url'], '\', \'', $context['smiley_path'], '\'); return false;" href="javascript:void(0);">[', $txt['more_smileys'], ']</a>';
 		}
 
 		// BBC box

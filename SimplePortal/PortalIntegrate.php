@@ -386,7 +386,6 @@ class PortalIntegrate
 
 		$actions['portal'] = ['\Addons\SimplePortal\Controller\PortalMain', 'action_index'];
 		$actions['shoutbox'] = ['\Addons\SimplePortal\Controller\PortalShoutbox', 'action_index'];
-		$actions['portalrefresh'] = ['\Addons\SimplePortal\Controller\PortalRefresh', 'action_index'];
 	}
 
 	/**
@@ -880,7 +879,7 @@ class PortalIntegrate
 			sportal_load_permissions();
 		}
 
-		$items = sportal_get_menu_items(null, 'id_item', 0);
+		$items = sportal_get_menu_items(null, 'id_item', 0, true);
 		if (!empty($items))
 		{
 			foreach ($items as $item)

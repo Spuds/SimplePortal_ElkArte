@@ -186,6 +186,15 @@ function sp_changeState($type = null, $id = null)
 			'id' => $id
 		];
 	}
+	elseif ($type === 'menu_item')
+	{
+		$query = [
+			'column' => 'state',
+			'table' => 'sp_menu_items',
+			'query_id' => 'id_item',
+			'id' => $id
+		];
+	}
 	else
 	{
 		return false;
@@ -734,7 +743,7 @@ function sp_delete_articles($article_ids = [])
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_articles
-		WHERE id_article = {array_int:id}',
+		WHERE id_article IN ({array_int:id})',
 		[
 			'id' => $article_ids,
 		]
@@ -1987,7 +1996,7 @@ function sp_remove_menu_items($remove_ids)
 
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_menu_items
-		WHERE id_menu = {array_int:id}',
+		WHERE id_item IN ({array_int:id})',
 		[
 			'id' => $remove_ids,
 		]
@@ -2155,6 +2164,7 @@ function sp_add_menu_item($item_info, $is_new)
 		'title' => 'string',
 		'href' => 'string',
 		'target' => 'int',
+		'state' => 'int',
 		'placement' => 'string',
 		'placement_after' => 'string',
 	];
@@ -2231,14 +2241,14 @@ function sp_menu_item_count($menu_id)
  */
 function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 {
-	global $txt;
+	global $txt, $scripturl, $context;
 
 	$db = database();
 
 	$items = [];
 	$db->query('', '
 		SELECT
-			id_item, title, namespace, target, id_profile
+			id_item, title, namespace, target, id_profile, state
 		FROM {db_prefix}sp_menu_items
 		WHERE id_menu = {int:menu}
 		ORDER BY {raw:sort}
@@ -2249,7 +2259,7 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 			'start' => $start,
 			'limit' => $items_per_page,
 		]
-	)->fetch_callback(function ($row) use (&$items, $menu_id, $txt) {
+	)->fetch_callback(function ($row) use (&$items, $menu_id, $txt, $scripturl, $context) {
 		$items[$row['id_item']] = [
 			'id' => $row['id_item'],
 			'menu' => $menu_id,
@@ -2257,6 +2267,10 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 			'namespace' => $row['namespace'],
 			'target' => $txt['sp_admin_menus_link_target_' . $row['target']],
 			'id_profile' => $row['id_profile'],
+			'state' => (int) $row['state'],
+			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=statuscustomitem;item_id=' . $row['id_item'] . ';menu_id=' . $menu_id . ';' . $context['session_var'] . '=' . $context['session_id'] . '" 
+			onclick="sp_change_status(' . $row['id_item'] . ', \'menu_item\');return false;">' . 
+			sp_embed_image(empty($row['state']) ? 'deactive' : 'active', $txt['sp_admin_menus_col_status'], null, null, true, 'status_image_' . $row['id_item']) . '</a>',
 		];
 	});
 

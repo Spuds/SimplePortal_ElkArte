@@ -803,7 +803,7 @@ class ManagePortalArticles extends AbstractController
 
 		if ($article['type'] === 'bbc')
 		{
-			PreparseCode::instance()->preparsecode($article['body']);
+			PreparseCode::instance('')->preparsecode($article['body']);
 		}
 
 		return $article;
@@ -888,7 +888,7 @@ class ManagePortalArticles extends AbstractController
 	 */
 	private function article_attachment()
 	{
-		global $context, $txt;
+		global $context, $txt, $modSettings;
 
 		// Calculate the total size and number of existing attachments.
 		$this->getCurrentSize();

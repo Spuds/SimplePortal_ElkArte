@@ -24,6 +24,7 @@ use ElkArte\Helper\Util;
 use ElkArte\Http\Headers;
 use ElkArte\Languages\Txt;
 use ElkArte\User;
+use ElkArte\EventManager;
 
 /**
  * Article controller.
@@ -305,7 +306,7 @@ class PortalArticles extends AbstractController
 			$modSettings['automanage_attachments'] = 0;
 			$modSettings['attachmentUploadDir'] = [1 => $modSettings['sp_articles_attachment_dir']];
 
-			return (new Attachment())->action_tmpattach();
+			return (new Attachment(new EventManager()))->action_tmpattach();
 		}
 
 		$id_article = (int) $_GET['article'];

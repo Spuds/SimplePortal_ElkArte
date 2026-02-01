@@ -18,6 +18,7 @@ use ElkArte\Errors\ErrorContext;
 use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\DataValidator;
 use ElkArte\Helper\Util;
+use ElkArte\User;
 
 /**
  * SimplePortal Page Administration controller class.
@@ -292,7 +293,7 @@ class ManagePortalPages extends AbstractController
 			// Fix up bbc errors before we go to the preview
 			if ($context['SPortal']['page']['type'] === 'bbc')
 			{
-				PreparseCode::instance('')->preparsecode($context['SPortal']['page']['body']);
+				PreparseCode::instance(User::$info->name)->preparsecode($context['SPortal']['page']['body']);
 			}
 
 			theme()->getTemplates()->load('PortalPages');

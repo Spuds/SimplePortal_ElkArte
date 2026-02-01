@@ -726,7 +726,7 @@ class ManagePortalBlocks extends AbstractController
 
 			// Prepare the message a bit for some additional testing.
 			$value = Util::htmlspecialchars($value, ENT_QUOTES);
-			PreparseCode::instance()->preparsecode($value);
+			PreparseCode::instance('')->preparsecode($value);
 
 			// Store now the correct and fixed value ;)
 			$_POST['parameters'][$name] = $value;
@@ -1013,6 +1013,8 @@ class ManagePortalBlocks extends AbstractController
 			// Clear out any template layers, add the xml response
 			$template_layers = theme()->getLayers();
 			$template_layers->removeAll();
+
+			theme()->getTemplates()->load('PortalAdmin');
 			$context['sub_template'] = 'change_status';
 
 			obExit();

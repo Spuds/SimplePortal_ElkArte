@@ -15,6 +15,7 @@ use ElkArte\Languages\Txt;
 use ElkArte\Request;
 use ElkArte\User;
 use ElkArte\Cache\Cache;
+use Michelf\MarkdownExtra;
 
 /**
  * Return if the portal is active or active in a given area.
@@ -1645,13 +1646,15 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			echo $parser->parseMessage($body, true);
 			break;
 		case 'markdown':
-			require_once(EXTDIR . '/markdown/markdown.php');
+			$parser = new MarkdownExtra();
+			$parser->hashtag_protection = true;
+
 			if ($output_method !== 'echo')
 			{
-				return un_htmlspecialchars(Markdown($body));
+				return un_htmlspecialchars($parser->transform($body));
 			}
 
-			echo un_htmlspecialchars(Markdown($body));
+			echo un_htmlspecialchars($parser->transform($body));
 			break;
 		case 'html':
 			if ($output_method !== 'echo')
@@ -1747,7 +1750,7 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
  *
  * @return array|mixed
  */
-function sportal_get_menu_items($item_id = null, $sort = 'id_item', $menu_id = null)
+function sportal_get_menu_items($item_id = null, $sort = 'id_item', $menu_id = null, $active = false)
 {
 	$db = database();
 
@@ -1764,6 +1767,12 @@ function sportal_get_menu_items($item_id = null, $sort = 'id_item', $menu_id = n
 	{
 		$query[] = 'id_menu = {int:menu_id}';
 		$parameters['menu_id'] = (int) $menu_id;
+
+		if ($active)
+		{
+			$query[] = 'state = {int:state}';
+			$parameters['state'] = 1;
+		}
 	}
 
 	$return = [];

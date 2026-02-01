@@ -45,6 +45,7 @@ class ManagePortalMenus extends AbstractController
 			'addmainitem' => [$this, 'action_main_item_edit'],
 			'editmainitem' => [$this, 'action_main_item_edit'],
 			'deletemainitem' => [$this, 'action_main_item_delete'],
+			'statuscustomitem' => [$this, 'action_custom_item_status'],
 
 			'listcustommenu' => [$this, 'action_custom_menu_list'],
 			'addcustommenu' => [$this, 'action_custom_menu_edit'],
@@ -336,7 +337,7 @@ class ManagePortalMenus extends AbstractController
 		// Build the list option array to display the custom items in this custom menu
 		$listOptions = [
 			'id' => 'portal_items',
-			'title' => $txt['sp_admin_menus_custom_item_list'],
+			'title' => $menu_id === 0 ? $txt['sp_admin_menus_main_item_list'] : $txt['sp_admin_menus_custom_item_list'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['sp_error_no_custom_menus'],
 			'base_href' => $scripturl . '?action=admin;area=portalmenus;sa=' . ($menu_id === 0 ? 'listmainitem' : 'listcustomitem') . ';',
@@ -388,6 +389,20 @@ class ManagePortalMenus extends AbstractController
 					'sort' => [
 						'default' => 'target',
 						'reverse' => 'target DESC',
+					],
+				],
+				'status' => [
+					'header' => [
+						'value' => $txt['sp_admin_menus_col_status'],
+						'class' => 'centertext',
+					],
+					'data' => [
+						'db' => 'status_image',
+						'class' => 'centertext',
+					],
+					'sort' => [
+						'default' => 'state DESC',
+						'reverse' => 'state',
 					],
 				],
 				'action' => [
@@ -509,6 +524,7 @@ class ManagePortalMenus extends AbstractController
 				'id_profile' => 'intval',
 				'url' => 'Util::htmlspecialchars',
 				'target' => 'intval',
+				'state' => 'intval'
 			]);
 			$validator->validation_rules([
 				'title' => 'required',
@@ -524,7 +540,7 @@ class ManagePortalMenus extends AbstractController
 			if (!$validator->validate($_POST))
 			{
 				// @todo, should set ErrorContext::context and display in template instead
-				foreach ($validator->validation_errors() as $id => $error)
+				foreach ($validator->validation_errors() as $error)
 				{
 					throw new Exception($error, false);
 				}
@@ -551,6 +567,7 @@ class ManagePortalMenus extends AbstractController
 				'title' => $validator->title,
 				'href' => $validator->url,
 				'target' => $validator->target,
+				'state' => isset($validator->state) ? 1 : 0,
 				'placement' => !empty($_POST['placement']) ? Util::htmlspecialchars($_POST['placement']) : '',
 				'placement_after' => !empty($_POST['placement_after']) ? Util::htmlspecialchars($_POST['placement_after']) : '',
 			];
@@ -680,6 +697,34 @@ class ManagePortalMenus extends AbstractController
 		$sa = $menu_id === 0 ? 'listmainitem' : 'listcustomitem';
 
 		redirectexit('action=admin;area=portalmenus;sa=' . $sa . ';menu_id=' . $menu_id);
+	}
+
+	/**
+	 * Toggle the active state of a menu item
+	 */
+	public function action_custom_item_status()
+	{
+		global $context;
+
+		checkSession($this->getApi() === 'xml' ? '' : 'get');
+
+		$item_id = $this->_req->getRequest('item_id', 'intval', 0);
+		$state = sp_changeState('menu_item', $item_id);
+
+		if ($this->getApi() === 'xml')
+		{
+			$context['item_id'] = $item_id;
+			$context['status'] = !empty($state) ? 'active' : 'deactive';
+
+			theme()->getTemplates()->load('PortalAdmin');
+			$template_layers = theme()->getLayers();
+			$template_layers->removeAll();
+			$context['sub_template'] = 'change_status';
+
+			obExit();
+		}
+
+		redirectexit('action=admin;area=portalmenus;sa=listmainitem;menu_id=0');
 	}
 
 	/**

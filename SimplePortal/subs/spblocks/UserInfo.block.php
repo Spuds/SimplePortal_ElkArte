@@ -47,9 +47,9 @@ class UserInfoBlock extends SPAbstractBlock
 		$this->data['username'] = !empty(User::$info->username) ? User::$info->username : '';
 		$this->data['urls'] = [
 			'pm' => $scripturl . '?action=pm',
-			'login' => $scripturl . '?action=login2;quicklogin',
+			'login' => $scripturl . '?action=auth;sa=login2;quicklogin',
 			'profile' => $scripturl . '?action=profile',
-			'logout' => $scripturl . '?action=logout;' . $context['session_var'] . '=' . $context['session_id'],
+			'logout' => $scripturl . '?action=auth;sa=logout;' . $context['session_var'] . '=' . $context['session_id'],
 			'unread' => $scripturl . '?action=unread',
 			'unreadreplies' => $scripturl . '?action=unreadreplies',
 		];

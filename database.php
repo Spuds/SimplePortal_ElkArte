@@ -182,6 +182,7 @@ function updateTableStructures()
 	$db_table->add_column('{db_prefix}sp_menu_items', array('name' => 'placement', 'type' => 'varchar', 'size' => 10, 'default' => ''));
 	$db_table->add_column('{db_prefix}sp_menu_items', array('name' => 'placement_after', 'type' => 'varchar', 'size' => 255, 'default' => ''));
 	$db_table->add_column('{db_prefix}sp_menu_items', array('name' => 'id_profile', 'type' => 'int', 'size' => 10, 'default' => 1));
+	$db_table->add_column('{db_prefix}sp_menu_items', array('name' => 'state', 'type' => 'tinyint', 'size' => 4, 'default' => 0));
 }
 
 /**
@@ -784,6 +785,7 @@ function defineTables()
 				array('name' => 'placement', 'type' => 'varchar', 'size' => 10, 'default' => ''),
 				array('name' => 'placement_after', 'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'id_profile', 'type' => 'int', 'size' => 10, 'default' => 1),
+				array('name' => 'state', 'type' => 'tinyint', 'size' => 4, 'default' => 0),
 			),
 			'indexes' => array(
 				array('type' => 'primary', 'columns' => array('id_item')),

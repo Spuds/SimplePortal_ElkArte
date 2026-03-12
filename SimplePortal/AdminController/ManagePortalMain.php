@@ -148,7 +148,6 @@ class ManagePortalMain extends AbstractController
 			['check', 'sp_resize_images'],
 			['check', 'sp_disableMobile'],
 			['check', 'sp_disableUserArrange'],
-
 		];
 
 		$this->_generalSettingsForm->setConfigVars($config_vars);

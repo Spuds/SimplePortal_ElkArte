@@ -51,6 +51,7 @@ class PortalIntegrate
 			['integrate_pre_bbc_parser', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_pre_parsebbc'],
 			['integrate_setup_allow', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_setup_allow'],
 			['integrate_additional_bbc', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_additional_bbc'],
+			['integrate_pre_load_theme', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_pre_load_theme'],
 		];
 	}
 
@@ -1073,6 +1074,28 @@ class PortalIntegrate
 		if (str_contains($message, '[cutoff]'))
 		{
 			$message = str_replace('[cutoff]', '', $message);
+		}
+	}
+
+	/**
+	 * Subs hook, integrate_pre_load_theme
+	 *
+	 * - Allow addons to change the theme before it's loaded, used to set a portal specific theme if needed
+	 *
+	 * @param int $id_theme
+	 */
+	public static function sp_integrate_pre_load_theme(&$id_theme)
+	{
+		global $modSettings, $sp_standalone;
+
+		// Maybe we have a portal specific theme?
+		if (!isset($_GET['action'])
+			&& !isset($_GET['board'])
+			&& !isset($_GET['topic'])
+			&& ((int) $modSettings['sp_portal_mode'] === 1 || !empty($sp_standalone))
+			&& !empty($modSettings['portaltheme']))
+		{
+			$id_theme = (int) $modSettings['portaltheme'];
 		}
 	}
 }

@@ -446,6 +446,7 @@ class ManagePortalBlocks extends AbstractController
 					$context['SPortal']['block']['board_options'][$name] = [];
 					$config_variable = !empty($context['SPortal']['block']['parameters'][$name]) ? $context['SPortal']['block']['parameters'][$name] : [];
 					$config_variable = !is_array($config_variable) ? explode('|', $config_variable) : $config_variable;
+					$config_variable = array_map('intval', $config_variable);
 					$context['SPortal']['block']['board_options'][$name] = [];
 
 					// Create the list for this Item

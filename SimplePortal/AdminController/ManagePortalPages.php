@@ -396,6 +396,7 @@ class ManagePortalPages extends AbstractController
 			'preview_type' => 1,
 			'smiley_container' => 'smileyBox_message',
 			'bbc_container' => 'bbcBox_message',
+			'disable_smiley_box' => $GLOBALS['context']['smiley_set'] === 'none' || !empty($GLOBALS['options']['show_no_smileys']),
 		];
 		$editorOptions['plugin_addons'] = [];
 		$editorOptions['plugin_addons'][] = 'portal';

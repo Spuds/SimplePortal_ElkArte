@@ -334,6 +334,7 @@ table.sp_articles {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
+	flex-wrap: wrap;
 }
 
 /* Prevent Klingons */
@@ -388,6 +389,7 @@ table.sp_articles {
 	margin: 0;
 	vertical-align: top;
 	clear: both;
+	flex: 0 0 100%
 }
 
 #sp_user, #sp_passwrd {

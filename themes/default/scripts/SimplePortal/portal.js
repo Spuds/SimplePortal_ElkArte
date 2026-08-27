@@ -285,14 +285,12 @@ function sp_showMoreSmileys (postbox, sTitleText, sPickText, sCloseText, elk_the
 		}
 	}
 
-	this.oSmileyPopupWindow = window.open('', 'add_smileys', 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=480,height=220,resizable=yes');
+	const spSmileyHtml = sp_moreSmileysTemplate.easyReplace({smileyRows: sp_smileyRowsContent});
+	const spSmileyBlob = new Blob([spSmileyHtml], {type: 'text/html'});
+	const spSmileyUrl = URL.createObjectURL(spSmileyBlob);
 
-	this.oSmileyPopupWindow.document.open('text/html', 'replace');
-	this.oSmileyPopupWindow.document.write(sp_moreSmileysTemplate.easyReplace({
-		smileyRows: sp_smileyRowsContent
-	}));
-
-	this.oSmileyPopupWindow.document.close();
+	this.oSmileyPopupWindow = window.open(spSmileyUrl, 'add_smileys', 'toolbar=no,location=no,status=no,menubar=no,scrollbars=yes,width=480,height=220,resizable=yes');
+	URL.revokeObjectURL(spSmileyUrl);
 }
 
 /**

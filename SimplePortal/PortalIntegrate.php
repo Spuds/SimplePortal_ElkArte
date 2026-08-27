@@ -42,7 +42,6 @@ class PortalIntegrate
 			['integrate_action_boardindex_after', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_boardindex'],
 			['integrate_actions', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_actions'],
 			['integrate_whos_online', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_whos_online'],
-			['integrate_action_frontpage', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_frontpage'],
 			['integrate_quickhelp', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_quickhelp'],
 			['integrate_buffer', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_buffer'],
 			['integrate_menu_buttons', '\Addons\SimplePortal\PortalIntegrate::sp_integrate_menu_buttons'],

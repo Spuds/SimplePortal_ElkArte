@@ -139,9 +139,10 @@ class BoardNewsBlock extends SPAbstractBlock
 			SELECT
 				m.icon, m.subject, m.body, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time,
 				t.num_replies, t.id_topic, m.id_member, m.smileys_enabled, m.id_msg, t.locked, mem.avatar, mem.email_address,
-				a.id_attach, a.attachment_type, a.filename, t.num_views
+				a.id_attach, a.attachment_type, a.filename, t.num_views, b.id_board, b.name AS board_name
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
+				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 			WHERE t.id_first_msg IN ({array_int:post_list})
@@ -211,6 +212,12 @@ class BoardNewsBlock extends SPAbstractBlock
 				'body' => $row['body'],
 				'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
 				'link' => '<a class="linkbutton" href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0">' . $txt['sp_read_more'] . '</a>',
+				'board' => [
+					'id' => $row['id_board'],
+					'name' => $row['board_name'],
+					'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+					'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['board_name'] . '</a>',
+				],
 				'replies' => $row['num_replies'],
 				'comment_href' => !empty($row['locked']) ? '' : $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'],
 				'comment_link' => !empty($row['locked']) ? '' : '<a class="linkbutton" href="' . $scripturl . '?action=post;topic=' . $row['id_topic'] . '.' . $row['num_replies'] . ';num_replies=' . $row['num_replies'] . '">' . $txt['reply'] . '</a>',
@@ -429,6 +436,7 @@ function template_sp_boardNews($data)
 				? '<span class="icon i-' . $news['icon_name'] . '"></span>'
 				: '<span class="floatleft sp_article_icon">' . $news['icon'] . '</span>') . '
 				<a href="', $news['href'], '" >', $news['subject'], '</a>
+				<span class="floatright">', $txt['in'], ': ', $news['board']['name'], '</span>
 			</h3>
 			<div id="msg_', $news['message_id'], '" class="sp_article_content">
 				<div class="sp_content_padding">';

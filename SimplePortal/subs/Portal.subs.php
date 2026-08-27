@@ -12,6 +12,7 @@
 use BBC\ParserWrapper;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
+use ElkArte\MetadataIntegrate;
 use ElkArte\Request;
 use ElkArte\User;
 use ElkArte\Cache\Cache;
@@ -139,8 +140,7 @@ function sportal_init($standalone = false)
 			require_once(BOARDDIR . '/SSI.php');
 		}
 
-		// Portal-specific templates and language
-		theme()->getTemplates()->load('Portal');
+		// Portal-specific language
 		Txt::load('SimplePortal');
 
 		if (!empty($modSettings['sp_maintenance']) && !allowedTo('sp_admin'))
@@ -177,6 +177,12 @@ function sportal_init($standalone = false)
 				'url' => $scripturl . '?action=forum',
 				'name' => $context['forum_name'],
 			];
+
+			// If we are on the portal, then we need to set up some basic metadata for the page
+			if (empty($_GET['page']) && empty($_GET['article']) && empty($_GET['category']))
+			{
+				MetadataIntegrate::prepare_basic_metadata();
+			}
 		}
 
 		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] === 1)
@@ -210,6 +216,7 @@ function sportal_init($standalone = false)
 
 	// Add the portal template
 	theme()->getTemplates()->load('Portal');
+	theme()->getLayers()->add('portal');
 
 	$is_loading = false;
 }
@@ -256,7 +263,7 @@ function sportal_init_headers()
 		&& empty($_REQUEST['action']) && empty($_REQUEST['board']) && empty($_REQUEST['article'])
 		&& !(User::$info->is_guest || (int) User::$info->id === 0))
 	{
-		loadJavascriptFile('admin.js');
+		loadJavascriptFile('admin.js', ['defer' => false], 'admin_script');
 		$modSettings['jquery_include_ui'] = true;
 		$javascript .= '
 			// Set up our sortable call
@@ -369,7 +376,7 @@ function sportal_load_blocks()
 		],
 	];
 
-	// Get the blocks in the system
+	// Get the blocks to show in this area
 	$blocks = getBlockInfo(null, null, true, true, true);
 	$context['SPortal']['blocks'] = [];
 
@@ -629,7 +636,7 @@ function getBlockInfo($column_id = null, $block_id = null, $state = null, $show 
  *
  * @param string[]|string|null $query
  *
- * @return boolean|array
+ * @return bool|array
  */
 function sportal_process_visibility($query)
 {
@@ -745,6 +752,7 @@ function sportal_process_visibility($query)
 		}
 	}
 
+	$query = trim($query, ',');
 	if (!empty($query))
 	{
 		$query = explode(',', $query);
@@ -914,13 +922,14 @@ function sportal_check_visibility($visibility_id)
 	static $visibilities;
 
 	// Load the visibility profiles, so we can put them to use on the blocks
-	if (!isset($visibilities))
+	$visibility_id = (int) $visibility_id;
+	if ($visibilities === null)
 	{
 		$visibilities = sportal_get_profiles(null, 3);
 	}
 
 	// See if we can show this block, here, now, for this ...
-	if ($visibility_id === '0' && !isset($visibilities[$visibility_id]))
+	if ($visibility_id === 0 && !isset($visibilities[$visibility_id]))
 	{
 		// No id, assume it's off
 		return false;

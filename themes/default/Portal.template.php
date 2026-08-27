@@ -213,7 +213,7 @@ function template_portal_above()
 		</div>';
 	}
 
-	// No left or right? Then force the center section to go full witch
+	// No left or right? Then force the center section to go full width
 	$flex = '';
 	if ((empty($modSettings['showleft']) || empty($context['SPortal']['blocks'][1]))
 		&& (empty($modSettings['showright']) || empty($context['SPortal']['blocks'][4])))

@@ -176,7 +176,7 @@ class PortalMain extends AbstractController implements FrontpageInterface
 		// Used to show/hide the portal front page options
 		theme()->addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
-				var $base = $(\'#sp_portal_mode\').parent();
+				let $base = $(\'#sp_portal_mode\').parent();
 				
 				if ($(this).val() === \'PortalMain\')
 				{
@@ -241,9 +241,6 @@ class PortalMain extends AbstractController implements FrontpageInterface
 				sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
 			}
 		}
-
-		theme()->getTemplates()->load('Portal');
-		theme()->getLayers()->add('portal');
 
 		// If we are to show the articles above or below the index page, add the appropriate layer.
 		// This is not the article BLOCK, but the articles themselves.

@@ -193,12 +193,12 @@ $txt['sp_param_WhosOnline_refresh_value'] = 'Actualiser la valeur en secondes, 0
 $txt['sp_param_BoardStats_averages'] = 'Afficher les moyennes ';
 $txt['sp_param_TopPoster_limit'] = 'Indiquer combien de membres afficher ';
 $txt['sp_param_TopPoster_type'] = 'Afficher sur la période ';
-$txt['sp_param_TopStats_Member_type'] = 'Type de la liste Membre qui postent le plus ';
-$txt['sp_param_TopStats_Member_limit'] = 'Membres à afficher ';
-$txt['sp_param_TopStats_Member_enable_label'] = 'Activer le libellé pour la liste ';
-$txt['sp_param_TopStats_Member_list_label'] = 'Liste des libellés ';
-$txt['sp_param_TopStats_Member_sort_asc'] = 'Trier en ordre inverse ';
-$txt['sp_param_TopStats_Member_last_active_limit'] = 'Enlève les membres inactifs de la liste<br /><span class="smalltext">(Temps en jours)</span> ';
+$txt['sp_param_TopStatsMember_type'] = 'Type de la liste Membre qui postent le plus ';
+$txt['sp_param_TopStatsMember_limit'] = 'Membres à afficher ';
+$txt['sp_param_TopStatsMember_enable_label'] = 'Activer le libellé pour la liste ';
+$txt['sp_param_TopStatsMember_list_label'] = 'Liste des libellés ';
+$txt['sp_param_TopStatsMember_sort_asc'] = 'Trier en ordre inverse ';
+$txt['sp_param_TopStatsMember_last_active_limit'] = 'Enlève les membres inactifs de la liste<br /><span class="smalltext">(Temps en jours)</span> ';
 $txt['sp_param_Recent_limit'] = 'Messages ou sujets récents à afficher ';
 $txt['sp_param_Recent_type'] = 'Afficher ';
 $txt['sp_param_Recent_display'] = 'Type d\'affichage ';

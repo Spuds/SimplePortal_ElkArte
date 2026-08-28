@@ -9,6 +9,7 @@
  * @version 2.0.0
  */
 
+use Addons\Online_Today_Integrate;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Languages\Txt;
 

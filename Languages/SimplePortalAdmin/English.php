@@ -176,12 +176,12 @@ $txt['sp_param_WhosOnline_refresh_value'] = 'Refresh value in seconds, 0 or blan
 $txt['sp_param_BoardStats_averages'] = 'Show Averages';
 $txt['sp_param_TopPoster_limit'] = 'Top Posters to Display';
 $txt['sp_param_TopPoster_type'] = 'Display';
-$txt['sp_param_TopStats_Member_type'] = 'Type of the Top Member List';
-$txt['sp_param_TopStats_Member_limit'] = 'Members to display';
-$txt['sp_param_TopStats_Member_enable_label'] = 'Enable label for list';
-$txt['sp_param_TopStats_Member_list_label'] = 'List label';
-$txt['sp_param_TopStats_Member_sort_asc'] = 'Sort in reverse order';
-$txt['sp_param_TopStats_Member_last_active_limit'] = 'Remove inactive Members from the List<span class="smalltext">(Time in days)</span>';
+$txt['sp_param_TopStatsMember_type'] = 'Type of the Top Member List';
+$txt['sp_param_TopStatsMember_limit'] = 'Members to display';
+$txt['sp_param_TopStatsMember_enable_label'] = 'Enable label for list';
+$txt['sp_param_TopStatsMember_list_label'] = 'List label';
+$txt['sp_param_TopStatsMember_sort_asc'] = 'Sort in reverse order';
+$txt['sp_param_TopStatsMember_last_active_limit'] = 'Remove inactive Members from the List<span class="smalltext">(Time in days)</span>';
 $txt['sp_param_Recent_limit'] = 'Recent Posts or Topics to Display';
 $txt['sp_param_Recent_type'] = 'Display';
 $txt['sp_param_Recent_display'] = 'Display type';

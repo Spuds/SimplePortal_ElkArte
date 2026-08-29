@@ -522,7 +522,7 @@ function sportal_modify_article_comment($comment_id, $body)
  *
  * @param int $comment_id comment it
  *
- * @return boolean
+ * @return bool
  */
 function sportal_delete_article_comment($comment_id)
 {

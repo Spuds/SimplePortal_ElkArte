@@ -839,7 +839,17 @@ function sportal_process_visibility($query)
 		{
 			if (isset($_GET[$key]))
 			{
-				if (is_array($value) && !in_array($_GET[$key], $value))
+				if (is_array($value) && !in_array($_GET[$key], $value, true))
+				{
+					continue;
+				}
+
+				return false;
+			}
+
+			if ($action === $key)
+			{
+				if (is_array($value) && !in_array($sub_action, $value, true))
 				{
 					continue;
 				}
@@ -897,7 +907,17 @@ function sportal_process_visibility($query)
 	{
 		if (isset($_GET[$key]))
 		{
-			if (is_array($value) && !in_array($_GET[$key], $value))
+			if (is_array($value) && !in_array($_GET[$key], $value, true))
+			{
+				continue;
+			}
+
+			return true;
+		}
+
+		if ($action === $key)
+		{
+			if (is_array($value) && !in_array($sub_action, $value, true))
 			{
 				continue;
 			}
@@ -956,7 +976,7 @@ function sportal_check_visibility($visibility_id)
  *
  * @param string $type type of data to load, events, birthdays, etc.
  * @param string $low_date don't load data before this date
- * @param string|boolean $high_date don't load data after this date, false for no limit
+ * @param string|bool $high_date don't load data after this date, false for no limit
  *
  * @return array
  */
@@ -1093,7 +1113,7 @@ function sp_loadColors($users = [])
  * @param string $alt
  * @param int|null $width
  * @param int|null $height
- * @param string|boolean $title
+ * @param string|bool $title
  * @param int|null $id
  *
  * @return string
@@ -1733,7 +1753,7 @@ function sportal_get_custom_menus($menu_id = null, $sort = 'id_menu')
 	}
 
 	$return = [];
-	$request = $db->query('', '
+	$db->query('', '
 		SELECT
 			id_menu, name
 		FROM {db_prefix}sp_custom_menus' . (!empty($query) ? '
@@ -1921,7 +1941,7 @@ function sportal_select_style($style_id)
  * @param string $type
  * @param bool $fatal
  *
- * @return boolean
+ * @return bool
  */
 function sp_prevent_flood($type, $fatal = true)
 {

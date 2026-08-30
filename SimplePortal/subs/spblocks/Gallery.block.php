@@ -95,13 +95,13 @@ class GalleryBlock extends SPAbstractBlock
 		$mod = '';
 
 		// This does exist and is available!
-		if (file_exists(SOURCEDIR . '/levgal_src/LevGal-Bootstrap.php'))
+		if (file_exists(ADDONSDIR . '/Levertine/Source/LevGalBootstrap.php'))
 		{
 			$mod = 'levgal';
 		}
 
-		// This does exist for ElkArte, but can't be shared I'm afraid
-		if (file_exists(SOURCEDIR . '/Aeva-Media.php'))
+		// This does not exist for ElkArte 2.0
+		if (file_exists(ADDONSDIR . '/AevaMedia/Source/AevaMedia.php'))
 		{
 			$mod = 'aeva_media';
 		}

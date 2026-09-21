@@ -8,7 +8,7 @@
  */
 
 hr {
-	margin: 6px 0;
+	margin: 0.6rem 0;
 }
 
 .sp_table {
@@ -30,16 +30,16 @@ hr {
 }
 
 .sp_regular_padding {
-	padding: 5px;
+	padding: 0.5rem;
 }
 
 .sp_content {
-	padding: 0 0.4em;
+	padding: 0 0.4rem;
 }
 
 #sp_credits {
-	padding: 0 8px 16px;
-	border-radius: 7px;
+	padding: 0 0.8rem 1.6rem;
+	border-radius: 0.7rem;
 	box-shadow: none;
 }
 
@@ -49,7 +49,7 @@ hr {
 
 .sp_page_index {
 	float: right;
-	padding-right: 1em;
+	padding-right: 1rem;
 }
 
 .sp_previous_start {
@@ -62,7 +62,7 @@ hr {
 
 .sp_side_clear {
 	clear: both;
-	line-height: 0.7em;
+	line-height: 0.7;
 }
 
 .sp_drag_header {
@@ -74,58 +74,58 @@ hr {
 	padding: 0 0 0 2px;
 	list-style-type: none;
 	text-align: left;
-	line-height: 1.5em;
+	line-height: 1.5;
 }
 
 .sp_list_indent {
-	padding: 0 0 0 10px;
+	padding: 0 0 0 1rem;
 }
 
 .sp_list_top {
-	padding-top: 5px;
+	padding-top: 0.5rem;
 }
 
 .sp_list_bottom {
-	padding-bottom: 5px;
-	border-bottom: 1px dashed #AAAAAA;
+	padding-bottom: 0.5rem;
+	border-bottom: 1px dashed var(--secondary_border);
 }
 
 .sp_list_divider {
-	padding: 8px 0;
-	border-bottom: 1px solid #DDDDDD;
+	padding: 0.8rem 0;
+	border-bottom: 1px solid var(--primary_border_top);
 }
 
 .sp_online_flow {
 	overflow: auto;
-	max-height: 150px;
+	max-height: 15rem;
 	height: auto !important;
 }
 
 .sp_rss_flow {
 	overflow: auto;
-	max-height: 300px;
-	height: 300px !important;
+	max-height: 30rem;
+	height: 30rem !important;
 }
 
 .sp_who_avatar {
-	margin-left: 35px;
+	margin-left: 3.5rem;
 }
 
 .sp_who_avatar a img {
 	vertical-align: middle;
-	max-width: 23px;
-	width: 23px;
-	padding-left: 10px;
-	margin: 1px 0 1px -35px;
+	max-width: 2.3rem;
+	width: 2.3rem;
+	padding-left: 1rem;
+	margin: 1px 0 1px -3.5rem;
 }
 
 .sp_staff_info {
-	padding: 7px 0;
+	padding: 0.7rem 0;
 	vertical-align: bottom;
 }
 
 .sp_staff_divider {
-	border-bottom: 1px dashed #AAAAAA;
+	border-bottom: 1px dashed var(--secondary_border);
 }
 
 .sp_recent_icon {
@@ -142,20 +142,20 @@ hr {
 }
 
 .sp_image {
-	padding: 5px;
-	min-width: 175px;
-	max-width: 200px;
-	min-height: 200px;
-	border: 1px solid #CCCCCC;
+	padding: 0.5rem;
+	min-width: 17.5rem;
+	max-width: 20rem;
+	min-height: 20rem;
+	border: 1px solid var(--primary_border);
 	text-align: center;
 	word-wrap: break-word;
-	line-height: 1.4em;
+	line-height: 1.4;
 	overflow: hidden;
 }
 
 .sp_image_topic {
 	overflow: hidden;
-	max-width: 200px;
+	max-width: 20rem;
 	text-overflow: ellipsis;
 	font-style: italic;
 }
@@ -167,8 +167,8 @@ hr {
 .sp_image a img {
 	display: block;
 	margin: auto;
-	max-width: 145px;
-	max-height: 145px;
+	max-width: 14.5rem;
+	max-height: 14.5rem;
 }
 
 .sp_search {
@@ -184,29 +184,29 @@ hr {
 
 .sp_acalendar_day {
 	padding: 2px;
-	height: 20px;
+	height: 2rem;
 	vertical-align: top;
 	text-align: center;
 }
 
 table.sp_blog,
 table.sp_articles {
-	line-height: 1.7em;
+	line-height: 1.7;
 }
 
 .sp_blog_title,
 .sp_articles_title,
 .sp_articles_row {
-	border-bottom: 1px dashed #AAAAAA;
+	border-bottom: 1px dashed var(--secondary_border);
 }
 
 #sp_menu {
-	width: 150px;
+	width: 15rem;
 }
 
 #sp_menu a {
 	margin: 0;
-	line-height: 1.7em;
+	line-height: 1.7;
 }
 
 #sp_menu li {
@@ -215,12 +215,12 @@ table.sp_articles {
 
 #sp_menu li ul {
 	position: absolute;
-	top: 1.5em;
-	left: 25px;
+	top: 1.5rem;
+	left: 2.5rem;
 	z-index: 90;
-	width: 13em;
-	border: 1px solid #AAAAAA;
-	background: #FFFFFF;
+	width: 13rem;
+	border: 1px solid var(--secondary_border);
+	background: var(--primary_content_background);
 }
 
 #sp_menu ul {
@@ -232,29 +232,29 @@ table.sp_articles {
 }
 
 #sp_menu a .pm_indicator {
-	font-size: 0.643em;
-	top: -0.6em;
-	right: 2em;
+	font-size: var(--font9);
+	top: -0.6rem;
+	right: 2rem;
 }
 
 #sp_menu a .avatar {
-	width: 25px;
-	height: 25px;
+	width: 2.5rem;
+	height: 2.5rem;
 	vertical-align: middle;
 }
 
 .sp_inner {
-	border-top: 1px solid transparent;
-	min-height: 3em;
-	margin-top: 4px;
+	border-top: 1px solid var(--transparent);
+	min-height: 3rem;
+	margin: 0.4rem;
 }
 
 .sp_article_icon {
-	margin: -2px .5em 0 0;
+	margin: -2px 0.5rem 0 0;
 }
 
 .sp_article_content {
-	margin: 0.25em 0 .5em 0;
+	margin: 0.25rem 0 0.5rem 0;
 }
 
 .sp_article_content > .sp_article_detail.category_header {
@@ -263,7 +263,7 @@ table.sp_articles {
 
 .sp_article_content .sp_attachment_thumb {
 	float: left;
-	margin: 5px 10px -3px 0;
+	margin: 0.5rem 1rem -0.3rem 0;
 }
 
 .sp_article_content .post:after {
@@ -274,28 +274,28 @@ table.sp_articles {
 }
 
 .sp_attachment_thumb img {
-	max-width: 175px;
+	max-width: 17.5rem;
 }
 
 #sp_view_article span.attachment_details {
-	font-size: 1em;
+	font-size: var(--font14);
 }
 
 .sp_article_detail h4 {
-	font-size: 1.1em;
+	font-size: var(--font15);
 	line-height: 2.1;
 }
 
 .sp_article_latest {
 	margin-left: auto;
-	padding-right: 0.5em;
+	padding-right: 0.5rem;
 	text-align: right;
 }
 
 .sp_article_detail .avatar {
 	float: left;
-	margin-right: 0.5em;
-	max-height: 40px;
+	margin-right: 0.5rem;
+	max-height: 4rem;
 }
 
 .sp_article_detail, .sp_comment_detail {
@@ -303,9 +303,9 @@ table.sp_articles {
 }
 
 .sp_article_detail {
-	padding: 5px;
-	line-height: 1.1em;
-	font-size: 1.1em;
+	padding: 0.5rem;
+	line-height: 1.1;
+	font-size: var(--font15);
 	display: flex;
 }
 
@@ -315,16 +315,16 @@ table.sp_articles {
 
 .sp_comment_detail .avatar {
 	float: left;
-	margin-right: 0.5em;
-	max-height: 30px;
+	margin-right: 0.5rem;
+	max-height: 3rem;
 }
 
 .sp_comment_body {
-	padding: 0 .3em;
+	padding: 0 0.3rem;
 }
 
 .sp_comment_detail {
-	line-height: 2em;
+	line-height: 2;
 }
 
 /* Parent portal container */
@@ -350,18 +350,18 @@ table.sp_articles {
 
 #sp_left, #sp_right, #sp_center_top, #sp_center_bottom {
 	vertical-align: top;
-	margin-bottom: .5em;
+	margin-bottom: 0.5rem;
 }
 
 #sp_left {
-	padding-right: .5em;
+	padding-right: 0.5rem;
 	height: 100%;
 	/* fixed width, cant grow or shrink */
 	flex: 0 0 auto;
 }
 
 #sp_right {
-	padding-left: .5em;
+	padding-left: 0.5rem;
 	height: 100%;
 	/* fixed width, cant grow or shrink */
 	flex: 0 0 auto;
@@ -372,7 +372,7 @@ table.sp_articles {
 	 the 200px width is simply a start as 1 1 auto will fill available */
 	flex: 1 1 auto;
 	padding: 2px;
-	width: 200px;
+	width: 20rem;
 }
 
 /*
@@ -389,7 +389,7 @@ table.sp_articles {
 	margin: 0;
 	vertical-align: top;
 	clear: both;
-	flex: 0 0 100%
+	flex: 0 0 100%;
 }
 
 #sp_user, #sp_passwrd {
@@ -397,7 +397,7 @@ table.sp_articles {
 }
 
 div.sp_block {
-	padding: 0 0.5em;
+	padding: 0 0.5rem;
 	width: 100%;
 	box-sizing: border-box;
 }
@@ -413,30 +413,31 @@ div.sp_block {
 }
 
 .sp_block_container h3 {
-	font-size: 1.214em;
+	font-size: var(--font16);
+	padding-left: 0;
 }
 
 .sp_block_padding {
-	padding: 5px;
+	padding: 0.5rem;
 }
 
 .sp_block_active {
-	color: green;
+	color: var(--success);
 }
 
 .sp_block_section {
 	overflow: auto;
-	margin: 2px 0 .7em 0;
-	border: 1px solid #CCCCCC;
-	border-radius: 0 0 5px 5px;
-	background: transparent;
-	box-shadow: 4px 6px 3px -5px rgba(0, 0, 0, 0.5);
+	margin: 2px 0 0.7rem 0;
+	border: 1px solid var(--primary_border);
+	border-radius: 0 0 0.5rem 0.5rem;
+	background: var(--transparent);
+	box-shadow: 4px 6px 3px -5px var(--opacity50);
 }
 
 .sp_block_section.roundframe {
 	margin-top: 0;
-	border-radius: 5px;
-	padding: 5px;
+	border-radius: 0.5rem;
+	padding: 0.5rem;
 }
 
 .sp_block.sp_attachmentrecent > ul {
@@ -445,15 +446,15 @@ div.sp_block {
 
 h3.sp_secondary_header, h2.sp_secondary_header {
 	border-radius: 0;
-	font-size: 1.143em;
+	font-size: var(--font16);
 }
 
 .sp_article_block_container {
 	overflow: auto;
-	margin: .1em 0;
-	padding: 0 .1em .5em .1em;
+	margin: 0.1rem 0;
+	padding: 0 0.1rem 0.5rem 0.1rem;
 	border: none;
-	background: transparent;
+	background: var(--transparent);
 }
 
 .sp_article_block .bbc_list {
@@ -461,39 +462,39 @@ h3.sp_secondary_header, h2.sp_secondary_header {
 }
 
 a.sp_attach > img.bbc_img {
-	padding: 0 5px;
+	padding: 0 0.5rem;
 }
 
 .portalbg {
-	padding: 5px 0;
+	padding: 0.5rem 0;
 }
 
 .portalbg2 {
-	padding: 10px 5px;
+	padding: 1rem 0.5rem;
 	border-radius: 0 0 2px 2px;
-	font-size: .929em;
+	font-size: var(--font13);
 }
 
 body {
-	min-width: 750px;
+	min-width: 75rem;
 }
 
 .sp_top_poster {
-	width: 45px;
+	width: 4.5rem;
 }
 
 .sp_top_poster > a > img, .sp_staff > a > img {
-	max-width: 35px;
+	max-width: 3.5rem;
 }
 
 #new_shout {
-	margin-top: 4px;
+	margin-top: 0.4rem;
 	display: flex;
 }
 
 .shoutbox_container {
 	width: 100%;
-	font-size: small;
+	font-size: var(--font13);
 }
 
 .sp_smiley_container {
@@ -515,7 +516,7 @@ body {
 }
 
 .shoutbox_padding {
-	padding: 5px;
+	padding: 0.5rem;
 }
 
 .shoutbox_body {
@@ -527,16 +528,16 @@ body {
 	overflow: auto;
 	margin: 2px 0 0;
 	padding: 0;
-	height: 200px;
-	box-shadow: 0 -1px 0 #CCCCCC;
+	height: 20rem;
+	box-shadow: 0 -1px 0 var(--primary_border);
 	list-style: none;
 	width: 100%;
 }
 
 .shoutbox_list_compact li {
-	padding: 4px 0 4px 4px;
-	border-bottom: 1px dashed #CCCCCC;
-	border-left: 3px solid #DADADA;
+	padding: 0.4rem 0 0.4rem 0.4rem;
+	border-bottom: 1px dashed var(--primary_border);
+	border-left: 3px solid var(--primary_border_top);
 }
 
 .shoutbox_list_all {
@@ -546,8 +547,8 @@ body {
 }
 
 .shoutbox_list_all li {
-	padding: 4px 0 0 4px;
-	border-left: 3px solid #DADADA;
+	padding: 0.4rem 0 0 0.4rem;
+	border-left: 3px solid var(--primary_border_top);
 }
 
 .shoutbox_list_compact li img, .shoutbox_list_all li img {
@@ -556,9 +557,9 @@ body {
 }
 
 .shoutbox_time {
-	border-bottom: 1px dashed #CCCCCC;
-	color: #777777;
-	padding-left: 5px;
+	border-bottom: 1px dashed var(--primary_border);
+	color: var(--disabled_text);
+	padding-left: 0.5rem;
 }
 
 .shoutbox_delete {
@@ -568,7 +569,7 @@ body {
 .shoutbox_page_index {
 	padding: 2px 0 3px 2px;
 	text-align: center;
-	line-height: 1.8em;
+	line-height: 1.8;
 }
 
 .shoutbox_input {
@@ -577,9 +578,9 @@ body {
 
 .shoutbox_warning {
 	border-bottom: none;
-	border-left: 3px solid #FF6666;
-	background: #FFDDDD;
-	color: #FF0000;
+	border-left: 3px solid var(--errorbox_border);
+	background: var(--errorbox);
+	color: var(--alert);
 }
 
 #new_shout button {
@@ -589,7 +590,7 @@ body {
 }
 
 .shoutbox_me {
-	color: #FF0000;
+	color: var(--me);
 	font-weight: bold;
 }
 
@@ -599,27 +600,27 @@ body {
 
 .shoutbox-button {
 	float: left;
-	margin-bottom: 5px;
-	border: 1px solid #BBBBBB;
+	margin-bottom: 0.5rem;
+	border: 1px solid var(--secondary_border_bottom);
 	border-right: none;
-	border-bottom: 1px solid #AAAAAA;
-	background: #FFFFFF;
-	box-shadow: -1px -1px 2px rgba(0, 0, 0, 0.15) inset;
-	color: #222222;
+	border-bottom: 1px solid var(--secondary_border);
+	background: var(--primary_content_background);
+	box-shadow: -1px -1px 2px var(--opacity20) inset;
+	color: var(--contrast_border);
 	cursor: pointer;
 }
 
 .shoutbox-button div, .shoutbox-button {
 	display: block;
-	width: 24px;
-	height: 24px;
+	width: 2.4rem;
+	height: 2.4rem;
 	background-position: center center !important;
 	background-repeat: no-repeat !important;
 }
 
 .shoutbox-button:hover {
-	background: #FAFAFA;
-	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2) inset;
+	background: var(--content_background);
+	box-shadow: 1px 1px 1px var(--opacity20) inset;
 }
 
 .shoutbox-font div {
@@ -687,7 +688,7 @@ body {
 }
 
 #sp_view_categories h4 {
-	font-size: 1.1em;
+	font-size: var(--font15);
 }
 
 #sp_collapse_side1.expand::before, #sp_collapse_side4.collapse::before {
@@ -706,7 +707,7 @@ body {
 #sp_view_categories p,
 #sp_view_articles p,
 #sp_view_category p {
-	margin: 0.5em 0;
+	margin: 0.5rem 0;
 }
 
 #sp_index span,
@@ -714,7 +715,7 @@ body {
 #sp_view_articles span,
 #sp_view_category span,
 #sp_view_article span {
-	font-size: 0.8em;
+	font-size: var(--font11);
 }
 
 #sp_view_category .sp_inner {
@@ -726,33 +727,33 @@ body {
 }
 
 .sp_cat_link:link, .sp_cat_link:visited {
-	padding: 0 6px;
+	padding: 0 0.6rem;
 	display: inline-block;
-	line-height: 1.3em;
+	line-height: 1.3;
 	border-radius: 2px;
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
-	background: #F4F4F4 linear-gradient(to bottom, #FFFFFF, #E4E4E4);
-	color: #555555;
-	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E4E4E4 inset;
+	border: 1px solid var(--secondary_border);
+	border-top: 1px solid var(--secondary_border_top);
+	border-left: 1px solid var(--secondary_border_left);
+	background: var(--menu_background) linear-gradient(to bottom, var(--primary_content_background), var(--mid_grey_background));
+	color: var(--body_text);
+	box-shadow: 1px 1px 2px var(--box_shadow), 0 -1px 0 var(--mid_grey_background) inset;
 }
 
 /* Hover effects. */
 .sp_cat_link:hover {
 	cursor: pointer;
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #AFAFAF;
-	border-left: 1px solid #AFAFAF;
-	background: #F0F0F0;
-	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	color: #555555;
+	border: 1px solid var(--input_submit_border_hover);
+	border-top: 1px solid var(--secondary_border);
+	border-left: 1px solid var(--secondary_border);
+	background: var(--menu_button_hover_background);
+	box-shadow: 2px 1px 1px var(--opacity10) inset;
+	color: var(--body_text);
 	text-decoration: none;
 }
 
 #sp_admin_main {
 	overflow: auto;
-	margin: 1em 0;
+	margin: 1rem 0;
 }
 
 #sp_live_info {
@@ -766,37 +767,37 @@ body {
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-	padding-left: 6px;
+	padding-left: 0.6rem;
 	width: 35%;
 }
 
 #sp_general_info div.windowbg {
-	padding: 0 0.8em;
+	padding: 0 0.8rem;
 }
 
 #spAnnouncements {
 	overflow: auto;
-	padding: 0 4px;
+	padding: 0 0.4rem;
 }
 
 #spAnnouncements dt {
-	border-top-color: #377828;
+	border-top-color: var(--title);
 	font-weight: 600;
 }
 
 #spAnnouncements dt a {
-	color: #377828;
+	color: var(--title);
 }
 
 #spAnnouncements dd {
-	border-top-color: #DDDDDD;
-	padding-bottom: 1em;
+	border-top-color: var(--primary_border_top);
+	padding-bottom: 1rem;
 }
 
 #admin_main_section .content {
 	overflow: auto;
-	padding: 6px 0;
-	height: 12em;
+	padding: 0.6rem 0;
+	height: 12rem;
 }
 
 #sp_live_info div.sp_content_padding,
@@ -805,25 +806,25 @@ body {
 }
 
 #sp_view_category article.sp_content_padding {
-	margin-bottom: .25em;
+	margin-bottom: 0.25rem;
 }
 
 .forumposts > article {
-	border: 1px solid #CFCFCF;
-	background: #FFFFFD;
+	border: 1px solid var(--secondary_border_top);
+	background: var(--forum_posts);
 }
 
 #sp_credits p {
 	margin: 0;
-	padding: 0.5em 0;
+	padding: 0.5rem 0;
 }
 
 .sp_content_padding {
-	padding: .5em .8em;
+	padding: 0.5rem 0.8rem;
 }
 
 #sp_manage_blocks .table_grid {
-	margin-bottom: 0.8em;
+	margin-bottom: 0.8rem;
 }
 
 #sp_select_block_type .reset {
@@ -838,9 +839,9 @@ body {
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 2px 0.166%;
-	padding: 10px 10px 4px 10px;
+	padding: 1rem 1rem 0.4rem 1rem;
 	width: 33%;
-	height: 7em;
+	height: 7rem;
 }
 
 #sp_select_block_type .content label:hover {
@@ -849,7 +850,7 @@ body {
 }
 
 #sp_select_block_type .smalltext {
-	margin: 6px;
+	margin: 0.6rem;
 }
 
 #sp_edit_block {
@@ -857,8 +858,8 @@ body {
 }
 
 #sp_select_visibility {
-	padding-top: 0.6em;
-	line-height: 2em;
+	padding-top: 0.6rem;
+	line-height: 2;
 }
 
 ul.sp_visibility_list {
@@ -881,7 +882,7 @@ select#board {
 }
 
 #sp_manage_articles table.table_grid {
-	margin: 0.4em 0;
+	margin: 0.4rem 0;
 }
 
 #sp_edit_article {
@@ -893,7 +894,7 @@ select#board {
 }
 
 #sp_manage_categories table.table_grid {
-	margin: 0.4em 0;
+	margin: 0.4rem 0;
 }
 
 #sp_edit_category {
@@ -901,7 +902,7 @@ select#board {
 }
 
 #sp_manage_pages table.table_grid {
-	margin: 0.4em 0;
+	margin: 0.4rem 0;
 }
 
 #sp_edit_page {
@@ -909,7 +910,7 @@ select#board {
 }
 
 #sp_manage_shoutboxes table.table_grid {
-	margin: 0.4em 0;
+	margin: 0.4rem 0;
 }
 
 #sp_edit_shoutbox {
@@ -930,11 +931,11 @@ select#board {
 }
 
 #sp_shoutbox_redirect {
-	margin: 1em auto 0;
+	margin: 1rem auto 0;
 }
 
 #sp_shoutbox_redirect div {
-	font-size: 1.071em;
+	font-size: var(--font15);
 }
 
 #sp_edit_custom_item #item_link_dt,
@@ -943,7 +944,7 @@ select#board {
 }
 
 #sp_manage_profiles table.table_grid {
-	margin: 0.4em 0;
+	margin: 0.4rem 0;
 }
 
 #sp_edit_profile {
@@ -975,7 +976,7 @@ dl.sp_form {
 dl.sp_form dt {
 	float: left;
 	clear: both;
-	margin: 0.5em 0 0 0;
+	margin: 0.5rem 0 0 0;
 	width: 31%;
 	font-weight: normal;
 }
@@ -990,13 +991,13 @@ dl.sp_form dt span {
 
 dl.sp_form dd {
 	float: left;
-	margin: 0.5em 0 0 0;
+	margin: 0.5rem 0 0 0;
 	width: 68%;
 }
 
 dl.sp_form img,
 #sp_add_articles_list_header img {
-	margin: 0 0.2em 0 0;
+	margin: 0 0.2rem 0 0;
 }
 
 #sp_add_articles_list_header a img {
@@ -1006,17 +1007,17 @@ dl.sp_form img,
 
 #sp_rich_editor {
 	margin: 0 auto;
-	padding-top: 1em;
+	padding-top: 1rem;
 	max-width: 97%;
-	width: 70em;
+	width: 70rem;
 }
 
 #sp_text_editor {
-	padding: 1em;
+	padding: 1rem;
 }
 
 #sp_text_editor textarea {
-	padding: 0.4em;
+	padding: 0.4rem;
 	width: 100%;
 }
 
@@ -1026,7 +1027,7 @@ dl.sp_form img,
 }
 
 #sp_view_comments {
-	margin-top: 1em;
+	margin-top: 1rem;
 }
 
 #category_description {
@@ -1040,9 +1041,9 @@ dl.sp_form img,
 
 /* some jquery ui styles we may need */
 .ui-state-highlight {
-	height: 40px;
-	border: 1px dashed #CCCCCC;
-	background-image: linear-gradient(to bottom, #FAFAFA, #FFFFFF);
+	height: 4rem;
+	border: 1px dashed var(--primary_border);
+	background-image: linear-gradient(to bottom, var(--content_background), var(--primary_content_background));
 	cursor: move;
 }
 
@@ -1061,38 +1062,38 @@ dl.sp_form img,
 .ui-dialog {
 	z-index: 100;
 	padding: 0;
-	border: 1px solid #999999;
-	border-radius: 4px 4px 0 0;
-	background-color: #F5F5F5;
-	box-shadow: 0 0 16px rgba(0, 0, 0, 0.3);
+	border: 1px solid var(--dark_background);
+	border-radius: 0.4rem 0.4rem 0 0;
+	background-color: var(--content_background);
+	box-shadow: 0 0 1.6rem var(--opacity30);
 }
 
 .ui-dialog .ui-dialog-title {
 	float: left;
 	overflow: hidden;
-	margin: 0.5em 0;
+	margin: 0.5rem 0;
 	width: 90%;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
 .ui-dialog .ui-dialog-titlebar {
-	padding: 0 1em;
-	border-radius: 4px 4px 0 0;
-	background-color: #FAFAFA;
+	padding: 0 1rem;
+	border-radius: 0.4rem 0.4rem 0 0;
+	background-color: var(--content_background);
 	font-weight: bold;
-	font-size: 1.071em;
+	font-size: var(--font15);
 }
 
 .warninbox .ui-dialog .ui-dialog-content {
-	padding-left: 35px;
+	padding-left: 3.5rem;
 }
 
 .ui-dialog .ui-dialog-titlebar-close {
 	float: right;
-	margin: 0.7em 0;
-	width: 16px;
-	height: 16px;
+	margin: 0.7rem 0;
+	width: 1.6rem;
+	height: 1.6rem;
 	border: 0;
 	background: url(../../images/SimplePortal/sp/delete.png) no-repeat scroll left center transparent;
 	cursor: pointer;
@@ -1111,14 +1112,14 @@ dl.sp_form img,
 }
 
 .sp_category_header {
-	padding-right: 5px;
+	padding-right: 0.5rem;
 }
 
 /* "dot" images as a sprite
 ------------------------------------------------- */
 .dot:before {
 	display: inline-block;
-	padding-right: 5px;
+	padding-right: 0.5rem;
 	width: 18px;
 	height: 18px;
 	background: url(../../images/SimplePortal/sp/dots.png) no-repeat;
@@ -1266,7 +1267,7 @@ dl.sp_form img,
 .sp_no_body_style,
 .sp_no_body_style_last {
 	overflow: auto;
-	margin: 2px 0 .7em 0;
+	margin: 2px 0 0.7rem 0;
 	border: 0 solid;
 	border-radius: 0;
 	box-shadow: none;
@@ -1359,7 +1360,7 @@ dl.sp_form img,
 	}
 
 	#sp_collapse_side1, #sp_collapse_side2, #sp_collapse_side3, #sp_collapse_side4 {
-		padding: 6px;
+		padding: 0.6rem;
 	}
 }
 /* This one does 480 and smaller screens */

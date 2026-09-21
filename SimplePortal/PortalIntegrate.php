@@ -1020,7 +1020,7 @@ class PortalIntegrate
 				? 'forum' : 'home';
 		}
 
-		if (empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], ['unread', 'unreadreplies', 'collapse', 'recent', 'stats', 'who'])) && in_array((int) $modSettings['sp_portal_mode'], [1, 3], true)))
+		if (empty($context['disable_sp']) && ((isset($_GET['board']) || isset($_GET['topic']) || in_array($context['current_action'], ['collapse', 'recent', 'stats', 'who'])) && in_array((int) $modSettings['sp_portal_mode'], [1, 3], true)))
 		{
 			$current_action = 'forum';
 		}

@@ -99,7 +99,7 @@ class PortalArticles extends AbstractController
 		// Account for videos, pretty print, spoilers and more
 		theme()->addInlineJavascript('sp_prep_articles();', true);
 
-		$context['linktree'][] = [
+		$context['breadcrumbs'][] = [
 			'url' => $scripturl . '?action=portal;sa=articles',
 			'name' => $txt['sp-articles'],
 		];
@@ -242,7 +242,7 @@ class PortalArticles extends AbstractController
 		}
 
 		// Build the breadcrumbs
-		$context['linktree'] = array_merge($context['linktree'], [
+		$context['breadcrumbs'] = array_merge($context['breadcrumbs'], [
 			[
 				'url' => $scripturl . '?category=' . $context['article']['category']['category_id'],
 				'name' => $context['article']['category']['name'],

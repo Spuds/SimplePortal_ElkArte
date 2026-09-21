@@ -48,7 +48,7 @@ class PortalPages extends AbstractController
 
 		$context['SPortal']['pages'] = sportal_get_pages(0, true, true);
 
-		$context['linktree'][] = [
+		$context['breadcrumbs'][] = [
 			'url' => $scripturl . '?action=portal;sa=pages',
 			'name' => $txt['sp-pages'],
 		];
@@ -88,7 +88,7 @@ class PortalPages extends AbstractController
 		}
 
 		// Prep the template for display
-		$context['linktree'][] = [
+		$context['breadcrumbs'][] = [
 			'url' => $scripturl . '?page=' . $page_id,
 			'name' => $context['SPortal']['page']['title'],
 		];

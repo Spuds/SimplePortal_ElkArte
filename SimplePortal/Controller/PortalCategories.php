@@ -50,7 +50,7 @@ class PortalCategories extends AbstractController
 
 		$context['categories'] = sportal_get_categories(null, true, true);
 
-		$context['linktree'][] = [
+		$context['breadcrumbs'][] = [
 			'url' => $scripturl . '?action=portal;sa=categories',
 			'name' => $txt['sp-categories'],
 		];
@@ -122,7 +122,7 @@ class PortalCategories extends AbstractController
 		// Needed for basic Lightbox functionality
 		loadJavascriptFile('topic.js', ['defer' => false]);
 
-		$context['linktree'][] = [
+		$context['breadcrumbs'][] = [
 			'url' => $scripturl . '?category=' . $context['category']['category_id'],
 			'name' => $context['category']['name'],
 		];

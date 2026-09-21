@@ -173,7 +173,7 @@ function sportal_init($standalone = false)
 
 		if ($modSettings['sp_portal_mode'] === 1)
 		{
-			$context['linktree'][0] = [
+			$context['breadcrumbs'][0] = [
 				'url' => $scripturl . '?action=forum',
 				'name' => $context['forum_name'],
 			];
@@ -185,15 +185,23 @@ function sportal_init($standalone = false)
 			}
 		}
 
-		if (!empty($context['linktree']) && $modSettings['sp_portal_mode'] === 1)
+		if (!empty($context['breadcrumbs']) && $modSettings['sp_portal_mode'] === 1)
 		{
-			foreach ($context['linktree'] as $key => $tree)
+			foreach ($context['breadcrumbs'] as $key => $tree)
 			{
 				if (str_contains($tree['url'], '#c') && !str_contains($tree['url'], 'action=forum#c'))
 				{
-					$context['linktree'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
+					$context['breadcrumbs'][$key]['url'] = str_replace('#c', '?action=forum#c', $tree['url']);
 				}
 			}
+		}
+
+		if (isset($_GET['action']) && $_GET['action'] === 'forum')
+		{
+			$context['breadcrumbs'][1] = [
+				'url' => $scripturl,
+				'name' => $context['forum_name'],
+			];
 		}
 	}
 	else

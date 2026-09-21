@@ -143,8 +143,6 @@ class ThemeSelectBlock extends SPAbstractBlock
 function template_sp_theme_select($data)
 {
 	global $txt, $scripturl, $context;
-	//<a class="linkbutton" href="http://192.168.99.90/fresh20/index.php?action=profile;area=pick;u=1;theme=0;wwdzLl89C=YiZntlasfQvnQSHSmKmvuPw16qkNENOI;variant=dark"
-	// id="theme_preview_0">Preview theme</a>
 
 	echo '
 		<form action="', $scripturl, '" method="post" accept-charset="UTF-8">

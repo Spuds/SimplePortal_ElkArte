@@ -190,7 +190,7 @@ function template_shoutbox_prune()
 	</form>';
 
 	theme()->addInlineJavascript('
-		var oPruneSuggest = new smc_AutoSuggest({
+		var oPruneSuggest = new elk_AutoSuggest({
 			sSelf: \'oPruneSuggest\',
 			sSessionId: elk_session_id,
 			sSessionVar: elk_session_var,

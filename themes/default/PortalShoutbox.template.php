@@ -161,8 +161,8 @@ function template_shoutbox_embed($shoutbox)
 		{
 			echo '
 					<li>', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> ' : ' ',
-						$shout['text'], '<br />', !empty($shout['delete_link_js'])
-							? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '', '
+			$shout['text'], '<br />', !empty($shout['delete_link_js'])
+				? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '', '
 						<span class="smalltext shoutbox_time">', $shout['time'], '</span>
 					</li>';
 		}
@@ -281,8 +281,8 @@ function template_shoutbox_xml()
 	{
 		echo '
 	<updated>1</updated>
-	<error>', empty($context['SPortal']['shouts']) ? Util::htmlspecialchars($txt['sp_shoutbox_no_shout'], ENT_COMPAT, 'UTF-8', true) : 0, '</error>
-	<warning>', !empty($context['SPortal']['shoutbox']['warning']) 	? Util::htmlspecialchars($context['SPortal']['shoutbox']['warning'], ENT_COMPAT, 'UTF-8', true) : 0, '</warning>
+	<error>', empty($context['SPortal']['shouts']) ? Util::htmlspecialchars($txt['sp_shoutbox_no_shout'], ENT_COMPAT) : 0, '</error>
+	<warning>', !empty($context['SPortal']['shoutbox']['warning']) 	? Util::htmlspecialchars($context['SPortal']['shoutbox']['warning'], ENT_COMPAT) : 0, '</warning>
 	<reverse>', !empty($context['SPortal']['shoutbox']['reverse']) ? 1 : 0, '</reverse>';
 
 		foreach ($context['SPortal']['shouts'] as $shout)
@@ -290,11 +290,11 @@ function template_shoutbox_xml()
 			echo '
 	<shout>
 		<id>', $shout['id'], '</id>
-		<author>', Util::htmlspecialchars($shout['author']['link'], ENT_COMPAT, 'UTF-8', true), '</author>
-		<time>', Util::htmlspecialchars($shout['time'], ENT_COMPAT, 'UTF-8', true), '</time>
-		<timeclean>', Util::htmlspecialchars(strip_tags($shout['time']), ENT_COMPAT, 'UTF-8', true), '</timeclean>
-		<delete>', !empty($shout['delete_link_js']) ? Util::htmlspecialchars($shout['delete_link_js'], ENT_COMPAT, 'UTF-8', true) : ' ', '</delete>
-		<content>', Util::htmlspecialchars($shout['text'], ENT_COMPAT, 'UTF-8', true), '</content>
+		<author>', Util::htmlspecialchars($shout['author']['link'], ENT_COMPAT), '</author>
+		<time>', Util::htmlspecialchars($shout['time'], ENT_COMPAT), '</time>
+		<timeclean>', Util::htmlspecialchars(strip_tags($shout['time']), ENT_COMPAT), '</timeclean>
+		<delete>', !empty($shout['delete_link_js']) ? Util::htmlspecialchars($shout['delete_link_js'], ENT_COMPAT) : ' ', '</delete>
+		<content>', Util::htmlspecialchars($shout['text'], ENT_COMPAT), '</content>
 		<is_me>', $shout['is_me'] ? 1 : 0, '</is_me>
 	</shout>';
 		}

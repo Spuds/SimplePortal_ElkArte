@@ -387,9 +387,9 @@ function sp_surroundText (text1, text2, oTextHandle)
 	// Compliant text range wrap.
 	else if ('selectionStart' in oTextHandle)
 	{
-		var begin = oTextHandle.value.substr(0, oTextHandle.selectionStart),
-			selection = oTextHandle.value.substr(oTextHandle.selectionStart, oTextHandle.selectionEnd - oTextHandle.selectionStart),
-			end = oTextHandle.value.substr(oTextHandle.selectionEnd),
+		var begin = oTextHandle.value.substring(0, oTextHandle.selectionStart),
+			selection = oTextHandle.value.substring(oTextHandle.selectionStart, oTextHandle.selectionEnd),
+			end = oTextHandle.value.substring(oTextHandle.selectionEnd),
 			newCursorPos = oTextHandle.selectionStart,
 			scrollPos = oTextHandle.scrollTop;
 

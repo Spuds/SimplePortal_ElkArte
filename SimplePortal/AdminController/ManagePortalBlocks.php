@@ -236,6 +236,27 @@ class ManagePortalBlocks extends AbstractController
 		// Passing the selected type via $_GET instead of $_POST?
 		$start_parameters = $this->_getStartParameters();
 
+		// Before anything is instantiated, make sure the requested block type exists and this user may configure it
+		$requested_type = null;
+		if (!empty($_POST['selected_type']))
+		{
+			$requested_type = is_array($_POST['selected_type']) ? (string) reset($_POST['selected_type']) : (string) $_POST['selected_type'];
+		}
+		elseif (!empty($_POST['block_type']))
+		{
+			$requested_type = (string) $_POST['block_type'];
+		}
+		elseif (!$context['SPortal']['is_new'])
+		{
+			$existing_block = current(getBlockInfo(null, (int) $_REQUEST['block_id']));
+			$requested_type = empty($existing_block['type']) ? '' : (string) $existing_block['type'];
+		}
+
+		if ($requested_type !== null)
+		{
+			$this->_assertCanConfigureBlockType($requested_type);
+		}
+
 		// Want to use a block on the portal?
 		if ($context['SPortal']['is_new'] && empty($_POST['selected_type']) && empty($_POST['add_block']))
 		{
@@ -306,6 +327,13 @@ class ManagePortalBlocks extends AbstractController
 				// Clean up
 				unset($_SESSION['sp_error'], $_SESSION['sp_error_post'], $_POST['add_block']);
 			}
+			else
+			{
+				checkSession();
+			}
+
+			// The type may have come back from the session, check it again
+			$this->_assertCanConfigureBlockType((string) ($_POST['block_type'] ?? ''));
 
 			// Just in case, the admin could be doing something silly like editing a SP block while SP is disabled. ;)
 			require_once(BOARDDIR . '/SSI.php');
@@ -389,11 +417,8 @@ class ManagePortalBlocks extends AbstractController
 
 		if (!empty($_POST['selected_type']) || !empty($_POST['preview_block']) || (!$context['SPortal']['is_new'] && empty($_POST['add_block'])))
 		{
-			// Only the admin can use PHP blocks
-			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
-			{
-				throw new Exception('cannot_admin_forum', false);
-			}
+			// Only those with the block's required permissions (e.g. admin for PHP blocks) can use it
+			$this->_assertCanConfigureBlockType((string) $context['SPortal']['block']['type']);
 
 			Txt::load('SimplePortalHelp');
 
@@ -532,11 +557,8 @@ class ManagePortalBlocks extends AbstractController
 		{
 			checkSession();
 
-			// Only the admin can do php here
-			if ($_POST['block_type'] === 'sp_php' && !allowedTo('admin_forum'))
-			{
-				throw new Exception('cannot_admin_forum', false);
-			}
+			// Only those with the block's required permissions (e.g. admin for PHP blocks) can save it
+			$this->_assertCanConfigureBlockType((string) ($_POST['block_type'] ?? ''));
 
 			// Make sure the block name is safe
 			if (!isset($_POST['block_name']) || Util::htmltrim(Util::htmlspecialchars($_POST['block_name'], ENT_QUOTES)) === '')
@@ -544,7 +566,7 @@ class ManagePortalBlocks extends AbstractController
 				throw new Exception('error_sp_name_empty', false);
 			}
 
-			if ($_POST['block_type'] === 'sp_php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
+			if (strtolower($_POST['block_type']) === 'php' && !empty($_POST['parameters']['content']) && empty($modSettings['sp_disable_php_validation']))
 			{
 				$validator = new DataValidator();
 				$validator->validation_rules(['content' => 'php_syntax']);
@@ -657,6 +679,25 @@ class ManagePortalBlocks extends AbstractController
 			}
 
 			redirectexit('action=admin;area=portalblocks');
+		}
+	}
+
+	/**
+	 * Ensures the block type is a known one and that the current user holds the
+	 * permissions the block requires in order to configure it
+	 *
+	 * @param string $type The block type (without "Block" at the end)
+	 * @throws Exception
+	 */
+	private function _assertCanConfigureBlockType($type)
+	{
+		/** @var class-string<\SPAbstractBlock> $class */
+		$class = sp_block_class_for_type((string) $type);
+		$required = $class::permissionsRequired();
+
+		if (!empty($required) && !allowedTo($required))
+		{
+			throw new Exception('cannot_admin_forum', false);
 		}
 	}
 
@@ -970,14 +1011,11 @@ class ManagePortalBlocks extends AbstractController
 		// Make sure column ID is an integer too.
 		$_REQUEST['col'] = (int) $_REQUEST['col'];
 
-		// Only Admins can Remove PHP Blocks
-		if (!allowedTo('admin_forum'))
+		// Only those with the block's required permissions (e.g. admin for PHP blocks) can remove it
+		$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
+		if (!empty($context['SPortal']['block']['type']))
 		{
-			$context['SPortal']['block'] = current(getBlockInfo(null, $_REQUEST['block_id']));
-			if ($context['SPortal']['block']['type'] === 'sp_php' && !allowedTo('admin_forum'))
-			{
-				throw new Exception('cannot_admin_forum', false);
-			}
+			$this->_assertCanConfigureBlockType((string) $context['SPortal']['block']['type']);
 		}
 
 		// We don't need it anymore.

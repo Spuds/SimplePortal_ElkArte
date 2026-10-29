@@ -10,6 +10,7 @@
  */
 
 use BBC\ParserWrapper;
+use ElkArte\Exceptions\Exception;
 use ElkArte\Helper\Util;
 use ElkArte\Languages\Txt;
 use ElkArte\MetadataIntegrate;
@@ -496,13 +497,62 @@ function sp_instantiate_block($name, $id = 0)
 
 	if (!isset($instances[$name . $id]))
 	{
-		require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/' . $name . '.block.php');
-
-		$class = $name . 'Block';
+		$class = sp_block_class_for_type((string) $name);
 		$instances[$name. $id] = new $class($db);
 	}
 
 	return $instances[$name . $id];
+}
+
+/**
+ * Returns the available block types and their source files.
+ *
+ * @return array<string, string>
+ */
+function sp_known_block_types(): array
+{
+	static $types;
+
+	if ($types === null)
+	{
+		$types = [];
+		$blocks = new GlobIterator(ADDONSDIR . '/SimplePortal/subs/spblocks/*.block.php');
+
+		foreach ($blocks as $block)
+		{
+			$type = substr($block->getFilename(), 0, -strlen('.block.php'));
+			$types[$type] = $block->getPathname();
+		}
+	}
+
+	return $types;
+}
+
+/**
+ * Loads and validates the class for a known block type.
+ *
+ * @param string $type The block type without "Block" at the end
+ * @return string
+ * @throws Exception
+ */
+function sp_block_class_for_type(string $type): string
+{
+	$types = sp_known_block_types();
+	if (!isset($types[$type]))
+	{
+		throw new Exception('SimplePortal.error_sp_block_type_invalid', false);
+	}
+
+	require_once(ADDONSDIR . '/SimplePortal/subs/spblocks/SPAbstractBlock.php');
+	require_once($types[$type]);
+
+	$class = $type . 'Block';
+	if (!class_exists($class, false) || !is_subclass_of($class, SPAbstractBlock::class))
+	{
+		throw new Exception('SimplePortal.error_sp_block_type_invalid', false);
+	}
+
+	return $class;
 }
 
 /**
@@ -1704,6 +1754,11 @@ function sportal_parse_content($body, $type, $output_method = 'echo')
 			break;
 		case 'php':
 			global $txt;
+
+			if (!allowedTo('admin_forum'))
+			{
+				throw new Exception('cannot_admin_forum', true);
+			}
 
 			$body = trim(un_htmlspecialchars($body));
 			if (str_starts_with($body, '<?php'))

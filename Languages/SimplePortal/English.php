@@ -44,6 +44,7 @@ $txt['sp_posted_on_by'] = 'posted on %1$s by %2$s';
 $txt['sp_posted_by'] = 'posted %1$s by %2$s';
 $txt['sp_posted_in_on_by'] = 'posted in %1$s on %2$s by %3$s';
 $txt['sp_posted_on_in_by'] = 'posted %2$s in %1$s by %3$s';
+$txt['sp_article_updated_on'] = 'last updated %1$s';
 $txt['sp_articles_in_category'] = 'Articles in Category "%s"';
 
 $txt['sp_read_more'] = 'Read More';
@@ -129,6 +130,7 @@ $txt['error_sp_no_category_normaluser'] = 'Sorry, articles require categories to
 $txt['error_sp_no_category_sp_moderator'] = 'A new category can be created <a href="%s">here</a>.';
 $txt['error_sp_side_wrong'] = 'Wrong side selected.';
 $txt['error_sp_block_wrong'] = 'Wrong block selected.';
+$txt['error_sp_block_type_invalid'] = 'The requested block type is invalid.';
 $txt['error_sp_no_posts_found'] = 'No posts were found.';
 $txt['error_sp_no_members_found'] = 'No members were found.';
 $txt['error_sp_no_gallery_found'] = 'There are no gallery mods installed.';

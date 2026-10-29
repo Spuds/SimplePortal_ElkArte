@@ -37,7 +37,6 @@ $helptxt['showleft'] = 'Diese Option aktiviert die Blöcke auf der linken Seite 
 $helptxt['showright'] = 'Diese Option aktiviert die Blöcke auf der rechten Seite im Portal und im Forum.';
 $helptxt['leftwidth'] = 'Sind die linken Blöcke aktiviert, kann hier deren Breite festgelegt werden. Die Breite kann in Pixel (px) oder in Prozent (%) angegeben werden.';
 $helptxt['rightwidth'] = 'Sind die rechten Blöcke aktiviert, kann hier deren Breite festgelegt werden. Die Breite kann in Pixel (px) oder in Prozent (%) angegeben werden.';
-$helptxt['sp_enableIntegration'] = 'Diese Einstellung aktiviert Blöcke innerhalb des Forums. Sie erlaubt die gezielte Verwendung der <em>Erweiterten Anzeigeoptionen</em> für jeden einzelnen Block.';
 $helptxt['sp_IntegrationHide'] = 'Damit lassen sich Blöcke in bestimmten Abschnitten des Forums verbergen. Die Option <em>Blöcke im Forum anzeigen</em> muss aktiviert sein, damit dies funktioniert.';
 
 // Article settings
@@ -63,7 +62,6 @@ $helptxt['sp-blocksFooterList'] = 'Diese Blöcke erscheinen ganz unten, im Fußb
 $helptxt['sp-blocksAdd'] = 'Hier kannst du den gewählten Block-Typ erstellen und bearbeiten.';
 $helptxt['sp-blocksSelectType'] = 'Dieser Bereich ermöglicht es dir, Blöcke für Portal oder Forum zu erstellen. Für weitere voreingestellte Blöcke oder Blöcke mit eigenen Inhalten einfach den gewünschten Block-Typ auswählen.';
 $helptxt['sp-blocksEdit'] = 'Hier kannst du den ausgewählten Block bearbeiten.';
-$helptxt['sp-blocksDisplayOptions'] = 'Hier kannst du auswählen wo der Block erscheinen soll.';
 $helptxt['sp-blocksCustomDisplayOptions'] = 'Die eigenen Anzeigeoptionen (Custom Display Options) bieten dir erweitere Kontroll- und Einstellungsmöglichkeiten, wo ein Block mit einer speziellen Syntax erscheinen soll.<br /><br />
 <strong>Spezielle Aktionen beinhalten:</strong><br /><br />
 <strong>all:</strong> Auf allen Seiten im Forum<br />
@@ -78,7 +76,6 @@ Dieses Symbol dient als Platzhalter und ermöglicht dynamische Aktionen, wie ../
 Ein weiteres Platzhalter-Symbol, das es ermöglicht einen genauen Wert für eine dynamische Aktion anzugeben, wie ../index.php?issue=1.0 oder ../index.php?game=xyz. Sollte mit "wavy" und nach der "action" verwendet werden, wie ~action|value<br /><br />
 <strong>Negator (-)</strong><br />
 Dieses Symbol ermöglich es, reguläre und dynamische Aktionen auszuschließen. Es sollte vor der Bezeichnung der "action" bei regulären Aktionen und vor dem "wavy" bei dynamischen Aktionen gesetzt werden. Wird bei -action und bei -~action verwendet.';
-$helptxt['sp-blocksStyleOptions'] = 'Hier kannst du das CSS-Styling für diesen Block festlegen.';
 
 // Articles area
 $helptxt['sp_ArticlesArea'] = 'Artikel sind spezielle Themen, von denen jeweils nur der erste Beitrag im Portal erscheint. Hier kannst du bestehende Artikel überarbeiten und neue Artikel erstellen, die im Portal erscheinen sollen.';
@@ -177,3 +174,11 @@ $helptxt['sp_param_sp_gallery_direction'] = 'Galerie-Bilder können horizontal (
 $helptxt['sp_param_sp_html_content'] = 'Füge HTML-Inhalte für einen selbst erstellten Block in dieses Feld ein.';
 $helptxt['sp_param_sp_bbc_content'] = 'Für einen selbst erstellten BBC-Block kannst du hier im Editor schreiben.';
 $helptxt['sp_param_sp_php_content'] = 'Füge PHP-Inhalte für einen selbst erstellten Block in dieses Feld ein.';
+
+$helptxt['sp_disableUserArrange'] = 'Disables the ability for users to rearrange portal blocks and will force display of the sites default layout';
+$helptxt['sp_articles_attachment_dir'] = 'The directory to save attachments uploaded with articles.  The directory must exist and be writable.  Do not use the standard attachment directory and don\'t change this unless you know what you are doing.';
+$helptxt['sp_articles_index_position'] = 'This setting allows the position of the article listing to be set.  The default is "inline" which will display the article listing between the top and bottom portal blocks.  "above" will display the article listing above the portal, while "below" will display the article listing below the portal.';
+$helptxt['sp_MenusArea'] = 'The main menu of the forum can be modified in this area. Additional custom menus can also be created and modified here.';
+$helptxt['sp_param_sp_boardNews_attachment'] = 'Enables the first attachment to be displayed as a leading left floated image, giving a blog look to the block.  If an Inline Attachment is found it will be used instead.';
+$helptxt['sp_param_sp_articles_view'] = 'Compact will display a simple list of article titles, linked to the article.  Full will display the article full text, or up to the limit characters';
+$helptxt['sp_param_sp_articles_attachment'] = 'Enables the first article attachment to be displayed as a leading left floated image, giving a blog look to the article block.  Inline image attachments will override this settings on a per article basis.';

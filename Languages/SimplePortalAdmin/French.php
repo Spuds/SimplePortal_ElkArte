@@ -41,7 +41,6 @@ $txt['showleft'] = 'Afficher les blocs de gauche';
 $txt['showright'] = 'Afficher les blocs de droite';
 $txt['leftwidth'] = 'Taille des blocs de gauche';
 $txt['rightwidth'] = 'Taille des blocs de droite';
-$txt['sp_enableIntegration'] = 'Afficher les blocs dans le Forum';
 $txt['sp_IntegrationHide'] = 'Masquer les blocs dans les sections du Forum';
 $txt['sp_IntegrationHide_desc'] = 'Le paramètre <em>Afficher les blocs dans le forum</em> doit être activé pour que cela marche';
 
@@ -98,26 +97,6 @@ $txt['sp-blocksRow'] = 'Ordre ';
 $txt['sp-blocksForce'] = 'Pas repliable ';
 $txt['sp-blocksMobile'] = 'Afficher sur mobile ';
 
-$txt['sp-blocksDisplayOptions'] = 'Afficher les options';
-$txt['sp-blocksAdvancedOptions'] = 'Options avancées';
-$txt['sp-blocksShowBlock'] = 'Afficher le bloc sur';
-$txt['sp-blocksOptionAllPages'] = 'Toutes les pages';
-$txt['sp-blocksOptionAllActions'] = 'Toutes les actions';
-$txt['sp-blocksOptionAllBoards'] = 'Toutes les sections';
-$txt['sp-blocksOptionEverywhere'] = 'Partout';
-$txt['sp-blocksSelectActions'] = 'Selectionner les actions';
-$txt['sp-blocksSelectBoards'] = 'Selectionner les sections';
-$txt['sp-blocksSelectPages'] = 'Selectionner les pages';
-$txt['sp_display_custom'] = 'Options d\'affichage personnalisé';
-$txt['sp-blocksStyleOptions'] = 'Options de style';
-$txt['sp-blocksTitleDefaultClass'] = 'Titre par défaut de Classe';
-$txt['sp-blocksTitleCustomClass'] = 'Définir un Titre de Classe';
-$txt['sp-blocksTitleCustomStyle'] = 'Définir un Titre de Style';
-$txt['sp-blocksBodyDefaultClass'] = 'Titre par Défaut de Body Classe';
-$txt['sp-blocksBodyCustomClass'] = 'Définir le Body Classe';
-$txt['sp-blocksBodyCustomStyle'] = 'Définir le Body Style';
-$txt['sp-blocksNoTitle'] = 'Pas de Titre';
-$txt['sp-blocksNoBody'] = 'Pas de Body';
 
 // Block labels
 $txt['sp_function_UserInfo_label'] = 'Informations utilisateur';
@@ -127,7 +106,6 @@ $txt['sp_function_ShowPoll_label'] = 'Sondage';
 $txt['sp_function_BoardStats_label'] = 'Statistiques du Forum';
 $txt['sp_function_QuickSearch_label'] = 'Recherche rapide';
 $txt['sp_function_TopPoster_label'] = 'Membres qui postent le plus';
-$txt['sp_function_TopStats_Member_label'] = 'Statistiques des membres';
 $txt['sp_function_TopBoards_label'] = 'Sections les plus actives';
 $txt['sp_function_TopTopics_label'] = 'Sujets les plus actifs';
 $txt['sp_function_Recent_label'] = 'Messages/Sujets récents';
@@ -160,7 +138,6 @@ $txt['sp_function_ShowPoll_desc'] = 'Lorsque l\'utilisateur peut voter, cela aff
 $txt['sp_function_BoardStats_desc'] = 'Affiche certaines statistiques à propos du Forum.';
 $txt['sp_function_QuickSearch_desc'] = 'Affiche un formulaire pour la recherche rapide.';
 $txt['sp_function_TopPoster_desc'] = 'Affiche les membres qui postent le plus avec leur nombre de messages et leurs avatars.';
-$txt['sp_function_TopStats_Member_desc'] = 'Affiche différents types de statistiques sur les membres.';
 $txt['sp_function_TopBoards_desc'] = 'Affiche la liste des sections ayant la plus grande activité.';
 $txt['sp_function_TopTopics_desc'] = 'Affiche une liste des sujets selon leur activité.';
 $txt['sp_function_Recent_desc'] = 'Affiche une liste des sections avec des sujets ou messages récents.';
@@ -264,7 +241,6 @@ $txt['sp_param_BoardStats_refresh_value'] = 'Actualiser la valeur en secondes, 0
 
 // Parameter options
 $txt['sp_param_TopPoster_type_options'] = 'Tout le temps|Ce jour|Cette semaine|Ce mois';
-$txt['sp_param_TopStats_Member_type_options'] = 'Total Temps de Connexion|Messages|Bon Rayonnement|Mauvais Rayonnement|Total Rayonnement|J\'aime donnés|J\'aime reçus|J\'aime Total';
 $txt['sp_param_Recent_type_options'] = 'Messages|Sujets';
 $txt['sp_param_Recent_display_options'] = 'Compact|Entier';
 $txt['sp_param_TopTopics_type_options'] = 'Réponses|Vues';
@@ -274,10 +250,6 @@ $txt['sp_param_Articles_type_options'] = 'Derniers|Aléatoire';
 $txt['sp_param_Articles_view_options'] = 'Compact|Entier';
 $txt['sp_param_Gallery_type_options'] = 'Derniers|Aléatoire';
 $txt['sp_param_Gallery_direction_options'] = 'Vertical|Horizontal';
-$txt['sp_param_sp_arcade_type_options'] = 'Le plus joué|Meilleurs joueurs|Le plus long Champ';
-$txt['sp_param_sp_shop_style_options'] = 'Membres|Articles';
-$txt['sp_param_sp_shop_type_options'] = 'Total|En poche|Banque';
-$txt['sp_param_sp_shop_sort_options'] = 'Récents|Aléatoire';
 $txt['sp_param_Blog_type_options'] = 'Articles|Blogs';
 $txt['sp_param_Blog_sort_options'] = 'Derniers|Aléatoire';
 $txt['sp_param_WhosOnline_online_today_options'] = '|Compte|Liste';
@@ -308,6 +280,7 @@ $txt['sp_admin_articles_col_body'] = 'Corps';
 $txt['sp_admin_articles_col_type'] = 'Type';
 $txt['sp_admin_articles_col_status'] = 'Actif';
 $txt['sp_admin_articles_col_date'] = 'Date';
+$txt['sp_admin_articles_col_modified'] = 'Modifié';
 $txt['sp_admin_articles_col_actions'] = 'Actions';
 $txt['sp_admin_articles_col_permissions'] = 'Permissions';
 $txt['sp_admin_articles_col_styles'] = 'Style';
@@ -358,7 +331,6 @@ $txt['sp_admin_pages_edit'] = 'Modifier une page';
 $txt['sp_admin_pages_remove'] = 'Supprimer des pages';
 $txt['sp_admin_pages_preview'] = 'Aperçu';
 $txt['sp_admin_pages_general'] = 'Paramètres généraux';
-$txt['sp_admin_pages_style'] = 'Options de style';
 
 $txt['sp_admin_pages_desc'] = 'Vous pouvez créer et gérer des pages SimplePortal dans cette partie.';
 $txt['sp_pages_remove_confirm'] = 'Etes-vous certain de vouloir supprimer les pages sélectionnées ?';
@@ -378,7 +350,6 @@ $txt['sp_admin_pages_col_status'] = 'Actif';
 $txt['sp_admin_pages_col_actions'] = 'Actions'; // No translation
 $txt['sp_admin_pages_col_permissions'] = 'Permissions'; // No translation
 $txt['sp_admin_pages_col_styles'] = 'Style';
-$txt['sp_admin_pages_col_blocks'] = 'Blocs';
 $txt['sp_admin_pages_activate'] = 'Activer';
 $txt['sp_admin_pages_deactivate'] = 'Désactiver';
 
@@ -610,7 +581,6 @@ $txt['sp-info_groups_beta'] = 'Bêta testeurs ';
 $txt['sp-info_groups_translators'] = 'Traducteurs ';
 $txt['sp-info_translators_message'] = 'Merci pour vos efforts d\'internationalisation de SimplePortal.';
 $txt['sp-info_groups_founder'] = 'Pères fondateurs de SimplePortal';
-$txt['sp-info_groups_orignal_pm'] = 'Chefs de Projet initiaux';
 $txt['sp-info_fam_fam'] = 'Belles icônes ';
 $txt['sp-info_fam_fam_message'] = 'Mark James pour ses <a href="http://www.famfamfam.com/lab/icons/silk/">Icônes Fam Fam Fam Silk</a>.';
 $txt['sp-info_contribute'] = 'Avez-vous trouvé SimplePortal utile ? <a href="%s" target="_blank">Contribuez au projet !</a>';
@@ -647,3 +617,31 @@ $txt['sp_php_validation_fail'] = 'Échec de la validation PHP. Vous avez une err
 $txt['core_settings_item_pt'] = 'SimplePortal';
 $txt['core_settings_item_pt_desc'] = 'L\'activation de cette fonctionnalité activera le module SimplePortal.';
 
+
+// Added to align with English.php keyset
+$txt['sp_disableUserArrange'] = 'Disable user block arrangement';
+$txt['sp_articles_index_position'] = 'Position of the Articles section on the portal page';
+$txt['sp_articles_position_inline'] = 'Between the end of top and start of bottom blocks';
+$txt['sp_articles_position_above'] = 'Above all the portal blocks';
+$txt['sp_articles_position_below'] = 'Below all the portal blocks';
+$txt['sp_function_TopStatsMember_label'] = 'Top Stats';
+$txt['sp_function_TopStatsMember_desc'] = 'Displays various types of member stats.';
+$txt['sp_param_ShowPoll_type'] = 'Type';
+$txt['sp_param_Menu_menu'] = 'Menu to Display';
+$txt['sp_param_TopStatsMember_type_options'] = 'Total Time Logged In|Posts|Good Karma|Bad Karma|Total Karma|Likes Given|Likes Received|Likes Total';
+$txt['sp_admin_pages_title'] = 'Pages';
+$txt['sp_admin_pages_col_type'] = 'Type';
+$txt['sp_admin_pages_col_actions'] = 'Actions';
+$txt['sp_admin_pages_col_permissions'] = 'Permissions';
+$txt['sp_admin_shoutbox_col_actions'] = 'Actions';
+$txt['sp_admin_shoutbox_col_permissions'] = 'Permissions';
+$txt['sp_admin_menus_col_status'] = 'Status';
+$txt['sp_admin_menus_col_enabled'] = 'Enabled';
+$txt['sp_admin_menus_col_permissions'] = 'Permissions';
+$txt['sp_admin_menus_col_placement'] = 'Placement';
+$txt['sp_admin_menus_placement_before'] = 'Before';
+$txt['sp_admin_menus_placement_after'] = 'After';
+$txt['sp-info_groups_marketing'] = 'Marketing';
+$txt['sp-info_groups_original_pm'] = 'Original Project Managers';
+$txt['permissiongroup_sp'] = 'SimplePortal';
+$txt['permissiongroup_simple_sp'] = 'SimplePortal';

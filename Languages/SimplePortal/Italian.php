@@ -44,6 +44,7 @@ $txt['sp_posted_on_by'] = 'pubblicato in data %1$s da %2$s';
 $txt['sp_posted_by'] = 'pubblicato %1$s da %2$s';
 $txt['sp_posted_in_on_by'] = 'pubblicato in %1$s in data %2$s da %3$s';
 $txt['sp_posted_on_in_by'] = 'pubblicato in data %2$s in %1$s da %3$s';
+$txt['sp_article_updated_on'] = 'ultimo aggiornamento %1$s';
 $txt['sp_articles_in_category'] = 'Articoli nella categoria "%s"';
 
 $txt['sp_read_more'] = 'Leggi tutto';
@@ -145,8 +146,6 @@ $txt['error_sp_no_blogs_found'] = 'Nessun blog installato.';
 $txt['error_sp_no_articles_found'] = 'Non ci sono articoli da visualizzare.';
 $txt['error_sp_no_articles_attach_folder'] = 'La cartella degli allegati degli articoli non esiste o non è scrivibile';
 $txt['error_sp_no_categories_found'] = 'Non ci sono categorie da visualizzare.';
-$txt['error_sp_no_shop_found'] = 'Non ci sono funzionalità Shop installate..';
-$txt['error_sp_no_arcade_found'] = 'Non ci sono funzionalità Arcade installate.';
 $txt['error_sp_no_stats_found'] = 'Nessuna statistica trovata.';
 $txt['error_sp_no_permission_profiles'] = 'Non ci sono profili di permessi disponibili.';
 $txt['error_sp_no_style_profiles'] = 'Non ci sono profili di stili disponibili.';
@@ -179,3 +178,5 @@ $txt['portal_order_error'] = 'Si è verificato un errore durante l\'elaborazione
 $txt['sp-blocks_success_arrange'] = 'I blocchi sono stati ordinati con successo';
 $txt['sp-blocks_fail_arrange'] = 'I blocchi non sono stati spostati.';
 $txt['sp_reset blocks'] = 'Ripristina l\'ordinamento dei blocchi.';
+
+$txt['error_sp_block_type_invalid'] = 'The requested block type is invalid.';

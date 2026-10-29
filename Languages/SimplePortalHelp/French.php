@@ -37,7 +37,6 @@ $helptxt['showleft'] = 'Ceci activera les blocs de gauche sur la page du portail
 $helptxt['showright'] = 'Ceci activera les blocs de droite sur la page du portail et dans le forum.';
 $helptxt['leftwidth'] = 'Si les blocs de gauche sont activés, leur taille peut être spécifiée ici. La taille peut être spécifiée en pixels (px) ou en pourcentage (%).';
 $helptxt['rightwidth'] = 'Si les blocs de droite sont activés, leur taille peut être spécifiée ici. La taille peut être spécifiée en pixels (px) ou en pourcentage (%).';
-$helptxt['sp_enableIntegration'] = 'Ce paramètre active les blocs sur le forum. Cela vous permet de gérer les \'Options d\'affichage\' avancées pour chaque bloc.';
 $helptxt['sp_IntegrationHide'] = 'Masquer les blocs dans certaines sections du forum. Le paramètre \'Afficher les blocs dans le forum\' doit être activé pour que cela fonctionne.';
 
 // Article settings
@@ -64,7 +63,6 @@ $helptxt['sp-blocksFooterList'] = 'Ces blocs sont affichés dans le pied de page
 $helptxt['sp-blocksAdd'] = 'Cette page vous permet de personnaliser et configurer le bloc sélectionné.';
 $helptxt['sp-blocksSelectType'] = 'Cette page permet de créer des blocs sur la page du portail. Des blocs préconstruits ou des blocs avec des contenus personnalisés peuvent être créés facilement en sélectionnant les options appropriées.';
 $helptxt['sp-blocksEdit'] = 'Cette page vous permet de personnaliser et configurer le bloc sélectionné.';
-$helptxt['sp-blocksDisplayOptions'] = 'Options d\'affichage';
 $helptxt['sp-blocksCustomDisplayOptions'] = 'Les options d\'affichage personnalisées autorisent un contrôle plus avancé du bloc avec les options de visiblilité et leur syntaxe spéciale.<br /><br />
 <strong>Les actions spéciales incluent :</strong><br /><br />
 <strong>all :</strong> chaque page du forum.<br />
@@ -81,7 +79,6 @@ Ce symbole agit comme un joker, en vous autorisant à inclure des actions dynami
 Un autre symbole de joker qui vous permet de spécifier une valeur exacte pour une action dynamique comme ../index.php?issue=1.0 or ../index.php?game=xyz. Devrait être utilisé avec un tilde et après l\'action. Par exemple : ~action|value<br /><br />
 <strong>Moins (-)</strong><br />
 Ce symbole est exclu des actions dynamiques. Devrait être utilisé avant le nom de l\'action pour les actions régulières et avant le tilde pour les actions dynamiques. Par exemple : -action et -~action';
-$helptxt['sp-blocksStyleOptions'] = 'Ces options vous permettent de spécifier le CSS qui est appelé pour chaque bloc.';
 
 // Articles area
 $helptxt['sp_ArticlesArea'] = 'Les articles sont des sujets (Le premier message uniquement) qui sont affichés sur la page du portail. Cette section permet aux sujets existants d\'être modifiés, et aux nouveaux d\'être créés pour la page du portail.';
@@ -183,3 +180,6 @@ $helptxt['sp_param_sp_gallery_direction'] = 'La galerie d\'images peut être ali
 $helptxt['sp_param_sp_html_content'] = 'Saisissez le contenu HTML personnalisé dans cette boîte.';
 $helptxt['sp_param_sp_bbc_content'] = 'Saisissez le contenu BBC personnalisé dans cette boîte.';
 $helptxt['sp_param_sp_php_content'] = 'Saisissez le contenu PHP personnalisé dans cette boîte.';
+
+$helptxt['sp_disableUserArrange'] = 'Disables the ability for users to rearrange portal blocks and will force display of the sites default layout';
+$helptxt['sp_articles_index_position'] = 'This setting allows the position of the article listing to be set.  The default is "inline" which will display the article listing between the top and bottom portal blocks.  "above" will display the article listing above the portal, while "below" will display the article listing below the portal.';

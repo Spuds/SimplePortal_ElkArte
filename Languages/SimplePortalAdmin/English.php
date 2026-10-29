@@ -159,9 +159,6 @@ $txt['sp_function_Staff_desc'] = 'Displays list of forum staff with their positi
 $txt['sp_function_Articles_desc'] = 'Displays recent or random articles.';
 $txt['sp_function_Shoutbox_desc'] = 'Displays a shoutbox.';
 $txt['sp_function_Gallery_desc'] = 'Displays a list of recent gallery items.';
-$txt['sp_function_Arcade_desc'] = 'Displays various statistics from the arcade if an arcade mod is installed.';
-$txt['sp_function_Shop_desc'] = 'Displays the richest members or various items from the shop if a shop mod is installed.';
-$txt['sp_function_Blog_desc'] = 'Displays various information from the forum blog.';
 $txt['sp_function_Menu_desc'] = 'Displays a vertical forum menu.';
 $txt['sp_function_Bbc_desc'] = 'A custom block where BBC content can be added.';
 $txt['sp_function_Html_desc'] = 'A custom block where HTML content can be added.';
@@ -254,12 +251,10 @@ $txt['sp_param_Recent_display_options'] = 'Compact|Full';
 $txt['sp_param_TopTopics_type_options'] = 'Replies|Views';
 $txt['sp_param_ShowPoll_type_options'] = 'Normal|Recent|Random';
 $txt['sp_param_AttachmentImage_direction_options'] = 'Vertical|Horizontal';
-$txt['sp_param_Articles_type_options'] = 'Latest|Random';
+$txt['sp_param_Articles_type_options'] = 'Created|Updated|Random';
 $txt['sp_param_Articles_view_options'] = 'Compact|Full';
 $txt['sp_param_Gallery_type_options'] = 'Latest Items|Random Items|Latest Images|Random Images';
 $txt['sp_param_Gallery_direction_options'] = 'Vertical|Horizontal';
-$txt['sp_param_Blog_type_options'] = 'Articles|Blogs';
-$txt['sp_param_Blog_sort_options'] = 'Latest|Random';
 $txt['sp_param_WhosOnline_online_today_options'] = '|Count|List';
 
 // Articles Area

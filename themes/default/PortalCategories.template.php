@@ -61,6 +61,12 @@ function template_view_category()
 
 	foreach ($context['articles'] as $article)
 	{
+		// Show the updated date in the header when the article has been modified
+		$show_updated = !empty($article['show_modified']);
+		$posted_text = $show_updated ? $txt['sp_updated_on_in_by'] : (!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by']);
+		$posted_time = $show_updated ? $article['modified'] : $article['date'];
+		$posted = sprintf($posted_text, $article['category']['link'], $posted_time, $article['author']['link']);
+
 		echo '
 		<article class="sp_article_content">
 			<header class="category_header sp_article_header">';
@@ -76,7 +82,7 @@ function template_view_category()
 			</header>
 			<div class="generalinfo sp_article_generalinfo">
 				<span class="sp_article_latest">
-					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
+					', $posted, '
 				</span>
 				<span class="sp_article_stats">
 					', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '

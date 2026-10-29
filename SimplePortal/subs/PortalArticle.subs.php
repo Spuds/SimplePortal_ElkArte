@@ -167,7 +167,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 				'link' => '<a href="' . $scripturl . '?article=' . $row['article_namespace'] . '">' . $row['title'] . '</a>',
 				'body' => $row['body'],
 				'type' => $row['type'],
-				'date' => $row['date'],
+				'date' => (int) $row['date'],
 				'modified' => (int) $row['modified'],
 				'permissions' => $row['article_permissions'],
 				'styles' => $row['styles'],

@@ -42,6 +42,7 @@ $txt['sp_posted_on_by'] = 'Geschrieben - %1$s von %2$s';
 $txt['sp_posted_by'] = 'Geschrieben %1$s von %2$s';
 $txt['sp_posted_in_on_by'] = 'Geschrieben in %1$s - %2$s von %3$s';
 $txt['sp_posted_on_in_by'] = 'Geschrieben %2$s in %1$s von %3$s';
+$txt['sp_updated_on_in_by'] = 'Aktualisiert %2$s in %1$s von %3$s';
 $txt['sp_article_updated_on'] = 'zuletzt aktualisiert %1$s';
 
 $txt['sp_read_more'] = 'Mehr lesen';

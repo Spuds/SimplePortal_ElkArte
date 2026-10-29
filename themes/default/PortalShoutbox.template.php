@@ -161,8 +161,8 @@ function template_shoutbox_embed($shoutbox)
 		{
 			echo '
 					<li>', !$shout['is_me'] ? '<strong>' . $shout['author']['link'] . ':</strong> ' : ' ',
-			$shout['text'], '<br />', !empty($shout['delete_link_js'])
-				? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '', '
+						$shout['text'], '<br />', !empty($shout['delete_link_js'])
+							? '<span class="shoutbox_delete">' . $shout['delete_link_js'] . '</span>' : '', '
 						<span class="smalltext shoutbox_time">', $shout['time'], '</span>
 					</li>';
 		}

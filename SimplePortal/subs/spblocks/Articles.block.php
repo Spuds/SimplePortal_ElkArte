@@ -93,14 +93,16 @@ class ArticlesBlock extends SPAbstractBlock
 		// Set up for the query
 		$category = empty($parameters['category']) ? null : (int) $parameters['category'];
 		$limit = empty($parameters['limit']) ? 5 : (int) $parameters['limit'];
-		$type = empty($parameters['type']) ? 0 : 1;
+		$type = empty($parameters['type']) ? 0 : (int) $parameters['type'];
 		$attachments = !empty($parameters['attachment']);
 		$this->data['view'] = empty($parameters['view']) ? 0 : 1;
 		$this->data['length'] = isset($parameters['length']) ? (int) $parameters['length'] : 250;
 		$this->data['avatar'] = empty($parameters['avatar']) ? 0 : (int) $parameters['avatar'];
 
 		// Fetch some articles
-		$this->data['articles'] = sportal_get_articles(null, true, true, $type ? 'RAND()' : 'spa.date DESC', $category, $limit);
+		$sort = $type === 0 ? 'spa.date DESC' : ($type === 1 ? 'spa.modified DESC' : 'RAND()');
+		$this->data['type'] = $type;
+		$this->data['articles'] = sportal_get_articles(null, true, true, $sort, $category, $limit);
 
 		// No articles in the system or none they can see
 		if (empty($this->data['articles']))
@@ -153,13 +155,13 @@ class ArticlesBlock extends SPAbstractBlock
 
 		foreach ($this->data['articles'] as $aid => $article)
 		{
-			// Good time to do this is ... now
+			// Time to do this is ... now
 			censor($article['title']);
 			censor($article['body']);
 
 			// Parse and optionally shorten the result
 			$context['article']['id'] = (int) $article['id'];
-			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $this->_modSettings['sp_articles_length'], $article['article_id']);
+			$article['cut'] = sportal_parse_cutoff_content($article['body'], $article['type'], $this->data['length'], $article['article_id']);
 
 			if ($this->_modSettings['sp_resize_images'])
 			{
@@ -250,8 +252,15 @@ function template_sp_articles($data)
 		theme()->addInlineJavascript('sp_prep_articles();', true);
 
 		// Show the articles.
+		$sort_type = $data['type'] ?? 0;
 		foreach ($data['articles'] as $article)
 		{
+			// Show the updated date when sorted by modified, or by random when the article was modified
+			$show_updated = $sort_type === 1 || ($sort_type !== 0 && $article['modified'] > $article['date']);
+			$posted_text = $show_updated ? $txt['sp_updated_on_in_by'] : (!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by']);
+			$posted_time = htmlTime($show_updated && !empty($article['modified']) ? $article['modified'] : $article['date']);
+			$posted = sprintf($posted_text, $article['category']['link'], $posted_time, $article['author']['link']);
+
 			echo '
 			<h3 class="secondary_header">',
 				$article['title'], '
@@ -266,7 +275,7 @@ function template_sp_articles($data)
 						<img src="', $article['author']['avatar']['href'], '" alt="', $article['author']['name'], '" style="max-width:40px" class="floatright" />
 					</a>
 					<span>
-						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
+						', $posted, '
 						<br />
 						', sprintf($article['view_count'] === 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] === 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>';
@@ -275,7 +284,7 @@ function template_sp_articles($data)
 			{
 				echo '
 					<span>
-						', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], htmlTime($article['date']), $article['author']['link']), '
+						', $posted, '
 						<br />
 						', sprintf($article['view_count'] === 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] === 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 					</span>';
@@ -302,7 +311,7 @@ function template_sp_articles($data)
 			echo '
 					<hr />
 					<div class="sp_article_block">',
-			$article['body'], '
+						$article['body'], '
 					</div>
 				
 				<div class="submitbutton">

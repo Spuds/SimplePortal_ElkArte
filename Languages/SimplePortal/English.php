@@ -40,11 +40,12 @@ $txt['sp_has_article'] = '%d article';
 $txt['sp_has_articles'] = '%d articles';
 $txt['sp_commented_on_time'] = 'commented on %d time';
 $txt['sp_commented_on_times'] = 'commented on %d times';
-$txt['sp_posted_on_by'] = 'posted on %1$s by %2$s';
-$txt['sp_posted_by'] = 'posted %1$s by %2$s';
-$txt['sp_posted_in_on_by'] = 'posted in %1$s on %2$s by %3$s';
-$txt['sp_posted_on_in_by'] = 'posted %2$s in %1$s by %3$s';
-$txt['sp_article_updated_on'] = 'last updated %1$s';
+$txt['sp_posted_on_by'] = 'Posted on %1$s by %2$s';
+$txt['sp_posted_by'] = 'Posted %1$s by %2$s';
+$txt['sp_posted_in_on_by'] = 'Posted in %1$s on %2$s by %3$s';
+$txt['sp_posted_on_in_by'] = 'Posted %2$s in %1$s by %3$s';
+$txt['sp_updated_on_in_by'] = 'Updated %2$s in %1$s by %3$s';
+$txt['sp_article_updated_on'] = 'Last updated %1$s';
 $txt['sp_articles_in_category'] = 'Articles in Category "%s"';
 
 $txt['sp_read_more'] = 'Read More';

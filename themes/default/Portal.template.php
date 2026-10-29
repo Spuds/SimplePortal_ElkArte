@@ -53,6 +53,12 @@ function template_portal_articles()
 
 	foreach ($context['articles'] as $article)
 	{
+		// Show the updated date in the header when the article has been modified
+		$show_updated = !empty($article['modified']) && $article['modified'] > $article['time'];
+		$posted_text = $show_updated ? $txt['sp_updated_on_in_by'] : $txt['sp_posted_in_on_by'];
+		$posted_time = $show_updated ? htmlTime($article['modified']) : $article['date'];
+		$posted = sprintf($posted_text, $article['category']['link'], $posted_time, $article['author']['link']);
+
 		echo '
 		<h2 class="category_header">
 			', $article['link'], '
@@ -68,7 +74,7 @@ function template_portal_articles()
 
 		echo '
 					<span class="sp_article_latest">
-						', sprintf($txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']);
+						', $posted;
 
 		if (!empty($article['author']['avatar']['image']))
 		{

@@ -45,6 +45,7 @@ $txt['sp_posted_by'] = 'pubblicato %1$s da %2$s';
 $txt['sp_posted_in_on_by'] = 'pubblicato in %1$s in data %2$s da %3$s';
 $txt['sp_posted_on_in_by'] = 'pubblicato in data %2$s in %1$s da %3$s';
 $txt['sp_article_updated_on'] = 'ultimo aggiornamento %1$s';
+$txt['sp_updated_on_in_by'] = 'Aggiornato %2$s in %1$s da %3$s';
 $txt['sp_articles_in_category'] = 'Articoli nella categoria "%s"';
 
 $txt['sp_read_more'] = 'Leggi tutto';

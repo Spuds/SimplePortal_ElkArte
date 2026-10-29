@@ -44,6 +44,7 @@ $txt['sp_posted_on_by'] = 'posté sur %1$s par %2$s';
 $txt['sp_posted_by'] = 'posté %1$s par %2$s';
 $txt['sp_posted_in_on_by'] = 'posté dans %1$s sur %2$s par %3$s';
 $txt['sp_posted_on_in_by'] = 'posté %2$s dans %1$s par %3$s';
+$txt['sp_updated_on_in_by'] = 'mis à jour %2$s dans %1$s par %3$s';
 $txt['sp_article_updated_on'] = 'dernière mise à jour %1$s';
 $txt['sp_articles_in_category'] = 'Articles dans la catégorie "%s"';
 

@@ -144,7 +144,7 @@ class BoardNewsBlock extends SPAbstractBlock
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member AND a.attachment_type = 1)
+				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 			WHERE t.id_first_msg IN ({array_int:post_list})
 			ORDER BY t.id_first_msg DESC
 			LIMIT ' . (!empty($per_page) ? '{int:start}, ' : '') . '{int:limit}',

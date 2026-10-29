@@ -126,7 +126,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	FROM {db_prefix}sp_articles AS spa
 		INNER JOIN {db_prefix}sp_categories AS spc ON (spc.id_category = spa.id_category)
 		LEFT JOIN {db_prefix}members AS m ON (m.id_member = spa.id_member)
-		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)' . (!empty($query) ? '
+		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = 1)' . (!empty($query) ? '
 	WHERE ' . implode(' AND ', $query) : '') . '
 	ORDER BY {raw:sort}' . ($limit !== null ? '
 	LIMIT {int:start}, {int:limit}' : ''), $parameters
@@ -443,7 +443,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 		a.id_attach, a.attachment_type, a.filename
 	FROM {db_prefix}sp_comments AS spc
 		LEFT JOIN {db_prefix}members AS m ON (m.id_member = spc.id_member)
-		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+		LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = 1)
 	WHERE spc.id_article = {int:article_id}
 	ORDER BY spc.id_comment' . ($limit !== null ? '
 	LIMIT {int:start}, {int:limit}' : ''),

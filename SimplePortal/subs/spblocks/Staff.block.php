@@ -87,7 +87,7 @@ class StaffBlock extends SPAbstractBlock
 				mg.group_name,
 				a.id_attach, a.attachment_type, a.filename
 			FROM {db_prefix}members AS m
-				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = 1)
 				LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN m.id_group = {int:reg_group_id} THEN m.id_post_group ELSE m.id_group END)
 			WHERE m.id_member IN ({array_int:staff_list})',
 			[

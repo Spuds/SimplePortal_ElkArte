@@ -86,7 +86,7 @@ class TopPosterBlock extends SPAbstractBlock
 					mem.avatar, a.id_attach, a.attachment_type, a.filename
 				FROM {db_prefix}messages AS m
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
+					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member AND a.attachment_type = 1)
 				WHERE m.poster_time > {int:start_time}
 					AND m.id_member != 0
 				GROUP BY mem.id_member
@@ -106,7 +106,7 @@ class TopPosterBlock extends SPAbstractBlock
 					m.id_member, m.real_name, m.posts, m.avatar, m.email_address,
 					a.id_attach, a.attachment_type, a.filename
 				FROM {db_prefix}members AS m
-					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = 1)
 				ORDER BY posts DESC
 				LIMIT {int:limit}',
 				[

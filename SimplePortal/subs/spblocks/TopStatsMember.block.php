@@ -278,7 +278,7 @@ class TopStatsMemberBlock extends SPAbstractBlock
 				a.id_attach, a.attachment_type, a.filename,
 				{raw:field}
 			FROM {db_prefix}members as mem
-				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
+				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member AND a.attachment_type = 1)
 			{raw:where}
 			ORDER BY {raw:order} {raw:sort}
 			LIMIT {int:limit}',

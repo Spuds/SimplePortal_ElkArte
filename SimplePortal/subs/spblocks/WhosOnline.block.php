@@ -109,7 +109,7 @@ class WhosOnlineBlock extends SPAbstractBlock
 				m.id_member,  m.avatar, m.email_address,
 				a.id_attach, a.attachment_type, a.filename
 			FROM {db_prefix}members AS m
-				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = 1)
 			WHERE m.id_member IN ({array_int:users})',
 			[
 				'users' => $users,

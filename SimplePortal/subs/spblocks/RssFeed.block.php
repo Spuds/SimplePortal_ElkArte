@@ -9,6 +9,7 @@
  * @version 2.0.0
  */
 
+use ElkArte\Cache\Cache;
 use ElkArte\Database\QueryInterface;
 use ElkArte\Helper\Util;
 
@@ -81,7 +82,38 @@ class RssFeedBlock extends SPAbstractBlock
 		$rss = [];
 
 		require_once(SUBSDIR . '/Package.subs.php');
-		$data = fetch_web_data($feed);
+
+		$cache_key = 'sp_rssfeed_' . md5($feed);
+		$cache_ttl = 600;
+		$data = Cache::instance()->get($cache_key, $cache_ttl);
+		if ($data === null)
+		{
+			$data = fetch_web_data($feed);
+			if ($data !== false)
+			{
+				Cache::instance()->put($cache_key, $data, $cache_ttl);
+			}
+		}
+
+		if ($data === false || $data === null || $data === '')
+		{
+			if (($stale = Cache::instance()->get($cache_key . '_stale', 86400)) !== null)
+			{
+				$data = $stale;
+			}
+			else
+			{
+				$this->data['error_msg'] = $txt['error_sp_invalid_feed'];
+				$this->setTemplate('template_sp_rssFeed_error');
+
+				return;
+			}
+		}
+		elseif ($data !== false)
+		{
+			Cache::instance()->put($cache_key . '_stale', $data, 86400);
+		}
+
 		$data_save = $data;
 
 		// Convert it to UTF8 if we can and its not already

@@ -170,6 +170,22 @@ function addDefaultPermissions()
 function updateTableStructures()
 {
 	$db_table = db_table();
+	$db = database();
+
+	// Add the article modified column and backfill it from the creation date
+	$article_cols = $db_table->list_columns('{db_prefix}sp_articles', true);
+	if (!isset($article_cols['modified']))
+	{
+		$db_table->add_column('{db_prefix}sp_articles', array('name' => 'modified', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true));
+
+		$db->query('', '
+			UPDATE {db_prefix}sp_articles
+			SET modified = date
+			WHERE modified = 0
+				OR modified IS NULL',
+			array()
+		);
+	}
 
 	// Update the page table to accept more data
 	$page_cols = $db_table->list_columns('{db_prefix}sp_pages', true);
@@ -700,6 +716,7 @@ function defineTables()
 				array('name' => 'body', 'type' => 'text'),
 				array('name' => 'type', 'type' => 'varchar', 'size' => 40, 'default' => ''),
 				array('name' => 'date', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
+				array('name' => 'modified', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),
 				array('name' => 'permissions', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
 				array('name' => 'styles', 'type' => 'mediumint', 'size' => 8, 'default' => 0, 'unsigned' => true),
 				array('name' => 'views', 'type' => 'int', 'size' => 10, 'default' => 0, 'unsigned' => true),

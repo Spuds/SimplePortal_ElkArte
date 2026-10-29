@@ -63,21 +63,32 @@ function template_view_category()
 	{
 		echo '
 		<article class="sp_article_content">
-			<div class="sp_article_detail category_header">';
+			<header class="category_header sp_article_header">';
 
 		if (!empty($article['author']['avatar']['image']))
 		{
-			echo $article['author']['avatar']['image'];
+			echo '
+				<span class="sp_article_avatar">', $article['author']['avatar']['image'], '</span>';
 		}
 
 		echo '
-				<h4>', $article['link'], '</h4>
+				<h4 class="sp_article_title">', $article['link'], '</h4>
+			</header>
+			<div class="generalinfo sp_article_generalinfo">
 				<span class="sp_article_latest">
 					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
-					<br />
-				', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']) ,', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
 				</span>
-				
+				<span class="sp_article_stats">
+					', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+				</span>';
+
+		if (!empty($article['show_modified']))
+		{
+			echo '
+				<span class="sp_article_latest sp_article_modified">', sprintf($txt['sp_article_updated_on'], $article['modified']), '</span>';
+		}
+
+		echo '
 			</div>
 			<div id="msg_', $article['id'], '" class="post inner sp_inner">';
 

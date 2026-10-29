@@ -91,6 +91,8 @@ class PortalArticles extends AbstractController
 			$context['articles'][$article['id']]['preview'] = censor($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 			$context['articles'][$article['id']]['time'] = $article['date'];
+			$context['articles'][$article['id']]['modified'] = !empty($article['modified']) ? htmlTime($article['modified']) : '';
+			$context['articles'][$article['id']]['show_modified'] = !empty($article['modified']) && $article['modified'] > $article['date'];
 
 			// Parse and cut as needed
 			$context['articles'][$article['id']]['cut'] = sportal_parse_cutoff_content($context['articles'][$article['id']]['preview'], $article['type'], $modSettings['sp_articles_length'], $context['articles'][$article['id']]['article_id']);
@@ -160,7 +162,10 @@ class PortalArticles extends AbstractController
 
 		// Prepare the final template details
 		$context['article']['time'] = $context['article']['date'];
+		$context['article']['modified_time'] = $context['article']['modified'];
 		$context['article']['date'] = htmlTime($context['article']['date']);
+		$context['article']['modified'] = !empty($context['article']['modified']) ? htmlTime($context['article']['modified']) : '';
+		$context['article']['show_modified'] = !empty($context['article']['modified_time']) && $context['article']['modified_time'] > $context['article']['time'];
 		$context['article']['can_comment'] = $context['user']['is_logged'];
 		$context['article']['can_moderate'] = allowedTo('sp_admin') || allowedTo('sp_manage_articles');
 

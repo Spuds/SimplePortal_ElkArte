@@ -104,6 +104,8 @@ class PortalCategories extends AbstractController
 			$context['articles'][$article['id']]['preview'] = censor($article['body']);
 			$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
 			$context['articles'][$article['id']]['time'] = $article['date'];
+			$context['articles'][$article['id']]['modified'] = !empty($article['modified']) ? htmlTime($article['modified']) : '';
+			$context['articles'][$article['id']]['show_modified'] = !empty($article['modified']) && $article['modified'] > $article['date'];
 
 			// Parse / shorten as required
 			$context['article']['id'] = $article['id'];

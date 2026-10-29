@@ -670,7 +670,7 @@ function sp_load_articles($start, $items_per_page, $sort)
 	$articles = [];
 	$db->query('', '
 		SELECT
-			spa.id_article, spa.id_category, spa.title, spa.type, spa.date, spa.status,
+			spa.id_article, spa.id_category, spa.title, spa.type, spa.date, spa.modified, spa.status,
 			spc.name, spc.namespace AS category_namespace,
 			IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name,
 			spa.namespace AS article_namespace
@@ -711,6 +711,7 @@ function sp_load_articles($start, $items_per_page, $sort)
 			'type' => $row['type'],
 			'type_text' => $txt['sp_articles_type_' . $row['type']],
 			'date' => standardTime($row['date']),
+			'modified' => standardTime(!empty($row['modified']) ? $row['modified'] : $row['date']),
 			'status' => $row['status'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalarticles;sa=status;article_id=' . $row['id_article'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" 
 				onclick="sp_change_status(\'' . $row['id_article'] . '\', \'articles\');return false;">' .
@@ -799,6 +800,7 @@ function sp_duplicate_articles($article_id, $namespace)
  *
  * - Expects to have $context populated from sportal_get_articles()
  * - Add items as a new article is is_new is true otherwise updates and existing one
+ * - Sets both date and modified on creation, and modified on every update
  *
  * @param array $article_info array of fields details to save/update
  * @param bool $is_new true for new insertion, false to update
@@ -822,7 +824,10 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		'permissions' => 'int',
 		'styles' => 'int',
 		'status' => 'int',
+		'modified' => 'int',
 	];
+
+	$now = time();
 
 	// Brand new, insert it
 	if ($is_new)
@@ -841,7 +846,8 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		$article_info = array_merge($article_info, [
 			'id_member' => User::$info->id,
 			'member_name' => User::$info->name,
-			'date' => time(),
+			'date' => $now,
+			'modified' => $now,
 		]);
 
 		// Add the new article to the system
@@ -866,6 +872,9 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 				$article_info['body'] = preg_replace('~\[attach(.*?)\]' . $attachment['id_attach'] . '\[\/attach\]~', '[spattach$1]' . $attachment['id_attach'] . '[/spattach]', $article_info['body']);
 			}
 		}
+
+		// This is an edit, so record when the article was last changed
+		$article_info['modified'] = $now;
 
 		$update_fields = [];
 		foreach ($fields as $name => $type)

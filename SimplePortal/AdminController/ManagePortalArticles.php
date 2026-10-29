@@ -209,6 +209,18 @@ class ManagePortalArticles extends AbstractController
 						'reverse' => 'date DESC',
 					],
 				],
+				'modified' => [
+					'header' => [
+						'value' => $txt['sp_admin_articles_col_modified'],
+					],
+					'data' => [
+						'db' => 'modified',
+					],
+					'sort' => [
+						'default' => 'modified',
+						'reverse' => 'modified DESC',
+					],
+				],
 				'status' => [
 					'header' => [
 						'value' => $txt['sp_admin_articles_col_status'],
@@ -1011,7 +1023,7 @@ class ManagePortalArticles extends AbstractController
 
 					if ($type === 'attachmentPostLimit')
 					{
-						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], '<span id="' . $type . '">' . byte_format(max(($modSettings['attachmentPostLimit'] * 1024) - $attachments['total_size'], 0)) . '</span>');
+						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], '<span id="' . $type . '">' . byte_format(max(($modSettings['attachmentPostLimit'] * 1024) - $context['attachments']['total_size'], 0)) . '</span>');
 					}
 				}
 			}

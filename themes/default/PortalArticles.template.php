@@ -37,23 +37,34 @@ function template_view_articles()
 	{
 		echo '
 		<div class="sp_content_padding">
-			<div class="sp_article_detail category_header">';
+			<header class="category_header sp_article_header">';
 
 		// Start off with the avatar
 		if (!empty($article['author']['avatar']['image']))
 		{
-			echo $article['author']['avatar']['image'];
+			echo '
+				<span class="sp_article_avatar">', $article['author']['avatar']['image'], '</span>';
 		}
 
 		// And now the article
 		echo '
-				<h4>', $article['link'], '</h4>
+				<h4 class="sp_article_title">', $article['link'], '</h4>
+			</header>
+			<div class="generalinfo sp_article_generalinfo">
 				<span class="sp_article_latest">
 					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $article['category']['link'], $article['date'], $article['author']['link']), '
-					<br />
-					', sprintf($article['views'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['views']), ', ', sprintf($article['comments'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comments']), '
 				</span>
-				
+				<span class="sp_article_stats">
+					', sprintf($article['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $article['view_count']), ', ', sprintf($article['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $article['comment_count']), '
+				</span>';
+
+		if (!empty($article['show_modified']))
+		{
+			echo '
+				<span class="sp_article_latest sp_article_modified">', sprintf($txt['sp_article_updated_on'], $article['modified']), '</span>';
+		}
+
+		echo '
 			</div>
 			<div id="msg_', $id, '" class="inner sp_inner">', $article['preview'], '<a href="', $article['href'], '">...</a></div>
 			<div class="sp_article_extra clear">
@@ -89,45 +100,55 @@ function template_view_article()
 	echo '
 	<article id="sp_view_article">';
 
-	if (empty($context['article']['style']['no_title']))
+	$show_title = empty($context['article']['style']['no_title']);
+	$has_avatar = !empty($context['article']['author']['avatar']['image']);
+	$title_class = $show_title && !empty($context['article']['style']['title']['class'])
+		? ' ' . $context['article']['style']['title']['class']
+		: ' category_header';
+	$title_style = $show_title && !empty($context['article']['style']['title']['style'])
+		? ' style="' . $context['article']['style']['title']['style'] . '"'
+		: '';
+
+	// The article header
+	if ($show_title || $has_avatar)
 	{
 		echo '
-		<h1', strpos($context['article']['style']['title']['class'], 'custom') === false ? ' class="' . $context['article']['style']['title']['class'] . '"' : '', !empty($context['article']['style']['title']['style']) ? ' style="' . $context['article']['style']['title']['style'] . '"' : '', '>
-			', $context['article']['title'], '
-		</h1>';
+		<header class="sp_article_header', $title_class, '"', $title_style, '>';
+
+		if ($has_avatar)
+		{
+			echo '
+			<span class="sp_article_avatar">', $context['article']['author']['avatar']['image'], '</span>';
+		}
+
+		if ($show_title)
+		{
+			echo '
+			<h1 class="sp_article_title">', $context['article']['title'], '</h1>';
+		}
+
+		echo '
+		</header>';
 	}
 
 	echo '
+		<div class="generalinfo sp_article_generalinfo">
+			<span class="sp_article_latest">
+				', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']), '
+			</span>
+			<span class="sp_article_stats">
+				', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ', sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
+			</span>';
+
+	if (!empty($context['article']['show_modified']))
+	{
+		echo '
+			<span class="sp_article_latest sp_article_modified">', sprintf($txt['sp_article_updated_on'], $context['article']['modified']), '</span>';
+	}
+
+	echo '
+		</div>
 		<div class="sp_content_padding ', $context['article']['style']['body']['class'], '"', !empty($context['article']['style']['body']['style']) ? ' style="' . $context['article']['style']['body']['style'] . '"' : '', '>
-			<div class="sp_article_detail category_header">';
-
-	if (!empty($context['article']['author']['avatar']['image']))
-	{
-		echo $context['article']['author']['avatar']['image'];
-	}
-
-	echo '
-				<span class="sp_article_latest">
-					', sprintf(!empty($context['using_relative_time']) ? $txt['sp_posted_on_in_by'] : $txt['sp_posted_in_on_by'], $context['article']['category']['link'], $context['article']['date'], $context['article']['author']['link']);
-
-	if (!empty($context['article']['author']['avatar']['image']))
-	{
-		echo '
-					<br />';
-	}
-	else
-	{
-		echo '
-				</span>
-				<br />
-				<span class="sp_article_latest">';
-	}
-
-	echo '
-				', sprintf($context['article']['view_count'] == 1 ? $txt['sp_viewed_time'] : $txt['sp_viewed_times'], $context['article']['view_count']), ', ',
-	sprintf($context['article']['comment_count'] == 1 ? $txt['sp_commented_on_time'] : $txt['sp_commented_on_times'], $context['article']['comment_count']), '
-				</span>
-			</div>
 			<div id="msg_', $context['article']['id'], '" class="messageContent inner sp_inner">',
 	$context['article']['body'];
 
@@ -271,7 +292,8 @@ function template_article_schema_script()
 		),
 		'url' => $context['article']['href'],
 		'commentCount' => $context['article']['comment_count'],
-		'datePublished' => standardTime($context['article']['time']),
+		'datePublished' => gmdate('c', $context['article']['time']),
+		'dateModified' => gmdate('c', !empty($context['article']['modified_time']) ? $context['article']['modified_time'] : $context['article']['time']),
 		'description' => $description,
 		'wordCount' => str_word_count($post),
 		'publisher' => array(

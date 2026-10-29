@@ -119,7 +119,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	$db->query('', '
 	SELECT
 		spa.id_article, spa.id_category, spa.namespace AS article_namespace, spa.title, spa.body,
-		spa.type, spa.date, spa.status, spa.permissions AS article_permissions, spa.views, spa.comments, spa.styles,
+		spa.type, spa.date, spa.modified, spa.status, spa.permissions AS article_permissions, spa.views, spa.comments, spa.styles,
 		spc.permissions AS category_permissions, spc.name, spc.namespace AS category_namespace,
 		m.avatar, IFNULL(m.id_member, 0) AS id_author, IFNULL(m.real_name, spa.member_name) AS author_name, m.email_address,
 		a.id_attach, a.attachment_type, a.filename
@@ -168,6 +168,7 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 				'body' => $row['body'],
 				'type' => $row['type'],
 				'date' => $row['date'],
+				'modified' => (int) $row['modified'],
 				'permissions' => $row['article_permissions'],
 				'styles' => $row['styles'],
 				'view_count' => (int) $row['views'],

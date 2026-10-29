@@ -51,7 +51,7 @@ class StaffBlock extends SPAbstractBlock
 
 		require_once(SUBSDIR . '/Members.subs.php');
 
-		// Including local board moderators
+		// Including local board moderators when the block option is enabled.
 		$local_mods = [];
 		if (empty($parameters['lmod']))
 		{
@@ -72,13 +72,11 @@ class StaffBlock extends SPAbstractBlock
 			}
 		}
 
-		// Admins and global moderator list
+		// Admins and global moderator list. Attempt to reuse the core permission calculation and then use
+		// the results to determine the type of staff member.
 		$global_mods = membersAllowedTo('moderate_board', 0);
 		$admins = membersAllowedTo('admin_forum');
-
-		// You only get one listing, highest authority
-		$all_staff = array_merge($local_mods, $global_mods, $admins);
-		$all_staff = array_unique($all_staff);
+		$all_staff = array_values(array_unique(array_merge($local_mods, $global_mods, $admins)));
 
 		$this->data['staff_list'] = [];
 		$this->_db->query('', '
@@ -98,11 +96,11 @@ class StaffBlock extends SPAbstractBlock
 			function ($row) use (&$admins, &$global_mods, $scripturl) {
 				$this->color_ids[$row['id_member']] = $row['id_member'];
 
-				if (in_array((int) $row['id_member'], $admins))
+				if (in_array((int) $row['id_member'], $admins, true))
 				{
 					$row['type'] = 1;
 				}
-				elseif (in_array((int) $row['id_member'], $global_mods))
+				elseif (in_array((int) $row['id_member'], $global_mods, true))
 				{
 					$row['type'] = 2;
 				}
@@ -121,7 +119,7 @@ class StaffBlock extends SPAbstractBlock
 						'avatar' => $row['avatar'],
 						'filename' => $row['filename'],
 						'id_attach' => $row['id_attach'],
-						'email_address' => $row['email_address'],
+						'email_address' => $row['email_address'] ?? '',
 						'attachment_type' => $row['attachment_type'],
 					]),
 				];
@@ -173,8 +171,11 @@ function template_sp_staff($data)
 		<table class="sp_fullwidth">';
 
 	$count = 0;
+	$staff_count = isset($data['staff_count']) ? (int) $data['staff_count'] : count($data['staff_list']);
 	foreach ($data['staff_list'] as $staff)
 	{
+		$count++;
+
 		echo '
 			<tr>
 				<td class="sp_staff centertext">', !empty($staff['avatar']['href']) ? '
@@ -182,7 +183,7 @@ function template_sp_staff($data)
 						<img src="' . $staff['avatar']['href'] . '" alt="' . $staff['name'] . '" />
 					</a>' : '', '
 				</td>
-				<td ', sp_embed_class($data['icons'][$staff['type']], '', 'sp_staff_info' . $data['staff_count'] != ++$count ? ' sp_staff_divider' : ''), '>',
+				<td class="', $count < $staff_count ? ' sp_staff_divider' : '', '">',
 		$staff['link'], '<br />', $staff['group'], '
 				</td>
 			</tr>';

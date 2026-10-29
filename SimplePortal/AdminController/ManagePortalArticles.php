@@ -486,6 +486,11 @@ class ManagePortalArticles extends AbstractController
 			$this->article_errors->addError('sp_error_article_namespace_numeric');
 		}
 
+		if ($_POST['type'] === 'php' && !allowedTo('admin_forum'))
+		{
+			throw new Exception('cannot_admin_forum', false);
+		}
+
 		// Posting some PHP code, and allowed? Then we need to validate it will run
 		if ($_POST['type'] === 'php' && !empty($_POST['content']) && empty($modSettings['sp_disable_php_validation']))
 		{

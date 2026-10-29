@@ -41,7 +41,7 @@ function sportal_get_article_views_comments($id)
 			'article_id' => $id,
 			'limit' => 1,
 		]
-	)->fetch_callback(function($row) use (&$result) {
+	)->fetch_callback(function ($row) use (&$result) {
 		$result[0] = $row['views'];
 		$result[1] = $row['comments'];
 	});
@@ -131,8 +131,9 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 	ORDER BY {raw:sort}' . ($limit !== null ? '
 	LIMIT {int:start}, {int:limit}' : ''), $parameters
 	)->fetch_callback(
-		function($row) use (&$return, &$member_ids, $scripturl) {
-			if (!empty($row['id_author'])) {
+		function ($row) use (&$return, &$member_ids, $scripturl) {
+			if (!empty($row['id_author']))
+			{
 				$member_ids[$row['id_author']] = $row['id_author'];
 			}
 
@@ -289,6 +290,41 @@ function sportal_article_access($id_article)
 }
 
 /**
+ * Checks if a member can moderate/edit an article
+ *
+ * @param int $id_article article to check moderation rights
+ * @return bool
+ */
+function sportal_article_can_moderate($id_article)
+{
+	if (empty($id_article) || User::$info->is_guest)
+	{
+		return false;
+	}
+
+	if (allowedTo('sp_admin') || allowedTo('sp_manage_articles'))
+	{
+		return true;
+	}
+
+	$db = database();
+	$request = $db->query('', '
+		SELECT id_member
+		FROM {db_prefix}sp_articles
+		WHERE id_article = {int:id_article}
+		LIMIT {int:limit}',
+		[
+			'id_article' => (int) $id_article,
+			'limit' => 1,
+		]
+	);
+	list ($author_id) = $request->fetch_row();
+	$request->free_result();
+
+	return !empty($author_id) && (int) User::$info->id === (int) $author_id;
+}
+
+/**
  * Returns the number of articles in the system that a user can see
  *
  * @return int
@@ -417,7 +453,7 @@ function sportal_get_comments($article_id = null, $limit = null, $start = null)
 			'start' => (int) $start,
 		]
 	)->fetch_callback(
-		function($row) use (&$return, &$member_ids, $scripturl, $parser) {
+		function ($row) use (&$return, &$member_ids, $scripturl, $parser) {
 			if (!empty($row['id_author']))
 			{
 				$member_ids[$row['id_author']] = $row['id_author'];
@@ -608,13 +644,52 @@ function sportal_recount_comments($article_id)
  * - It does no permissions check.
  *
  * @param array $attachmentQuery
+ * @return bool
  */
 function removeArticleAttachments($attachmentQuery)
 {
 	$db = database();
 
-	$aid = $attachmentQuery['id_article'];
-	$restriction = !empty($attachmentQuery['not_id_attach']) ? $attachmentQuery['not_id_attach'] : [];
+	$aid = (int) $attachmentQuery['id_article'];
+
+	if (!empty($attachmentQuery['not_id_attach']))
+	{
+		$restriction = is_array($attachmentQuery['not_id_attach']) ? $attachmentQuery['not_id_attach'] : [$attachmentQuery['not_id_attach']];
+	}
+	else
+	{
+		$restriction = [];
+	}
+
+	if (!empty($attachmentQuery['id_attach']))
+	{
+		$include_ids = is_array($attachmentQuery['id_attach']) ? $attachmentQuery['id_attach'] : [$attachmentQuery['id_attach']];
+	}
+	else
+	{
+		$include_ids = [];
+	}
+
+	$query_where = [
+		'a.attachment_type = {int:attachment_type}',
+		'a.id_article = {int:aid}',
+	];
+	$parameters = [
+		'attachment_type' => 0,
+		'aid' => $aid,
+	];
+
+	if (!empty($restriction))
+	{
+		$query_where[] = 'a.id_attach NOT IN ({array_int:restriction})';
+		$parameters['restriction'] = $restriction;
+	}
+
+	if (!empty($include_ids))
+	{
+		$query_where[] = 'a.id_attach IN ({array_int:id_attach})';
+		$parameters['id_attach'] = $include_ids;
+	}
 
 	// Get all the attachments
 	$attach = [];
@@ -625,15 +700,11 @@ function removeArticleAttachments($attachmentQuery)
 	FROM {db_prefix}sp_attachments AS a
 		LEFT JOIN {db_prefix}sp_attachments AS thumb ON (thumb.id_attach = a.id_thumb)
 	WHERE 
-		a.attachment_type = {int:attachment_type}
-		AND a.id_article = {int:aid}' . (!empty($restriction) ? ' AND a.id_attach NOT IN ({array_int:restriction})' : ''),
-		[
-			'attachment_type' => 0,
-			'aid' => $aid,
-			'restriction' => $restriction,
-		]
+		' . implode('
+		AND ', $query_where),
+		$parameters
 	)->fetch_callback(
-		function($row) use (&$attach, $attachmentQuery) {
+		function ($row) use (&$attach, $attachmentQuery) {
 			$filename = $attachmentQuery['id_folder'] . '/' . $row['id_attach'] . '_' . $row['file_hash'] . '.elk';
 			@unlink($filename);
 
@@ -775,7 +846,7 @@ function createArticleAttachment(&$attachmentOptions)
 		'{db_prefix}sp_attachments',
 		[
 			'id_article' => 'int', 'id_member' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40',
-			'fileext' => 'string-8', 'size' => 'int', 'width' => 'int', 'height' => 'int', 	'mime_type' => 'string-20'
+			'fileext' => 'string-8', 'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20'
 		],
 		[
 			(int) $attachmentOptions['article'],
@@ -862,7 +933,7 @@ function createArticleAttachment(&$attachmentOptions)
 					]
 				);
 
-				rename($thumb_path,$attachmentOptions['id_folder'] . '/' . $attachmentOptions['thumb'] . '_' . $thumb_file_hash . '.elk');
+				rename($thumb_path, $attachmentOptions['id_folder'] . '/' . $attachmentOptions['thumb'] . '_' . $thumb_file_hash . '.elk');
 			}
 		}
 	}
@@ -933,7 +1004,7 @@ function sportal_get_articles_attachments($articles, $template = false)
 			'attachment_type' => 0,
 		]
 	)->fetch_callback(
-		function($row) use (&$temp, &$attachments) {
+		function ($row) use (&$temp, &$attachments) {
 			$temp[$row['id_attach']] = $row;
 
 			if (!isset($attachments[$row['id_article']]))
@@ -1121,7 +1192,7 @@ function sportal_get_attachment_thumb_from_article($article, $attach)
 			'attach' => $attach,
 			'article' => $article,
 		]
-	)->fetch_callback(function($row) use (&$attachmentData) {
+	)->fetch_callback(function ($row) use (&$attachmentData) {
 		// If there is a hash, then the thumbnail exists
 		if (!empty($row['file_hash']))
 		{
@@ -1165,10 +1236,10 @@ function sportal_get_attachment_thumb_from_article($article, $attach)
  * - Sets 'is_image' if the attachment is an image file
  * - Returns basic attachment values
  *
- * @package Attachments
  * @param int $id_attach
  *
  * @returns array|boolean
+ * @package Attachments
  */
 function isArticleAttachmentImage($id_attach)
 {
@@ -1187,7 +1258,7 @@ function isArticleAttachmentImage($id_attach)
 			'attach' => $id_attach,
 			'type' => 0,
 		]
-	)->fetch_callback(function($row) use (&$attachmentData) {
+	)->fetch_callback(function ($row) use (&$attachmentData) {
 		$attachmentData = $row;
 		$attachmentData['is_image'] = str_starts_with($attachmentData['mime_type'], 'image');
 		$attachmentData['size'] = byte_format($attachmentData['size']);
@@ -1227,7 +1298,7 @@ function sportal_article_has_attachments($articles)
 		[
 			'articles' => $articles,
 		]
-	)->fetch_callback(function($row) use (&$attachments) {
+	)->fetch_callback(function ($row) use (&$attachments) {
 		$attachments[$row['id_article']] = $row['number'];
 	});
 

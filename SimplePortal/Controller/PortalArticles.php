@@ -167,7 +167,7 @@ class PortalArticles extends AbstractController
 		$context['article']['modified'] = !empty($context['article']['modified']) ? htmlTime($context['article']['modified']) : '';
 		$context['article']['show_modified'] = !empty($context['article']['modified_time']) && $context['article']['modified_time'] > $context['article']['time'];
 		$context['article']['can_comment'] = $context['user']['is_logged'];
-		$context['article']['can_moderate'] = allowedTo('sp_admin') || allowedTo('sp_manage_articles');
+		$context['article']['can_moderate'] = sportal_article_can_moderate($context['article']['id']);
 
 		// Commenting, new or an update perhaps
 		if ($context['article']['can_comment'] && !empty($_POST['body']))
@@ -300,7 +300,7 @@ class PortalArticles extends AbstractController
 		}
 
 		// No funny business, you need to have access to the article to see its attachments
-		if (sportal_article_access($_GET['article']) === false)
+		if (sportal_article_access($_GET['article']) === false && sportal_article_can_moderate((int) $_GET['article']) === false)
 		{
 			throw new Exception('no_access', false);
 		}
@@ -386,7 +386,7 @@ class PortalArticles extends AbstractController
 			$body = gzencode($body, 2);
 			$length = strlen($body);
 			$headers
-				->header('Content-Encoding','gzip')
+				->header('Content-Encoding', 'gzip')
 				->header('Vary', 'Accept-Encoding');
 		}
 
@@ -565,35 +565,40 @@ class PortalArticles extends AbstractController
 			{
 				$attachId = $this->_req->getPost('attachid', 'intval');
 				$articleId = $this->_req->getPost('articleid', 'intval');
-				sportal_load_permissions();
-				if (sportal_article_access($articleId))
+
+				if (empty($articleId) || empty($attachId))
 				{
-					$keep_ids = [];
+					$result = 'attachment_not_found';
+				}
+				elseif (!sportal_article_can_moderate($articleId))
+				{
+					$result = 'no_access';
+				}
+				else
+				{
 					$attach_ids = sportal_get_articles_attachments($articleId);
-					$attach_ids = !empty($attach_ids[$articleId]) ? $attach_ids[$articleId] : [];
-					foreach ($attach_ids as $id => $value)
+					if (empty($attach_ids[$articleId][$attachId]))
 					{
-						if ($id !== $attachId)
-						{
-							$keep_ids[] = $id;
-						}
-					}
-
-					$attachmentQuery = [
-						'id_article' => $articleId,
-						'not_id_attach' => $keep_ids,
-						'id_folder' => $modSettings['sp_articles_attachment_dir'],
-					];
-
-					$result_tmp = removeArticleAttachments($attachmentQuery);
-					if (!empty($result_tmp))
-					{
-						$context['json_data'] = ['result' => true];
-						$result = true;
+						$result = 'attachment_not_found';
 					}
 					else
 					{
-						$result = $result_tmp;
+						$attachmentQuery = [
+							'id_article' => $articleId,
+							'id_attach' => $attachId,
+							'id_folder' => $modSettings['sp_articles_attachment_dir'],
+						];
+
+						$result_tmp = removeArticleAttachments($attachmentQuery);
+						if (!empty($result_tmp))
+						{
+							$context['json_data'] = ['result' => true];
+							$result = true;
+						}
+						else
+						{
+							$result = 'attachment_not_found';
+						}
 					}
 				}
 			}
@@ -601,13 +606,13 @@ class PortalArticles extends AbstractController
 			if ($result !== true)
 			{
 				Txt::load('Errors');
-				$context['json_data'] = ['result' => false, 'data' => $txt[!empty($result) ? $result : 'attachment_not_found']];
+				$context['json_data'] = ['result' => false, 'data' => $txt[!empty($result) && isset($txt[$result]) ? $result : 'attachment_not_found'] ?? (!empty($result) ? $result : 'attachment_not_found')];
 			}
 		}
 		else
 		{
 			Txt::load('Errors');
-			$context['json_data'] = ['result' => false, 'data' => $txt['attachment_not_found']];
+			$context['json_data'] = ['result' => false, 'data' => $txt['attachment_not_found'] ?? 'attachment_not_found'];
 		}
 	}
 

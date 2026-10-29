@@ -391,28 +391,36 @@ function sportal_get_article_comment_count($id)
  * Given an article comment ID, fetch the comment and comment author
  *
  * @param int $id
+ * @param int $article_id
  *
  * @return array
  */
-function sportal_fetch_article_comment($id)
+function sportal_fetch_article_comment($id, $article_id)
 {
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT
-			id_comment, id_member, body
+			id_comment, id_article, id_member, body
 		FROM {db_prefix}sp_comments
 		WHERE id_comment = {int:comment_id}
+			AND id_article = {int:article_id}
 		LIMIT {int:limit}',
 		[
 			'comment_id' => $id,
+			'article_id' => $article_id,
 			'limit' => 1,
 		]
 	);
-	list ($comment_id, $author_id, $body) = $request->fetch_row();
+	$row = $request->fetch_row();
 	$request->free_result();
 
-	return [$comment_id, $author_id, $body];
+	if (empty($row))
+	{
+		return [0, 0, 0, ''];
+	}
+
+	return [(int) $row[0], (int) $row[1], (int) $row[2], $row[3]];
 }
 
 /**
@@ -537,18 +545,21 @@ function sportal_create_article_comment($article_id, $body)
  * Edits an article comment that has already been made
  *
  * @param int $comment_id comment id to edit
+ * @param int $article_id article id for ownership check
  * @param string $body replacement text
  */
-function sportal_modify_article_comment($comment_id, $body)
+function sportal_modify_article_comment($comment_id, $article_id, $body)
 {
 	$db = database();
 
 	$db->query('', '
 		UPDATE {db_prefix}sp_comments
 		SET body = {text:body}
-		WHERE id_comment = {int:comment_id}',
+		WHERE id_comment = {int:comment_id}
+			AND id_article = {int:article_id}',
 		[
 			'comment_id' => $comment_id,
+			'article_id' => $article_id,
 			'body' => $body,
 		]
 	);
@@ -557,32 +568,35 @@ function sportal_modify_article_comment($comment_id, $body)
 /**
  * Removes a comment from an article
  *
- * @param int $comment_id comment it
+ * @param int $comment_id comment id
+ * @param int $article_id article id for ownership check
  *
  * @return bool
  */
-function sportal_delete_article_comment($comment_id)
+function sportal_delete_article_comment($comment_id, $article_id)
 {
-	global $context;
-
 	$db = database();
 
 	$request = $db->query('', '
 		SELECT 
-			id_comment, id_article, id_member
+			id_comment, id_member
 		FROM {db_prefix}sp_comments
 		WHERE id_comment = {int:comment_id}
+			AND id_article = {int:article_id}
 		LIMIT {int:limit}',
 		[
 			'comment_id' => $comment_id,
+			'article_id' => $article_id,
 			'limit' => 1,
 		]
 	);
-	list ($comment_id, $article_id, $author_id) = $request->fetch_row();
+	$row = $request->fetch_row();
 	$request->free_result();
+	$comment_id = !empty($row[0]) ? (int) $row[0] : 0;
+	$author_id = !empty($row[1]) ? (int) $row[1] : 0;
 
 	// You do have a right to remove the comment?
-	if (empty($comment_id) || (!$context['article']['can_moderate'] && User::$info->id !== (int) $author_id))
+	if (empty($comment_id) || (!sportal_article_can_moderate($article_id) && User::$info->id !== $author_id))
 	{
 		return false;
 	}
@@ -590,9 +604,11 @@ function sportal_delete_article_comment($comment_id)
 	// Poof ... gone
 	$db->query('', '
 		DELETE FROM {db_prefix}sp_comments
-		WHERE id_comment = {int:comment_id}',
+		WHERE id_comment = {int:comment_id}
+			AND id_article = {int:article_id}',
 		[
 			'comment_id' => $comment_id,
+			'article_id' => $article_id,
 		]
 	);
 

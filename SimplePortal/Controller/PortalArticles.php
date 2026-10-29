@@ -188,13 +188,13 @@ class PortalArticles extends AbstractController
 			{
 				if (!empty($_POST['comment']))
 				{
-					[$comment_id, $author_id,] = sportal_fetch_article_comment((int) $_POST['comment']);
-					if (empty($comment_id) || (!$context['article']['can_moderate'] && User::$info['id'] !== (int) $author_id))
+					[$comment_id, $comment_article_id, $author_id,] = sportal_fetch_article_comment((int) $_POST['comment'], (int) $context['article']['id']);
+					if (empty($comment_id) || (!sportal_article_can_moderate($comment_article_id) && User::$info['id'] !== $author_id))
 					{
 						throw new Exception('error_sp_cannot_comment_modify', false);
 					}
 
-					sportal_modify_article_comment($comment_id, $body);
+					sportal_modify_article_comment($comment_id, $comment_article_id, $body);
 				}
 				else
 				{
@@ -212,8 +212,8 @@ class PortalArticles extends AbstractController
 		{
 			checkSession('get');
 
-			[$comment_id, $author_id, $body] = sportal_fetch_article_comment((int) $_GET['modify']);
-			if (empty($comment_id) || (!$context['article']['can_moderate'] && User::$info['id'] != (int) $author_id))
+			[$comment_id, $comment_article_id, $author_id, $body] = sportal_fetch_article_comment((int) $_GET['modify'], (int) $context['article']['id']);
+			if (empty($comment_id) || (!sportal_article_can_moderate($comment_article_id) && User::$info['id'] !== $author_id))
 			{
 				throw new Exception('error_sp_cannot_comment_modify', false);
 			}
@@ -231,7 +231,7 @@ class PortalArticles extends AbstractController
 		{
 			checkSession('get');
 
-			if (sportal_delete_article_comment((int) $_GET['delete']) === false)
+			if (sportal_delete_article_comment((int) $_GET['delete'], (int) $context['article']['id']) === false)
 			{
 				throw new Exception('error_sp_cannot_comment_delete', false);
 			}

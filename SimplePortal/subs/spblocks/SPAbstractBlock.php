@@ -19,9 +19,6 @@ use ElkArte\Helper\ValuesContainer;
  */
 abstract class SPAbstractBlock
 {
-	/** @var QueryInterface */
-	protected $_db;
-
 	/** @var array|ValuesContainer */
 	protected $_modSettings = [];
 
@@ -38,17 +35,15 @@ abstract class SPAbstractBlock
 	protected $refresh = [];
 
 	/**
-	 * Class constructor makes db and modSettings available to the blocks
-	 *
-	 * - Called by sp_instantiate_block function (via block constructor)
-	 *
-	 * @param QueryInterface|null $db
-	 */
-	public function __construct($db = null)
+     * Class constructor makes db and modSettings available to the blocks
+     *
+     * - Called by sp_instantiate_block function (via block constructor)
+     *
+     * @param QueryInterface|null $_db
+     */
+    public function __construct(protected $_db = null)
 	{
 		global $modSettings;
-
-		$this->_db = $db;
 
 		$this->_modSettings = new ValuesContainer($modSettings ?: []);
 	}

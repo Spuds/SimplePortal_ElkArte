@@ -11,7 +11,6 @@
 
 use ElkArte\Helper\Util;
 
-
 /**
  * Used to view articles on the portal
  */

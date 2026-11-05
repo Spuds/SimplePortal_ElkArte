@@ -121,7 +121,19 @@ function template_articles_edit_above()
 						</dt>
 						<dd>
 							<input type="checkbox" name="status" id="article_status" value="1"', $context['article']['status'] ? ' checked="checked"' : '', ' class="input_check" />
-						</dd>
+						</dd>';
+
+	if ($context['is_new'] === false)
+	{
+		echo '
+						<dt>
+							<label for="article_minor_edit">', $txt['sp_admin_articles_minor_edit'], ':</label>
+						</dt>
+						<dd>
+							<input type="checkbox" name="article_minor_edit" id="article_minor_edit" value="1"', $context['article']['minor_edit'] ? ' checked="checked"' : '', ' class="input_check" />
+						</dd>';
+	}
+	echo '
 					</dl>';
 }
 

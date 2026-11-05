@@ -387,9 +387,9 @@ class ManagePortalArticles extends AbstractController
 		// Page out values
 		$context[$context['admin_menu_name']]['current_subsection'] = 'add';
 		$context['article']['style'] = sportal_select_style($context['article']['styles']);
-		$context['is_new'] = $this->_is_aid;
+		$context['is_new'] = empty($this->_is_aid);
 		$context['article']['body'] = sportal_parse_content($context['article']['body'], $context['article']['type'], 'return');
-		$context['page_title'] = !$this->_is_aid ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
+		$context['page_title'] = empty($this->_is_aid) ? $txt['sp_admin_articles_add'] : $txt['sp_admin_articles_edit'];
 
 		return true;
 	}
@@ -450,7 +450,7 @@ class ManagePortalArticles extends AbstractController
 			'permissions' => 'intval',
 			'styles' => 'intval',
 			'type' => 'trim',
-			'content' => 'trim'
+			'content' => 'trim',
 		]);
 		$validator->validation_rules([
 			'title' => 'required',
@@ -526,6 +526,8 @@ class ManagePortalArticles extends AbstractController
 			'permissions' => $validator->permissions,
 			'styles' => $validator->styles,
 			'status' => !empty($_POST['status']) ? 1 : 0,
+			'minor_edit' => empty($_POST['article_minor_edit']) || empty($this->_is_aid) ? 0 : 1,
+			'modified' => $context['article']['modified'] ?? 0,
 		];
 
 		if ($article_info['type'] === 'bbc')
@@ -765,6 +767,7 @@ class ManagePortalArticles extends AbstractController
 				'permissions' => 3,
 				'styles' => 4,
 				'status' => 1,
+				'minor_edit' => 0,
 			];
 		}
 		// Something used

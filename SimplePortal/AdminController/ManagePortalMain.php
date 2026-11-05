@@ -301,6 +301,11 @@ class ManagePortalMain extends AbstractController
 				'above' => $txt['sp_articles_position_above'],
 				'below' => $txt['sp_articles_position_below'],
 			]],
+			['select', 'sp_articles_index_sort', [
+				'created' => $txt['sp_articles_sort_asc'],
+				'updated' => $txt['sp_articles_sort_desc'],
+				'random' => $txt['sp_articles_sort_random'],
+			]],
 			'',
 			['int', 'sp_articles_per_page'],
 			['int', 'sp_articles_comments_per_page'],

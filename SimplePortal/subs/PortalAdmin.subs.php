@@ -874,7 +874,7 @@ function sp_save_article($article_info, $is_new = false, $update_counts = true)
 		}
 
 		// This is an edit, so record when the article was last changed
-		$article_info['modified'] = $now;
+		$article_info['modified'] = $article_info['minor_edit'] === 0 ? $now : $article_info['modified'];
 
 		$update_fields = [];
 		foreach ($fields as $name => $type)
@@ -2278,7 +2278,7 @@ function sp_menu_items($start, $items_per_page, $sort, $menu_id)
 			'id_profile' => $row['id_profile'],
 			'state' => (int) $row['state'],
 			'status_image' => '<a href="' . $scripturl . '?action=admin;area=portalmenus;sa=statuscustomitem;item_id=' . $row['id_item'] . ';menu_id=' . $menu_id . ';' . $context['session_var'] . '=' . $context['session_id'] . '" 
-			onclick="sp_change_status(' . $row['id_item'] . ', \'menu_item\');return false;">' . 
+			onclick="sp_change_status(' . $row['id_item'] . ', \'menu_item\');return false;">' .
 			sp_embed_image(empty($row['state']) ? 'deactive' : 'active', $txt['sp_admin_menus_col_status'], null, null, true, 'status_image_' . $row['id_item']) . '</a>',
 		];
 	});

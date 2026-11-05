@@ -219,7 +219,8 @@ class PortalMain extends AbstractController implements FrontpageInterface
 
 			// If we have some articles
 			require_once(ADDONSDIR . '/SimplePortal/subs/PortalArticle.subs.php');
-			$context['articles'] = sportal_get_articles(null, true, true, 'spa.id_article DESC', null, $per_page, $start);
+			$sort = (empty($modSettings['sp_articles_index_sort']) || $modSettings['sp_articles_index_sort'] === 'created') ? 'spa.date DESC' : ($modSettings['sp_articles_index_sort'] === 'updated' ? 'spa.modified DESC' : 'RAND()');
+			$context['articles'] = sportal_get_articles(null, true, true, $sort, null, $per_page, $start);
 
 			// Get the first "image/attachment" for blog views
 			$context['articles'] = setBlogAttachments(getBlogAttachments($context['articles']));
@@ -228,6 +229,7 @@ class PortalMain extends AbstractController implements FrontpageInterface
 			{
 				$context['articles'][$article['id']]['preview'] = censor($article['body']);
 				$context['articles'][$article['id']]['date'] = htmlTime($article['date']);
+				$context['articles'][$article['id']]['modified'] = $article['modified'];
 				$context['articles'][$article['id']]['time'] = $article['date'];
 
 				// Fetch attachments if there are any

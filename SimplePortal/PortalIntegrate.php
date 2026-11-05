@@ -795,7 +795,7 @@ class PortalIntegrate
 			return $tourniquet;
 		}
 
-		$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . Util::strftime('%Y', time()) . '</a>');
+		$fix = str_replace('{version}', SPORTAL_VERSION, '<a href="https://github.com/SimplePortal" target="_blank" class="new_win">SimplePortal {version} &copy; 2008-' . date('Y', time()) . '</a>');
 
 		if (str_contains($tourniquet, $fix))
 		{

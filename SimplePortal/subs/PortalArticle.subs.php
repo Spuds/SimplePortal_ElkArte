@@ -175,7 +175,8 @@ function sportal_get_articles($article_id = null, $active = false, $allowed = fa
 				'view_count' => (int) $row['views'],
 				'comment_count' => (int) $row['comments'],
 				'status' => $row['status'],
-				'has_attachments' => false
+				'has_attachments' => false,
+				'minor_edit' => 0,
 			];
 		}
 	);

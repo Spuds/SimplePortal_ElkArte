@@ -293,7 +293,7 @@ class PortalArticles extends AbstractController
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
 
-		// Make sure some attachment was requested, and they can view them
+		// Make sure some attachment was requested
 		if (!isset($_GET['article'], $_GET['attach']))
 		{
 			throw new Exception('no_access', false);
@@ -311,7 +311,8 @@ class PortalArticles extends AbstractController
 			$modSettings['automanage_attachments'] = 0;
 			$modSettings['attachmentUploadDir'] = [1 => $modSettings['sp_articles_attachment_dir']];
 
-			return (new Attachment(new EventManager()))->action_tmpattach();
+			(new Attachment(new EventManager()))->action_tmpattach();
+			obExit(false);
 		}
 
 		$id_article = (int) $_GET['article'];
@@ -344,7 +345,6 @@ class PortalArticles extends AbstractController
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
 		$disposition = !isset($_GET['image']) ? 'attachment' : 'inline';
-		$do_cache = (!isset($_GET['image']) && getValidMimeImageType($file_ext) !== '') === false;
 
 		// Make sure the mime type warrants an inline display.
 		if (isset($_GET['image']) && !empty($mime_type) && !str_starts_with($mime_type, 'image/'))
@@ -353,13 +353,13 @@ class PortalArticles extends AbstractController
 			$mime_type = '';
 		}
 		// Does this have a mime type?
-		elseif (empty($mime_type) || !(isset($_GET['image']) || getValidMimeImageType($file_ext) === ''))
+		elseif (empty($mime_type))
 		{
 			$mime_type = '';
 			unset($_GET['image']);
 		}
 
-		$this->send_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache);
+		$this->send_headers($filename, $eTag, $mime_type, $disposition, $real_filename);
 		$this->send_file($filename, $mime_type);
 
 		obExit(false);
@@ -444,7 +444,7 @@ class PortalArticles extends AbstractController
 	 * @param bool $do_cache If to send a max-age header or not
 	 * @param bool $check_filename When false, any check on $filename is skipped
 	 */
-	public function send_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache, $check_filename = true)
+	public function send_headers($filename, $eTag, $mime_type, $disposition, $real_filename, $do_cache = true, $check_filename = true)
 	{
 		global $txt;
 
@@ -503,7 +503,7 @@ class PortalArticles extends AbstractController
 		// Different browsers like different standards...
 		$headers->setAttachmentFileParams($mime_type, $real_filename, $disposition);
 
-		// If this has an "image extension" - but isn't an image - then ensure it isn't cached cause of silly IE.
+		// Cache-Control headers
 		if ($do_cache)
 		{
 			$headers

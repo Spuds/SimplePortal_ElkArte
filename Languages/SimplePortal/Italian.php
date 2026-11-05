@@ -45,7 +45,6 @@ $txt['sp_posted_by'] = 'pubblicato %1$s da %2$s';
 $txt['sp_posted_in_on_by'] = 'pubblicato in %1$s in data %2$s da %3$s';
 $txt['sp_posted_on_in_by'] = 'pubblicato in data %2$s in %1$s da %3$s';
 $txt['sp_article_updated_on'] = 'ultimo aggiornamento %1$s';
-$txt['sp_updated_on_in_by'] = 'Aggiornato %2$s in %1$s da %3$s';
 $txt['sp_articles_in_category'] = 'Articoli nella categoria "%s"';
 
 $txt['sp_read_more'] = 'Leggi tutto';
@@ -149,7 +148,7 @@ $txt['error_sp_no_articles_attach_folder'] = 'La cartella degli allegati degli a
 $txt['error_sp_no_categories_found'] = 'Non ci sono categorie da visualizzare.';
 $txt['error_sp_no_stats_found'] = 'Nessuna statistica trovata.';
 $txt['error_sp_no_permission_profiles'] = 'Non ci sono profili di permessi disponibili.';
-$txt['error_sp_no_style_profiles'] = 'Non ci sono profili di stili disponibili.';
+$txt['error_sp_no_style_profiles'] = 'Non ci sono profili di stile disponibili.';
 $txt['error_sp_no_visibility_profiles'] = 'Non ci sono profili di visibilità disponibili.';
 $txt['error_sp_no_pages'] = 'Non ci sono pagine disponibili.';
 $txt['error_sp_no_categories'] = 'Non ci sono categorie disponibili.';
@@ -158,7 +157,7 @@ $txt['error_sp_no_comments'] = 'Non ci sono ancora dei commenti su questo artico
 $txt['error_sp_no_profiles'] = 'Non è stato ancora aggiunto nessun profilo.';
 $txt['error_sp_no_custom_menus'] = 'Non è stato ancora aggiunto nessun menu personalizzato.';
 $txt['error_sp_no_menu_items'] = 'Non è stata ancora aggiunta nessuna voce di menu.';
-$txt['error_sp_cannot_comment_modify'] = 'Non hai i permessi per modificare questo commento.';
+$txt['error_sp_cannot_comment_modify'] = 'Non hai il permesso di modificare questo commento.';
 $txt['error_sp_cannot_comment_delete'] = 'Non hai i permessi per eimuovere questo commento.';
 $txt['error_sp_menu_not_found'] = 'Il menu richiesto non è stato trovato.';
 $txt['error_sp_page_not_found'] = 'La pagina richiesta non è stata trovata.';
@@ -174,7 +173,7 @@ $txt['error_sp_flood_spsbp'] = 'Il tuo ultimo shot è di meno di %1$d secondi fa
 $txt['error_sp_id_empty'] = 'Spiacenti, è stato indicato un tipo non valido.';
 
 // Portal arrangement
-$txt['portal_order_title'] = 'Errore nell\'ordinamento dei blocchi';
+$txt['portal_order_title'] = 'Errore di ordinamento';
 $txt['portal_order_error'] = 'Si è verificato un errore durante l\'elaborazione dell\'ordinamento blocchi';
 $txt['sp-blocks_success_arrange'] = 'I blocchi sono stati ordinati con successo';
 $txt['sp-blocks_fail_arrange'] = 'I blocchi non sono stati spostati.';

@@ -52,6 +52,10 @@ $txt['sp_articles_per_page'] = 'Articles par page sur la liste des articles';
 $txt['sp_articles_comments_per_page'] = 'Commentaires d\'articles par pages';
 $txt['sp_articles_length'] = 'Limite de caractères par article';
 $txt['sp_articles_attachment_dir'] = 'Dossier des pièces jointes des articles';
+$txt['sp_articles_index_sort'] = 'Trier les articles sur la page du portail par';
+$txt['sp_articles_sort_asc'] = 'Créé';
+$txt['sp_articles_sort_desc'] = 'Mis à jour';
+$txt['sp_articles_sort_random'] = 'Aléatoire';
 
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Liste des blocs';
@@ -246,7 +250,7 @@ $txt['sp_param_Recent_display_options'] = 'Compact|Entier';
 $txt['sp_param_TopTopics_type_options'] = 'Réponses|Vues';
 $txt['sp_param_ShowPoll_type_options'] = 'Normal|Récents|Aléatoire';
 $txt['sp_param_AttachmentImage_direction_options'] = 'Vertical|Horizontal';
-$txt['sp_param_Articles_type_options'] = 'Created|Updated|Random';
+$txt['sp_param_Articles_type_options'] = 'Derniers|Aléatoire';
 $txt['sp_param_Articles_view_options'] = 'Compact|Entier';
 $txt['sp_param_Gallery_type_options'] = 'Derniers|Aléatoire';
 $txt['sp_param_Gallery_direction_options'] = 'Vertical|Horizontal';
@@ -287,6 +291,7 @@ $txt['sp_admin_articles_col_styles'] = 'Style';
 $txt['sp_admin_articles_activate'] = 'Activer';
 $txt['sp_admin_articles_deactivate'] = 'Désactiver';
 $txt['sp_admin_namespace_requirements'] = 'Un "permalien" alpha-numérique unique';
+$txt['sp_admin_articles_minor_edit'] = 'Modification mineure';
 
 $txt['sp_articles_default_title'] = 'Article sans titre';
 

@@ -57,6 +57,10 @@ $txt['sp_articles_index_position'] = 'Position of the Articles section on the po
 $txt['sp_articles_position_inline'] = 'Between the end of top and start of bottom blocks';
 $txt['sp_articles_position_above'] = 'Above all the portal blocks';
 $txt['sp_articles_position_below'] = 'Below all the portal blocks';
+$txt['sp_articles_index_sort'] = 'Sort Articles on Portal Page by';
+$txt['sp_articles_sort_asc'] = 'Created';
+$txt['sp_articles_sort_desc'] = 'Updated';
+$txt['sp_articles_sort_random'] = 'Random';
 
 // Blocks area
 $txt['sp-adminBlockListName'] = 'Block List';
@@ -290,6 +294,7 @@ $txt['sp_admin_articles_col_styles'] = 'Style';
 $txt['sp_admin_articles_activate'] = 'Activate';
 $txt['sp_admin_articles_deactivate'] = 'Deactivate';
 $txt['sp_admin_namespace_requirements'] = 'A unique alpha_numeric "permalink"';
+$txt['sp_admin_articles_minor_edit'] = 'Minor Edit';
 
 $txt['sp_articles_default_title'] = 'Untitled Article';
 

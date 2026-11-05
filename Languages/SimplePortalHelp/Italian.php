@@ -48,6 +48,7 @@ $helptxt['sp_articles_length'] = 'Limita il numero di caratteri di un articolo m
 $helptxt['sp_articles_per_page'] = 'Numero massimo di articoli mostrati per pagina nell\'elenco degli articoli';
 $helptxt['sp_articles_comments_per_page'] = 'Numero massimo di commenti agli articoli mostrati per pagina';
 $helptxt['sp_articles_attachment_dir'] = 'La cartella in cui salvare gli allegati caricati con gli articoli. La cartella deve esistere ed essere scrivibile. Non usare la cartella standard degli allegati e non modificare questa impostazione se non sai cosa stai facendo.';
+$helptxt['sp_articles_index_position'] = 'Con questa impostazione scegli dove mostrare l\'elenco degli articoli. Il valore predefinito, "tra i blocchi", mostra gli articoli tra i blocchi in alto e quelli in basso del portale; "sopra" li mostra sopra il portale, "sotto" li mostra sotto il portale.';
 
 // Blocks area
 $helptxt['sp_BlocksArea'] = 'I blocchi sono riquadri che possono essere mostrati nel portale o all\'interno del forum. Da questa sezione puoi modificare i blocchi esistenti e crearne di nuovi.';
@@ -171,7 +172,7 @@ $helptxt['sp_param_sp_articles_limit'] = 'Quanti articoli mostrare.';
 $helptxt['sp_param_sp_articles_type'] = 'Mostra articoli a caso oppure gli articoli più recenti.';
 $helptxt['sp_param_sp_articles_view'] = 'Compatta mostra un semplice elenco di titoli con il link all\'articolo. Completa mostra il testo intero dell\'articolo, oppure fino al limite di caratteri';
 $helptxt['sp_param_sp_articles_length'] = 'Se indicato, gli articoli completi che superano questo limite vengono accorciati e terminano con un link a forma di puntini di sospensione (...).';
-$helptxt['sp_param_sp_articles_avatar'] = 'Mostra l\'avatar dell\'autore insieme all\'articolo.';
+$helptxt['sp_param_sp_articles_avatar'] = 'Mostra l\'avatar dell\'autore insieme all\'articolo, nella visualizzazione completa.';
 $helptxt['sp_param_sp_articles_attachment'] = 'Mostra il primo allegato dell\'articolo come immagine a sinistra del testo, per dare al blocco l\'aspetto di un blog. Se un articolo contiene immagini allegate inserite nel testo, per quell\'articolo vengono usate quelle.';
 $helptxt['sp_param_sp_gallery_limit'] = 'Quanti elementi mostrare.';
 $helptxt['sp_param_sp_gallery_type'] = 'Mostra elementi della galleria a caso oppure i più recenti.';

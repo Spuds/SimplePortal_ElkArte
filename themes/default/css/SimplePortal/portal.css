@@ -268,7 +268,7 @@ table.sp_articles {
 }
 
 .sp_article_content .post:after {
-	content: '';
+	content: "";
 	display: block;
 	width: 100%;
 	clear: both;
@@ -470,7 +470,6 @@ table.sp_articles {
 div.sp_block {
 	padding: 0 0.5rem;
 	width: 100%;
-	box-sizing: border-box;
 }
 
 .sp_block_container {
@@ -479,7 +478,7 @@ div.sp_block {
 }
 
 /* allows menu block to not clip drop menu */
-.sp_block_container.sp_block_menu, .sp_block_container.sp_block_menu > .sp_block_section  {
+.sp_block_container.sp_block_menu, .sp_block_container.sp_block_menu > .sp_block_section {
 	overflow: visible;
 }
 
@@ -576,13 +575,13 @@ body {
 
 .sp_smiley_container > a > img {
 	max-width: 2rem;
-	margin:	.8rem .4rem .2rem .4rem;
+	margin: .8rem .4rem .2rem .4rem;
 	cursor: pointer;
 }
 
 .sp_smile_popup > a > img {
 	max-width: 3rem;
-	margin:	.8rem .4rem .2rem .4rem;
+	margin: .8rem .4rem .2rem .4rem;
 	cursor: pointer;
 }
 
@@ -828,22 +827,12 @@ body {
 }
 
 #sp_live_info {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
 	width: 65%;
 }
 
 #sp_general_info {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
 	padding-left: 0.6rem;
 	width: 35%;
-}
-
-#sp_general_info div.windowbg {
-	padding: 0 0.8rem;
 }
 
 #spAnnouncements {
@@ -906,9 +895,6 @@ body {
 #sp_select_block_type .content {
 	float: left;
 	overflow: auto;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
 	margin: 2px 0.166%;
 	padding: 1rem 1rem 0.4rem 1rem;
 	width: 33%;
@@ -1368,14 +1354,12 @@ dl.sp_form img,
 	#sp_center {
 		float: right;
 		width: 75%;
-		box-sizing: border-box;
 	}
 
 	#sp_left, #sp_right {
 		/* Take over any ACP defined width */
 		width: 25% !important;
 		float: left;
-		box-sizing: border-box;
 	}
 }
 
@@ -1434,6 +1418,7 @@ dl.sp_form img,
 		padding: 0.6rem;
 	}
 }
+
 /* This one does 480 and smaller screens */
 @media screen and (max-width: 30em) {
 	/* Stack left/right below center */

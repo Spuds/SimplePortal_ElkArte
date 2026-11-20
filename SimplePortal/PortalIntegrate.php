@@ -12,7 +12,6 @@
 namespace Addons\SimplePortal;
 
 use BBC\Codes;
-use ElkArte\Helper\Util;
 use ElkArte\Hooks;
 use ElkArte\Languages\Txt;
 use ElkArte\Menu\Menu;

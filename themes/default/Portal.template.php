@@ -390,7 +390,7 @@ function template_block_default($block, $side)
 		$parser = ParserWrapper::instance();
 
 		echo '
-						<h3 class="sp_category_header ', strpos($block['style']['title']['class'], 'custom') === false ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
+						<h3 class="sp_category_header ', !str_contains($block['style']['title']['class'], 'custom') ? $block['style']['title']['class'] : '', ' sp_drag_header"', !empty($block['style']['title']['style']) ? ' style="' . $block['style']['title']['style'] . '"' : '', '>';
 
 		if (empty($block['force_view']))
 		{

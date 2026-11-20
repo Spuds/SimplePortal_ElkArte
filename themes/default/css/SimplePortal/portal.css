@@ -235,6 +235,7 @@ table.sp_articles {
 	font-size: var(--font9);
 	top: -0.6rem;
 	right: 2rem;
+	z-index: 10;
 }
 
 #sp_menu a .avatar {
